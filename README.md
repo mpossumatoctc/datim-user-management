@@ -1,4 +1,6 @@
 #PEPFAR User management app
+[![Build Status](https://travis-ci.org/dhis2/user-management-pepfar.svg)](https://travis-ci.org/dhis2/user-management-pepfar)
+[![Coverage Status](https://img.shields.io/coveralls/dhis2/user-management-pepfar.svg)](https://coveralls.io/r/dhis2/user-management-pepfar)
 
 ##Dependency statuses
 Dependency file | Status

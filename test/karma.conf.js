@@ -1,6 +1,6 @@
 module.exports = function( config ) {
     config.set({
-        basePath: '../../src',
+        basePath: '../src',
         frameworks: ['jasmine'],
 
         preprocessors: {
@@ -12,7 +12,7 @@ module.exports = function( config ) {
 
         coverageReporter: {
             type: 'lcov',
-            dir: '../../coverage',
+            dir: '../coverage',
             subdir: function(browser) {
                 // normalization process to keep a consistent browser name accross different OS
                 return browser.toLowerCase().split(/[ /-]/)[0];

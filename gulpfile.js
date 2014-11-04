@@ -22,6 +22,7 @@ var files = [
     'vendor/angular-mocks/angular-mocks.js',
 
     //Source files
+    'src/app/app-controller.js',
     'src/**/*.js',
     //Jasmine spec files
     'test/specs/**/*_spec.js'
@@ -207,4 +208,8 @@ gulp.task('clean', function () {
 gulp.task('copy-app', function () {
     checkForDHIS2ConfigFile();
     gulp.src('build/**/*.*', { base: './build/' }).pipe(gulp.dest(dhisDirectory));
+});
+
+gulp.task('travis', function () {
+    return runSequence('test', 'jshint', 'jscs');
 });
