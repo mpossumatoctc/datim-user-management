@@ -27,7 +27,6 @@ function routerConfig($stateProvider, $urlRouterProvider) {
 }
 
 angular.module('PEPFAR.usermanagement', [
-    'ng',
     'ui.router',
     'restangular',
     'pascalprecht.translate',
