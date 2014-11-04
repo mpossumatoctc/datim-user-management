@@ -16,12 +16,12 @@ function routerConfig($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state('list', {
             url: '/list',
-            templateUrl: 'partials/list.html',
+            templateUrl: 'userlist/list.html',
             controller: 'userListController as userList'
         })
         .state('add', {
             url: '/add',
-            templateUrl: 'partials/add.html',
+            templateUrl: 'adduser/add.html',
             controller: 'addUserController as addUser'
         });
 }
