@@ -10,6 +10,8 @@
 <body ng-controller="appController as app">
 Test stuff
     <div ng-bind="app.title"></div>
+    <a ui-sref="add" translate>Add user</a>
+    <a ui-sref="list" translate>Manage users</a>
     <div ui-view></div>
 
     <!-- build:vendor js/vendor.js -->
@@ -25,6 +27,8 @@ Test stuff
 
     <!-- build:js js/app.js -->
     <script src="app/app-controller.js"></script>
+    <script src="adduser/adduser-controller.js"></script>
+    <script src="userlist/userlist-controller.js"></script>
     <!-- endbuild -->
 </body>
 </html>

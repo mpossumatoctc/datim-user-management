@@ -10,6 +10,22 @@ function translateConfig($translateProvider) {
     $translateProvider.preferredLanguage('en');
 }
 
+function routerConfig($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise('/list');
+
+    $stateProvider
+        .state('list', {
+            url: '/list',
+            templateUrl: 'partials/list.html',
+            controller: 'userListController as userList'
+        })
+        .state('add', {
+            url: '/add',
+            templateUrl: 'partials/add.html',
+            controller: 'addUserController as addUser'
+        });
+}
+
 angular.module('PEPFAR.usermanagement', [
     'ng',
     'ui.router',
@@ -21,3 +37,4 @@ angular.module('PEPFAR.usermanagement', [
 
 angular.module('PEPFAR.usermanagement').controller('appController', appController);
 angular.module('PEPFAR.usermanagement').config(translateConfig);
+angular.module('PEPFAR.usermanagement').config(routerConfig);

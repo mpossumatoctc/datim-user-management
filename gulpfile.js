@@ -169,7 +169,7 @@ gulp.task('min', ['sass'], function () {
     var rev = require('gulp-rev');
 
     return gulp.src([
-            'src/*.html'
+            'src/**/*.html'
         ])
         .pipe(usemin({
             css: [minifyCss()],
