@@ -1,0 +1,27 @@
+{
+  "name": "pepfar-user-management",
+  "version": "0.0.0",
+  "description": "PEPFAR User management app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mark Polak",
+  "license": "MIT",
+  "dependencies": {
+    "bower": "^1.3.12",
+    "gulp": "^3.8.10",
+    "gulp-jscs": "^1.2.2",
+    "gulp-jshint": "^1.9.0",
+    "gulp-karma": "0.0.4",
+    "gulp-ruby-sass": "^0.7.1",
+    "gulp-zip": "^2.0.2",
+    "jscs": "^1.7.3",
+    "jshint-stylish": "^1.0.0",
+    "karma": "^0.12.24",
+    "karma-coverage": "^0.2.6",
+    "karma-jasmine": "^0.2.3",
+    "karma-ng-html2js-preprocessor": "^0.1.2",
+    "karma-phantomjs-launcher": "^0.1.4"
+  }
+}

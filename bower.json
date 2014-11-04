@@ -1,0 +1,30 @@
+{
+  "name": "pepfar-user-management",
+  "version": "0.0.0",
+  "description": "User management app for PEPFAR",
+  "main": "src/index.html",
+  "keywords": [
+    "PEPFAR",
+    "User",
+    "Management",
+    "DHIS2"
+  ],
+  "authors": [
+    "Mark Polak"
+  ],
+  "license": "MIT",
+  "homepage": "http://www.dhis2.org",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.3.1",
+    "d2js": "/Work/UIO/dhis/apps/d2/.git",
+    "angular-translate": "~2.4.2",
+    "restangular": "~1.4.0"
+  }
+}
