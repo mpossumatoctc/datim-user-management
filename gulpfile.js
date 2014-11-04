@@ -29,24 +29,6 @@ var files = [
  * Utility functions
  */
 
-/**
- * Checks if the dhis.json file is present in the root of the project. This will be required for
- * tasks that interact with a running dhis2 instance (for example to circumvent the install process)
- */
- function checkForDHIS2ConfigFile() {
-    var path = require('path');
-    var dhisConfig = require(path.resolve('./dhis.json'));
-
-    if (!dhisConfig.dhisDeployDirectory) {
-        console.log('');
-        console.log('Dhis 2 deploy directory not set, please add a dhis.json to your project that looks like');
-        console.log(JSON.stringify({ dhisDeployDirectory: '<YOUR DHIS2 DIRECTORY>' }, undefined, 2));
-        console.log('');
-        throw new Error('DHIS deploy location not found');
-    }
-    dhisDirectory = dhisConfig.dhisDeployDirectory;
-}
-
 function runKarma(watch) {
     var karma = require('gulp-karma');
     var config = {
@@ -70,9 +52,14 @@ function printHelp() {
         default: 'Display this help',
         test: 'Run the unit tests once',
         watch: 'Run the unit tests on change detection',
-        jslint: 'Run jshint on the sourcecode',
+        jshint: 'Run jshint on the sourcecode',
         jscs: 'Run jscs on the sourcecode',
-        js: 'Run jslint and jscs tasks on the sourcecode'
+        sass: 'Run sass on the sass files and save the output to temp directory',
+        i18n: 'Copy the language files to the build directory',
+        manifest: 'Copy the manifest to the build directory',
+        images: 'Copy the images to the build directory',
+        package: 'Package the build directory in a zip file',
+        min: 'Minify and concat the html and javascript files'
     };
 
     console.log('\nGulp has the following available tasks.');
@@ -121,10 +108,10 @@ gulp.task('jscs', function () {
 gulp.task('sass', function () {
     var sass = require('gulp-ruby-sass');
 
-    gulp.src('**/*.sass')
+    gulp.src('app/app.sass', { base: './src/' })
         .pipe(sass())
         .pipe(gulp.dest(
-            [buildDirectory, 'css'].join('/')
+            ['temp', 'css'].join('/')
         ));
 });
 
@@ -149,7 +136,7 @@ gulp.task('images', function () {
 gulp.task('package', function () {
     var zip = require('gulp-zip');
     return gulp.src('build/**/*', { base: './build/' })
-        .pipe(zip('approvals.zip', { compress: false }))
+        .pipe(zip('user-management.zip', { compress: false }))
         .pipe(gulp.dest('.'));
 });
 
@@ -165,7 +152,6 @@ gulp.task('min', function () {
             'src/*.html'
         ])
         .pipe(usemin({
-            css: [minifyCss(), 'concat'],
             html: [minifyHtml({empty: true, quotes: true })],
             js: [ngAnnotate({
                 add: true,
@@ -178,12 +164,7 @@ gulp.task('min', function () {
 });
 
 gulp.task('copy-files', function () {
-
-});
-
-gulp.task('deploy', function () {
-    checkForDHIS2ConfigFile();
-    return gulp.src(buildDirectory + '/**/*').pipe(gulp.dest(dhisDirectory));
+    //TODO: Copy templates
 });
 
 gulp.task('build', function () {
@@ -191,31 +172,9 @@ gulp.task('build', function () {
 });
 
 gulp.task('build-prod', function () {
-    return runSequence('build', 'package');
+    return runSequence('clean', 'sass', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'package');
 });
 
 gulp.task('clean', function () {
     return del(buildDirectory);
-});
-
-gulp.task('clean-app-dir', function (cb) {
-    return del([
-        dhisDirectory + '**',
-        '!' + dhisDirectory + 'manifest.webapp'
-    ], cb, { force: true });
-});
-
-gulp.task('build-to-dev', function () {
-    var path = require('path');
-    var oldManifest;
-
-    checkForDHIS2ConfigFile();
-    try{
-        oldManifest = require(path.resolve(dhisDirectory + 'manifest.webapp'));
-    } catch (e) {
-
-    }
-
-    console.log(oldManifest);
-    return runSequence('clean-app-dir', 'build', 'deploy');
 });
