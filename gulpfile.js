@@ -116,19 +116,19 @@ gulp.task('sass', function () {
 });
 
 gulp.task('i18n', function () {
-    return gulp.src('**/i18n/**/*.json', { base: './src/' }).pipe(gulp.dest(
+    return gulp.src('src/i18n/**/*.json', { base: './src/' }).pipe(gulp.dest(
         buildDirectory
     ));
 });
 
 gulp.task('manifest', function () {
-    return gulp.src('**/*.webapp', { base: './src/' }).pipe(gulp.dest(
+    return gulp.src('src/**/*.webapp', { base: './src/' }).pipe(gulp.dest(
         buildDirectory
     ));
 });
 
 gulp.task('images', function () {
-    return gulp.src('**/icons/**/*', { base: './src/' }).pipe(gulp.dest(
+    return gulp.src('src/**/icons/**/*', { base: './src/' }).pipe(gulp.dest(
         buildDirectory
     ));
 });
