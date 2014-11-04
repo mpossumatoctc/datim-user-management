@@ -12,6 +12,8 @@ var files = [
     'vendor/ui-router/release/angular-ui-router.js',
     'vendor/lodash/dist/lodash.js',
     'vendor/restangular/dist/restangular.js',
+    'vendor/angular-ui-select/dist/select.js',
+    'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
 
     //Test specific includes
     'test/utils/*.js',
@@ -71,6 +73,24 @@ function printHelp() {
     console.log('');
 }
 
+/**
+ * Checks if the dhis.json file is present in the root of the project. This will be required for
+ * tasks that interact with a running dhis2 instance (for example to circumvent the install process)
+ */
+function checkForDHIS2ConfigFile() {
+    var path = require('path');
+    var dhisConfig = require(path.resolve('./dhis.json'));
+
+    if (!dhisConfig.dhisDeployDirectory) {
+        console.log('');
+        console.log('Dhis 2 deploy directory not set, please add a dhis.json to your project that looks like');
+        console.log(JSON.stringify({ dhisDeployDirectory: '<YOUR DHIS2 DIRECTORY>' }, undefined, 2));
+        console.log('');
+        throw new Error('DHIS deploy location not found');
+    }
+    dhisDirectory = dhisConfig.dhisDeployDirectory;
+}
+
 /**************************************************************************************************
  * Gulp tasks
  */
@@ -108,7 +128,7 @@ gulp.task('jscs', function () {
 gulp.task('sass', function () {
     var sass = require('gulp-ruby-sass');
 
-    gulp.src('app/app.sass', { base: './src/' })
+    return gulp.src('src/app/app.sass', { base: './src/' })
         .pipe(sass())
         .pipe(gulp.dest(
             ['temp', 'css'].join('/')
@@ -140,7 +160,7 @@ gulp.task('package', function () {
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('min', function () {
+gulp.task('min', ['sass'], function () {
     var usemin = require('gulp-usemin');
     var minifyCss = require('gulp-minify-css');
     var minifyHtml = require('gulp-minify-html');
@@ -152,13 +172,18 @@ gulp.task('min', function () {
             'src/*.html'
         ])
         .pipe(usemin({
+            css: [minifyCss()],
             html: [minifyHtml({empty: true, quotes: true })],
+            vendor: [
+                /*uglify()*/,
+                rev()
+            ],
             js: [ngAnnotate({
                 add: true,
                 remove: true,
                 single_quotes: true,
                 stats: true
-            }), uglify(), rev()]
+            }), /*uglify(),*/ rev()]
         }))
         .pipe(gulp.dest(buildDirectory));
 });
@@ -168,13 +193,18 @@ gulp.task('copy-files', function () {
 });
 
 gulp.task('build', function () {
-    return runSequence('clean', 'sass', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files');
+    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files');
 });
 
 gulp.task('build-prod', function () {
-    return runSequence('clean', 'sass', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'package');
+    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'package');
 });
 
 gulp.task('clean', function () {
-    return del(buildDirectory);
+    del(buildDirectory);
+});
+
+gulp.task('copy-app', function () {
+    checkForDHIS2ConfigFile();
+    gulp.src('build/**/*.*', { base: './build/' }).pipe(gulp.dest(dhisDirectory));
 });

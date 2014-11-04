@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="PEPFAR.usermanagement">
 <head>
     <title></title>
 
-    <link href="css/app/app.css" rel="stylesheet" type="text/css" />
+    <!-- build:vendor css/app.css -->
+    <link href="../temp/css/app/app.css" rel="stylesheet" type="text/css" />
+    <!-- endbuild -->
 </head>
-<body>
-    <header-bar></header-bar>
-
+<body ng-controller="appController as app">
+Test stuff
+    <div ng-bind="app.title"></div>
     <div ui-view></div>
 
-    <!-- build:js js/vendor.js -->
+    <!-- build:vendor js/vendor.js -->
+    <script src="../vendor/lodash/dist/lodash.js"></script>
     <script src="../vendor/angular/angular.js"></script>
     <script src="../vendor/ui-router/release/angular-ui-router.js"></script>
     <script src="../vendor/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="../vendor/angular-ui-select/dist/select.js"></script>
     <script src="../vendor/angular-translate/angular-translate.js"></script>
+    <script src="../vendor/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
     <script src="../vendor/restangular/dist/restangular.js"></script>
     <!-- endbuild -->
 
