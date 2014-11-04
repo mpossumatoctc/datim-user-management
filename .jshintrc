@@ -24,5 +24,11 @@
 
     "browser": true,
 
-    "predef": [ "angular", "_" ]
+    "predef": [
+        //App globals
+        "angular", "_",
+
+        //Test globals
+        "jasmine", "describe", "it", "beforeEach", "inject", "module", "expect"
+    ]
 }

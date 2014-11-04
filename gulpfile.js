@@ -1,8 +1,7 @@
-/* jshint globalstrict: true*/
-/* global console, require */
 'use strict';
 var gulp = require('gulp');
-var path = require('path');
+var runSequence = require('run-sequence');
+var del = require('del');
 
 var dhisDirectory;
 var buildDirectory = 'build';
@@ -10,6 +9,15 @@ var buildDirectory = 'build';
 var files = [
     //Vendor dependency files
     'vendor/angular/angular.js',
+    'vendor/ui-router/release/angular-ui-router.js',
+    'vendor/lodash/dist/lodash.js',
+    'vendor/restangular/dist/restangular.js',
+
+    //Test specific includes
+    'test/utils/*.js',
+    'test/matchers/*.js',
+    'test/mocks/*_mock.js',
+    'vendor/angular-mocks/angular-mocks.js',
 
     //Source files
     'src/**/*.js',
@@ -26,14 +34,15 @@ var files = [
  * tasks that interact with a running dhis2 instance (for example to circumvent the install process)
  */
  function checkForDHIS2ConfigFile() {
+    var path = require('path');
     var dhisConfig = require(path.resolve('./dhis.json'));
 
-    if (dhisConfig.dhisDeployDirectory) {
+    if (!dhisConfig.dhisDeployDirectory) {
         console.log('');
         console.log('Dhis 2 deploy directory not set, please add a dhis.json to your project that looks like');
         console.log(JSON.stringify({ dhisDeployDirectory: '<YOUR DHIS2 DIRECTORY>' }, undefined, 2));
         console.log('');
-        return;
+        throw new Error('DHIS deploy location not found');
     }
     dhisDirectory = dhisConfig.dhisDeployDirectory;
 }
@@ -82,25 +91,20 @@ gulp.task('default', function () {
     printHelp();
 });
 
-gulp.task('clean', function(cb){
-    var rimraf = require('rimraf');
-    rimraf('./build', cb);
-});
-
 gulp.task('test', function () {
-    gulp.src(files).pipe(runKarma());
+    return gulp.src(files).pipe(runKarma());
 });
 
 gulp.task('watch', function () {
-    gulp.src(files).pipe(runKarma(true));
+    return gulp.src(files).pipe(runKarma(true));
 });
 
 gulp.task('jshint', function () {
     var jshint = require('gulp-jshint');
-    return gulp.src(
-            './test/specs/**/*.js',
-            './src/**/*.js'
-        )
+    return gulp.src([
+            'test/specs/**/*.js',
+            'src/**/*.js'
+        ])
         .pipe(jshint())
         .pipe(jshint.reporter('jshint-stylish'))
         .pipe(jshint.reporter('fail'));
@@ -108,58 +112,48 @@ gulp.task('jshint', function () {
 
 gulp.task('jscs', function () {
     var jscs = require('gulp-jscs');
-    return gulp.src('src/main/**/*.js').pipe(jscs('./.jscsrc'));
+    return gulp.src([
+        'test/specs/**/*.js',
+        'src/**/*.js'
+    ]).pipe(jscs('./.jscsrc'));
 });
 
 gulp.task('sass', function () {
     var sass = require('gulp-ruby-sass');
-    var minifyCss = require('gulp-minify-css');
 
-    return gulp.src('src/main/**.sass')
+    gulp.src('**/*.sass')
         .pipe(sass())
-        .pipe(minifyCss())
         .pipe(gulp.dest(
             [buildDirectory, 'css'].join('/')
         ));
 });
 
-gulp.task('html', function () {
-    var minifyHTML = require('gulp-minify-html');
-
-    gulp.src('src/main/**/*.html').pipe(minifyHTML({ empty: true, quotes: true })).pipe(gulp.dest(
-        buildDirectory
-    ));
-});
-
 gulp.task('i18n', function () {
-    gulp.src('**/i18n/**/*.json', { base: './src/main/' }).pipe(gulp.dest(
+    return gulp.src('**/i18n/**/*.json', { base: './src/' }).pipe(gulp.dest(
         buildDirectory
     ));
 });
 
 gulp.task('manifest', function () {
-    gulp.src('**/*.webapp', { base: './src/main/' }).pipe(gulp.dest(
+    return gulp.src('**/*.webapp', { base: './src/' }).pipe(gulp.dest(
+        buildDirectory
+    ));
+});
+
+gulp.task('images', function () {
+    return gulp.src('**/icons/**/*', { base: './src/' }).pipe(gulp.dest(
         buildDirectory
     ));
 });
 
 gulp.task('package', function () {
     var zip = require('gulp-zip');
-    gulp.src('build/**/*', { base: './build/' })
+    return gulp.src('build/**/*', { base: './build/' })
         .pipe(zip('approvals.zip', { compress: false }))
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('build', function () {
-    var runSequence = require('run-sequence');
-    runSequence('clean', 'js', 'sass', 'html', 'dependencies', 'i18n', 'images', 'manifest');
-});
-
-gulp.task('live', function () {
-    checkForDHIS2ConfigFile();
-});
-// jscs:disable
-gulp.task('min', ['jshint', 'jscs', 'sass'], function () {
+gulp.task('min', function () {
     var usemin = require('gulp-usemin');
     var minifyCss = require('gulp-minify-css');
     var minifyHtml = require('gulp-minify-html');
@@ -167,21 +161,15 @@ gulp.task('min', ['jshint', 'jscs', 'sass'], function () {
     var uglify = require('gulp-uglify');
     var rev = require('gulp-rev');
 
-    // jscs:disable
-    gulp.src([
-            'src/*.html',
-            'src/app/**/*.js',
-            'src/css/**/*.css'
+    return gulp.src([
+            'src/*.html'
         ])
-        // jscs:disable
         .pipe(usemin({
             css: [minifyCss(), 'concat'],
             html: [minifyHtml({empty: true, quotes: true })],
-            // jscs:disable
             js: [ngAnnotate({
                 add: true,
                 remove: true,
-                // jscs:disable
                 single_quotes: true,
                 stats: true
             }), uglify(), rev()]
@@ -189,3 +177,45 @@ gulp.task('min', ['jshint', 'jscs', 'sass'], function () {
         .pipe(gulp.dest(buildDirectory));
 });
 
+gulp.task('copy-files', function () {
+
+});
+
+gulp.task('deploy', function () {
+    checkForDHIS2ConfigFile();
+    return gulp.src(buildDirectory + '/**/*').pipe(gulp.dest(dhisDirectory));
+});
+
+gulp.task('build', function () {
+    return runSequence('clean', 'sass', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files');
+});
+
+gulp.task('build-prod', function () {
+    return runSequence('build', 'package');
+});
+
+gulp.task('clean', function () {
+    return del(buildDirectory);
+});
+
+gulp.task('clean-app-dir', function (cb) {
+    return del([
+        dhisDirectory + '**',
+        '!' + dhisDirectory + 'manifest.webapp'
+    ], cb, { force: true });
+});
+
+gulp.task('build-to-dev', function () {
+    var path = require('path');
+    var oldManifest;
+
+    checkForDHIS2ConfigFile();
+    try{
+        oldManifest = require(path.resolve(dhisDirectory + 'manifest.webapp'));
+    } catch (e) {
+
+    }
+
+    console.log(oldManifest);
+    return runSequence('clean-app-dir', 'build', 'deploy');
+});
