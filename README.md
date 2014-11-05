@@ -9,15 +9,54 @@ package.json | [![Dependency Status](https://www.versioneye.com/user/projects/54
 bower.json | [![Dependency Status](https://www.versioneye.com/user/projects/54595fc12b48049ecc00004e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54595fc12b48049ecc00004e)
 
 ####The app uses the following depencencies
+To get more familiar with the techniques we are using in this project please see the following websites.
 + angular-ui-router (ui.router) https://github.com/angular-ui/ui-router
+  - Used instead of ng-route for routing using states
 + restangular (restangular) https://github.com/mgonto/restangular
+  - For rest communication with the DHIS2 web api.
 + angular-translate (pascalprecht.translate) https://github.com/angular-translate/angular-translate
+  - For i18n support
 + angular-bootstrap (ui.bootstrap) https://github.com/angular-ui/bootstrap
 + angular-ui-select (ui.select) https://github.com/angular-ui/ui-select
 
 ##Getting started
 
-### Structure
+### How to get started
+
+#####Clone the repository
+```
+git clone https://github.com/dhis2/user-management-pepfar.git
+```
+
+#####Install the node dependencies
+```
+npm install
+```
+
+#####Install the bower app dependencies
+```
+bower install
+```
+
+#####Run the tests
+```
+gulp test
+```
+
+###Running tests continuously
+To run the tests continuously while making changes to the app files or the jasmine spec files use the following gulp task.
+```
+gulp watch
+```
+
+###Building the project
+The gulp file contains two different build tasks `build` and `build-prod`.
+`build` builds the project into the build directory within the root of the project. `build-prod` does exactly the same but also zips the contents of the build folder into a zip file called `user-maintenance.zip`. This zipfile can be used to install the app into DHIS2. 
+
+####Installing the app into DHIS
+How to install the app into dhis can be found at the following url https://www.dhis2.org/doc/snapshot/en/developer/html/ch02s04.html.
+
+### Additional info on the project structure
 The project directory stucture is set up as follows. See below the tree for some more detailed information.
 ```
 + src
@@ -60,38 +99,3 @@ The following directories might show up in the root of the project. The short ex
   - Directory used by coveralls to store the test coverage output from karma
 + .sass-cache
   - Directory used by sass to store cashed sass output
-
-### How to get started
-
-#####Clone the repository
-```
-git clone https://github.com/dhis2/user-management-pepfar.git
-```
-
-#####Install the node dependencies
-```
-npm install
-```
-
-#####Install the bower app dependencies
-```
-bower install
-```
-
-#####Run the tests
-```
-gulp test
-```
-
-##Running tests continuously
-To run the tests continuously while making changes to the app files or the jasmine spec files use the following gulp task.
-```
-gulp watch
-```
-
-##Building the project
-The gulp file contains two different build tasks `build` and `build-prod`.
-`build` builds the project into the build directory within the root of the project. `build-prod` does exactly the same but also zips the contents of the build folder into a zip file called `user-maintenance.zip`. This zipfile can be used to install the app into DHIS2. 
-
-#####Installing the app into DHIS
-How to install the app into dhis can be found at the following url https://www.dhis2.org/doc/snapshot/en/developer/html/ch02s04.html.
