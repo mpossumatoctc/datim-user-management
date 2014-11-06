@@ -2,6 +2,7 @@
 var gulp = require('gulp');
 var runSequence = require('run-sequence');
 var del = require('del');
+var path = require('path');
 
 var dhisDirectory;
 var buildDirectory = 'build';
@@ -79,7 +80,6 @@ function printHelp() {
  * tasks that interact with a running dhis2 instance (for example to circumvent the install process)
  */
 function checkForDHIS2ConfigFile() {
-    var path = require('path');
     var dhisConfig = require(path.resolve('./dhis.json'));
 
     if (!dhisConfig.dhisDeployDirectory) {
@@ -90,6 +90,17 @@ function checkForDHIS2ConfigFile() {
         throw new Error('DHIS deploy location not found');
     }
     dhisDirectory = dhisConfig.dhisDeployDirectory;
+
+    return dhisConfig;
+}
+
+function stringSrc(filename, string) {
+    var src = require('stream').Readable({ objectMode: true })
+    src._read = function () {
+        this.push(new gutil.File({ cwd: "", base: "", path: filename, contents: new Buffer(string) }))
+        this.push(null)
+    }
+    return src
 }
 
 /**************************************************************************************************
@@ -194,7 +205,7 @@ gulp.task('copy-files', function () {
 });
 
 gulp.task('build', function () {
-    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files');
+    runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files');
 });
 
 gulp.task('build-prod', function () {
@@ -205,9 +216,40 @@ gulp.task('clean', function () {
     del(buildDirectory);
 });
 
+gulp.task('modify-manifest', function () {
+    var fs = require('fs');
+    var dhisConfig = checkForDHIS2ConfigFile();
+
+    fs.readFile('build/manifest.webapp', 'utf8', function (err, data) {
+        var manifest;
+
+        if (err) {
+            console.log('Failed to load manifest from build directory');
+            return;
+        }
+
+        manifest = JSON.parse(data);
+        if (!(manifest && manifest.activities && manifest.activities.dhis && manifest.activities.dhis.href)) {
+            console.log('Incorrect manifest "manifest.activities.dhis.href" is not available');
+            return;
+        }
+        manifest.activities.dhis.href = dhisConfig.dhisBaseUrl || '*';
+
+        fs.writeFile('build/manifest.webapp', JSON.stringify(manifest, undefined, 2), function (err) {
+            if (err) {
+                console.log('Failed to save modified manifest');
+            }
+        });
+    });
+});
+
 gulp.task('copy-app', function () {
     checkForDHIS2ConfigFile();
     gulp.src('build/**/*.*', { base: './build/' }).pipe(gulp.dest(dhisDirectory));
+});
+
+gulp.task('copy-to-dev', function () {
+    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'modify-manifest', 'copy-app');
 });
 
 gulp.task('travis', function () {
