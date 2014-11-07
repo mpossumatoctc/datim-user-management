@@ -29,6 +29,6 @@
         "angular", "_",
 
         //Test globals
-        "jasmine", "describe", "it", "beforeEach", "inject", "module", "expect"
+        "jasmine", "describe", "it", "beforeEach", "afterEach", "inject", "module", "expect", "spyOn"
     ]
 }

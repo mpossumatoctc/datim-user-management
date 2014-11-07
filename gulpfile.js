@@ -19,12 +19,15 @@ var files = [
     //Test specific includes
     'test/utils/*.js',
     'test/matchers/*.js',
-    'test/mocks/*_mock.js',
     'vendor/angular-mocks/angular-mocks.js',
 
     //Source files
-    'src/app/app-controller.js',
+    'src/ngBootstrapper.js',
     'src/**/*.js',
+
+    //Testmocks
+    'test/mocks/*_mock.js',
+
     //Jasmine spec files
     'test/specs/**/*_spec.js'
 ];
