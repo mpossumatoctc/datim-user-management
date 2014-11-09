@@ -124,7 +124,14 @@ describe('ngBootstrapper', function () {
 
         beforeEach(function () {
             $httpBackend = ngBootstrapper.injector.get('$httpBackend');
-            $httpBackend.expectGET('manifest.webapp').respond(200, {name: 'User Management'});
+            $httpBackend.expectGET('manifest.webapp').respond(200, {
+                name: 'User Management',
+                activities: {
+                    dhis: {
+                        href: 'localhost:8080'
+                    }
+                }
+            });
 
             angular.bootstrap.calls.reset();
 
@@ -184,6 +191,7 @@ describe('ngBootstrapper', function () {
 
         it('should log an error when a remote call failed', function () {
             var $log = ngBootstrapper.injector.get('$log');
+            spyOn($log, 'error').and.callThrough();
 
             $httpBackend.expectGET('markData.json').respond(404, {});
             ngBootstrapper.addInjectableFromRemoteLocation('markData', 'markData.json');
@@ -193,6 +201,7 @@ describe('ngBootstrapper', function () {
 
             expect($log.error.logs.length).toBe(1);
             expect($log.error.logs[0][0].status).toBe(404);
+            expect($log.error).toHaveBeenCalled();
         });
     });
 });

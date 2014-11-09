@@ -12,4 +12,8 @@ describe('App controller', function () {
     it('should be an object', function () {
         expect(controller).toBeAnObject();
     });
+
+    it('should have the title set on the object', function () {
+        expect(controller.title).toBe('User management');
+    });
 });

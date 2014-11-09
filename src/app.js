@@ -18,7 +18,15 @@ function routerConfig($stateProvider, $urlRouterProvider) {
         .state('add', {
             url: '/add',
             templateUrl: 'adduser/add.html',
-            controller: 'addUserController as addUser'
+            controller: 'addUserController as addUser',
+            resolve: {
+                userTypes: function (userTypesService) {
+                    return userTypesService.getUserTypes();
+                },
+                dataGroups: function (dataGroupsService) {
+                    return dataGroupsService.getDataGroups();
+                }
+            }
         });
 }
 
@@ -32,6 +40,10 @@ angular.module('PEPFAR.usermanagement', [
 
 angular.module('PEPFAR.usermanagement').config(translateConfig);
 angular.module('PEPFAR.usermanagement').config(routerConfig);
+angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifest) {
+    var baseUrl = [webappManifest.activities.dhis.href, 'api'].join('/');
+    Restangular.setBaseUrl(baseUrl);
+});
 
 window.getBootstrapper('PEPFAR.usermanagement', document)
     .addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp')
