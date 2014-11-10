@@ -10,7 +10,7 @@ describe('Agency select directive', function () {
             this.getAgencies = function () {
                 return {
                     then: function (callback) {
-                        callback(fixtures.agenciesList.items);
+                        callback(fixtures.get('agenciesList').items);
                     }
                 };
             };
@@ -36,12 +36,23 @@ describe('Agency select directive', function () {
     it('should have all the elements in the list', function () {
         var elements = element[0].querySelectorAll('.ui-select-choices-row');
 
-        expect(elements.length).toBe(fixtures.agenciesList.items.length);
+        expect(elements.length).toBe(fixtures.get('agenciesList').items.length);
     });
 
     it('should have the right placeholder', function () {
         var inputBox = element[0].querySelector('input');
 
-        expect(inputBox.attributes.placeholder.value).toBe('Select agency');
+        expect(inputBox.attributes.placeholder.value).toBe('Select an agency');
+    });
+
+    it('should have an islolate scope', function () {
+        var elements;
+
+        $scope.selectbox = {};
+        $scope.$apply();
+
+        elements = element[0].querySelectorAll('.ui-select-choices-row');
+
+        expect(elements.length).toBe(fixtures.get('agenciesList').items.length);
     });
 });

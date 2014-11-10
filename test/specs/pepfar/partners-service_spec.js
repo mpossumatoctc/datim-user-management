@@ -18,7 +18,7 @@ describe('Partners service', function () {
             $httpBackend = $injector.get('$httpBackend');
 
             $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/BOyWrF33hiR/items?paging=false')
-                .respond(200, fixtures.partnerList);
+                .respond(200, fixtures.get('partnerList'));
         }));
 
         afterEach(function () {
@@ -38,7 +38,7 @@ describe('Partners service', function () {
 
         it('promise should return the correct partners', function () {
             var partnerList;
-            var expectedPartnerList = fixtures.partnerList.items;
+            var expectedPartnerList = fixtures.get('partnerList').items;
 
             partnersService.getPartners().then(function (data) {
                 partnerList = data;

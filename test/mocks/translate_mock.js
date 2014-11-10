@@ -3,7 +3,11 @@ angular.module('pascalprecht.translate', []);
 angular.module('pascalprecht.translate').provider('$translate', function () {
     return {
         $get: function () {
-
+            return {
+                instant: function (toTranslate) {
+                    return toTranslate;
+                }
+            };
         },
         useStaticFilesLoader: function () {},
         preferredLanguage: function () {}

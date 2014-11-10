@@ -18,7 +18,7 @@ describe('Agencies service', function () {
             $httpBackend = $injector.get('$httpBackend');
 
             $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/bw8KHXzxd9i/items?paging=false')
-                .respond(200, fixtures.agenciesList);
+                .respond(200, fixtures.get('agenciesList'));
         }));
 
         afterEach(function () {
@@ -40,7 +40,7 @@ describe('Agencies service', function () {
 
         it('promise should return an array with agencies', function () {
             var agencies;
-            var expectedAgencies = fixtures.agenciesList.items;
+            var expectedAgencies = fixtures.get('agenciesList').items;
 
             agenciesService.getAgencies().then(function (data) {
                 agencies = data;
