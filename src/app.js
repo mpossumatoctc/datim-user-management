@@ -1,3 +1,6 @@
+//==================================================================================
+// Config functions
+//
 function translateConfig($translateProvider) {
     $translateProvider.useStaticFilesLoader({
         prefix: 'i18n/',
@@ -30,6 +33,13 @@ function routerConfig($stateProvider, $urlRouterProvider) {
         });
 }
 
+function angularUiSelectConfig(uiSelectConfig) {
+    uiSelectConfig.theme = 'bootstrap';
+}
+
+//==================================================================================
+// Angular app module definition
+//
 angular.module('PEPFAR.usermanagement', [
     'ui.router',
     'restangular',
@@ -38,13 +48,24 @@ angular.module('PEPFAR.usermanagement', [
     'ui.bootstrap'
 ]);
 
+//==================================================================================
+// Angular config blocks
+//
 angular.module('PEPFAR.usermanagement').config(translateConfig);
 angular.module('PEPFAR.usermanagement').config(routerConfig);
+angular.module('PEPFAR.usermanagement').config(angularUiSelectConfig);
+
+//==================================================================================
+// Angular run blocks
+//
 angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifest) {
     var baseUrl = [webappManifest.activities.dhis.href, 'api'].join('/');
     Restangular.setBaseUrl(baseUrl);
 });
 
+//==================================================================================
+// Bootstrap the app manually
+//
 window.getBootstrapper('PEPFAR.usermanagement', document)
     .addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp')
     .bootstrap();

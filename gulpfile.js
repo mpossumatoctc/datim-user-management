@@ -17,6 +17,7 @@ var files = [
     'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
 
     //Test specific includes
+    'test/fixtures/fixtures.js',
     'test/utils/*.js',
     'test/matchers/*.js',
     'vendor/angular-mocks/angular-mocks.js',
@@ -24,6 +25,7 @@ var files = [
     //Source files
     'src/ngBootstrapper.js',
     'src/**/*.js',
+    'src/**/*.html',
 
     //Testmocks
     'test/mocks/*_mock.js',
