@@ -23,6 +23,8 @@
         {name: 'Read data', userGroup: 'Data reader', default: true}
     ];
 
+    fixtures.locales = ["ar", "ar_IQ", "ar_SD", "bn", "bi", "my", "zh", "dz", "en", "fr", "in", "km", "rw", "lo", "ne", "pt", "pt_BR", "ru", "es", "tg", "vi"];
+
     window.fixtures = {
         get: function (fixtureName) {
             if (fixtures[fixtureName])
