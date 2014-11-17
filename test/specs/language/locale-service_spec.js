@@ -1,5 +1,5 @@
 describe('Locale service', function () {
-    var locales = window.fixtures;
+    var fixtures = window.fixtures;
     var localeService;
 
     beforeEach(module('PEPFAR.usermanagement'));

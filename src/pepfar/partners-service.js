@@ -1,5 +1,12 @@
+angular.module('PEPFAR.usermanagement').factory('partnersService', partnersService);
+
 function partnersService(Restangular) {
-    this.getPartners = function () {
+
+    return {
+        getPartners: getPartners
+    };
+
+    function getPartners() {
         return Restangular
             .all('dimensions')
             .all('BOyWrF33hiR')
@@ -8,7 +15,5 @@ function partnersService(Restangular) {
             }).then(function (response) {
                 return response.items;
             });
-    };
+    }
 }
-
-angular.module('PEPFAR.usermanagement').service('partnersService', partnersService);

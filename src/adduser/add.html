@@ -1,4 +1,7 @@
 Ability to add users here
-
-<agency-select></agency-select>
-<partner-select></partner-select>
+<div ng-controller="userTypeController as userType">
+    <select-usertype ng-required="true" ng-model="user.userType" user-types="userType.userTypes"></select-usertype>
+    <agency-select ng-show="userType.isAgency()" user-entity-change="userType.setUserEntity"></agency-select>
+    <partner-select ng-show="userType.isPartner()" user-entity-change="userType.setUserEntity"></partner-select>
+</div>
+<locale-select></locale-select>

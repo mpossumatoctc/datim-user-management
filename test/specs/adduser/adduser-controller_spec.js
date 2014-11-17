@@ -1,12 +1,15 @@
 describe('Add user controller', function () {
+    var scope;
+
     beforeEach(module('PEPFAR.usermanagement'));
 
     describe('basic structure', function () {
         var controller;
 
-        beforeEach(inject(function ($controller) {
+        beforeEach(inject(function ($controller, $rootScope) {
+            scope = $rootScope.$new();
             controller = $controller('addUserController', {
-                $scope: {},
+                $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined
             });
@@ -21,7 +24,7 @@ describe('Add user controller', function () {
         });
 
         it('should have an array for user types', function () {
-            expect(controller.userTypes).toEqual([]);
+            expect(scope.userTypes).toEqual([]);
         });
 
         it('should have an array for "data streams"', function () {
@@ -40,9 +43,11 @@ describe('Add user controller', function () {
     describe('load data into the controller through injectables', function () {
         var controller;
 
-        beforeEach(inject(function ($controller) {
+        beforeEach(inject(function ($controller, $rootScope) {
+            scope = $rootScope.$new();
+
             controller = $controller('addUserController', {
-                $scope: {},
+                $scope: scope,
                 userTypes: [
                     {name: 'Inter-Agency'},
                     {name: 'Agency'},
@@ -63,7 +68,7 @@ describe('Add user controller', function () {
                 {name: 'Partner'}
             ];
 
-            expect(controller.userTypes).toEqual(expectedUsertypes);
+            expect(scope.userTypes).toEqual(expectedUsertypes);
         });
 
         it('should add the loaded datagroups', function () {

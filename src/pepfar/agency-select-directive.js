@@ -1,3 +1,5 @@
+angular.module('PEPFAR.usermanagement').directive('agencySelect', agencySelectDirective);
+
 function agencySelectDirective(agenciesService, $translate) {
     return {
         restrict: 'E',
@@ -16,5 +18,3 @@ function agencySelectDirective(agenciesService, $translate) {
         }
     };
 }
-
-angular.module('PEPFAR.usermanagement').directive('agencySelect', agencySelectDirective);

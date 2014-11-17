@@ -1,3 +1,5 @@
+angular.module('PEPFAR.usermanagement').directive('partnerSelect', partnerSelectDirective);
+
 function partnerSelectDirective(partnersService, $translate) {
     return {
         restrict: 'E',
@@ -15,5 +17,3 @@ function partnerSelectDirective(partnersService, $translate) {
         }
     };
 }
-
-angular.module('PEPFAR.usermanagement').directive('partnerSelect', partnerSelectDirective);

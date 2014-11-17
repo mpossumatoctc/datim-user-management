@@ -1,3 +1,5 @@
+angular.module('PEPFAR.usermanagement').service('userTypesService', userTypesService);
+
 function userTypesService($q) {
     var deferred = $q.defer();
     var userTypes = [
@@ -6,11 +8,13 @@ function userTypesService($q) {
         {name: 'Partner'}
     ];
 
-    this.getUserTypes = function () {
-        return deferred.promise;
+    deferred.resolve(userTypes);
+
+    return {
+        getUserTypes: getUserTypes
     };
 
-    deferred.resolve(userTypes);
+    function getUserTypes() {
+        return deferred.promise;
+    }
 }
-
-angular.module('PEPFAR.usermanagement').service('userTypesService', userTypesService);

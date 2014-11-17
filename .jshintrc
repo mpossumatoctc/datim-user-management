@@ -21,6 +21,7 @@
     "maxdepth": 5,
     "maxstatements": 30,
     "maxcomplexity": 6,
+    "latedef": "nofunc",
 
     "browser": true,
 

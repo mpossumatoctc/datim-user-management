@@ -35,7 +35,7 @@
 
     /**
      * Specify a remote source by setting the name and the location.
-     * The souces will be loaded when the bootstrap method is called.
+     * The sources will be loaded when the bootstrap method is called.
      *
      * @param {String} name The name this data will be known by, the injectable name
      * @param {String} url The url where the data is located

@@ -1,12 +1,16 @@
+angular.module('PEPFAR.usermanagement').factory('localeService', localeService);
+
 function localeService(Restangular) {
     var localeResource = Restangular
         .all('locales')
         .all('ui')
         .getList();
 
-    this.getUiLocales = function () {
-        return localeResource;
+    return {
+        getUiLocales: getUiLocales
     };
-}
 
-angular.module('PEPFAR.usermanagement').service('localeService', localeService);
+    function getUiLocales() {
+        return localeResource;
+    }
+}

@@ -1,3 +1,5 @@
+angular.module('PEPFAR.usermanagement').service('dataGroupsService', dataGroupsService);
+
 function dataGroupsService($q) {
     var deferred = $q.defer();
 
@@ -13,5 +15,3 @@ function dataGroupsService($q) {
 
     deferred.resolve(dataGroups);
 }
-
-angular.module('PEPFAR.usermanagement').service('dataGroupsService', dataGroupsService);

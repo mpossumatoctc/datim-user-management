@@ -1,3 +1,5 @@
+angular.module('PEPFAR.usermanagement').service('userActionsService', userActionsService);
+
 function userActionsService(_) {
     var availableAgencyActions = [
         'Accept data', 'Submit data', 'Manage users'
@@ -8,8 +10,21 @@ function userActionsService(_) {
     var availablePartnerActions =  [
         'Capture data', 'Submit data', 'Manage users'
     ];
+    var actions = [
+        {name: 'Capture data', userGroup: '', typeDependent: true},
+        {name: 'Capture inter-agency data', userGroup: '', typeDependent: true},
+        {name: 'Accept data', userGroup: 'Data accepter'},
+        {name: 'Submit data', userGroup: 'Data submitter'},
+        {name: 'Manage users', userGroup: 'User administrator'},
+        {name: 'Read data', userGroup: 'Data reader', default: true}
+    ];
 
-    var getAvailableActionsForUserType = function (userType) {
+    return {
+        actions: actions,
+        getActionsFor: getActionsFor
+    };
+
+    function getAvailableActionsForUserType(userType) {
         switch (userType) {
             case 'agency':
                 return availableAgencyActions;
@@ -21,24 +36,13 @@ function userActionsService(_) {
                 return [];
         }
         return [];
-    };
+    }
 
-    this.actions = [
-        {name: 'Capture data', userGroup: '', typeDependent: true},
-        {name: 'Capture inter-agency data', userGroup: '', typeDependent: true},
-        {name: 'Accept data', userGroup: 'Data accepter'},
-        {name: 'Submit data', userGroup: 'Data submitter'},
-        {name: 'Manage users', userGroup: 'User administrator'},
-        {name: 'Read data', userGroup: 'Data reader', default: true}
-    ];
-
-    this.getActionsFor = function (userType) {
+    function getActionsFor(userType) {
         var availableActions = getAvailableActionsForUserType(userType);
 
-        return _.filter(this.actions, function (action) {
+        return _.filter(actions, function (action) {
             return (availableActions.indexOf(action.name) >= 0) || action.default;
         });
-    };
+    }
 }
-
-angular.module('PEPFAR.usermanagement').service('userActionsService', userActionsService);

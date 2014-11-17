@@ -1,0 +1,8 @@
+<div class="locale-select">
+    <ui-select ng-model="selectbox.selectedItem" on-select="onChange($item, $model)">
+        <ui-select-match placeholder="{{selectbox.placeholder}}">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="item in selectbox.items | filter: $select.search">
+            <div>{{item.name}}</div>
+        </ui-select-choices>
+    </ui-select>
+</div>
