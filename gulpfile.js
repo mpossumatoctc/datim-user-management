@@ -16,6 +16,7 @@ var files = [
     'vendor/angular-ui-select/dist/select.js',
     'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
     'vendor/angular-messages/angular-messages.js',
+    'vendor/angular-ui-utils/validate.js',
 
     //Test specific includes
     'test/fixtures/fixtures.js',

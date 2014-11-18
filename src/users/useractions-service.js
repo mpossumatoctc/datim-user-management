@@ -25,6 +25,10 @@ function userActionsService(_) {
     };
 
     function getAvailableActionsForUserType(userType) {
+        if (typeof userType === 'string') {
+            userType = userType.toLowerCase();
+        }
+
         switch (userType) {
             case 'agency':
                 return availableAgencyActions;

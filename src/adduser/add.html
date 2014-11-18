@@ -21,7 +21,25 @@ Ability to add users here
         <locale-select user="user"></locale-select>
     </div>
     <div class="form-controls-wrap">
-        <button class="btn btn-primary" ng-disabled="!userForm.$valid" ng-click="addUser.addUser()">Add user</button>
+        <div class="half">
+            <ul>
+                <li ng-repeat="(name, value) in user.dataGroups">
+                    <label ng-bind="name"></label>
+                    <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" name="dataStream" ng-model="user.dataGroups[name]" type="checkbox">
+                </li>
+            </ul>
+        </div>
+        <div class="half">
+            <ul>
+                <li ng-repeat="action in addUser.actions">
+                    <label ng-bind="action.name"></label>
+                    <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default" type="checkbox">
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-controls-wrap">
+        <button class="btn btn-primary" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">Add user</button>
     </div>
     <div>
         <div ng-bind="user.userType.name"></div>

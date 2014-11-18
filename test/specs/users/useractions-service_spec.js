@@ -60,4 +60,15 @@ describe('User actions', function () {
 
         expect(userActionsService.getActionsFor()).toEqual(expectedActions);
     });
+
+    it('should also return the correct data when called with uppercase value', function () {
+        var expectedActions = [
+            {name: 'Capture data', userGroup: '', typeDependent: true},
+            {name: 'Submit data', userGroup: 'Data submitter'},
+            {name: 'Manage users', userGroup: 'User administrator'},
+            {name: 'Read data', userGroup: 'Data reader', default: true}
+        ];
+
+        expect(userActionsService.getActionsFor('Partner')).toEqual(expectedActions);
+    });
 });

@@ -46,6 +46,7 @@ angular.module('PEPFAR.usermanagement', [
     'pascalprecht.translate',
     'ui.select',
     'ui.bootstrap',
+    'ui.validate',
     'ngMessages'
 ]);
 
