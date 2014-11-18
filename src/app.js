@@ -45,7 +45,8 @@ angular.module('PEPFAR.usermanagement', [
     'restangular',
     'pascalprecht.translate',
     'ui.select',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'ngMessages'
 ]);
 
 //==================================================================================

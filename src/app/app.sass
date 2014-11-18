@@ -1,2 +1,45 @@
 *
- box-sizing: border-box
+  box-sizing: border-box
+
+.form-controls-wrap
+  margin-bottom: 15px
+
+  &.select-user-type > div
+    margin-bottom: 15px
+
+
+.app-content-wrap
+  margin: 0 auto
+  max-width: 1200px
+  width: 80%
+
+.form-control.ng-valid,
+.ui-select-bootstrap.ng-valid button
+  border: 1px solid green
+
+.form-control-wrap
+  position: relative
+  display: block
+
+.form-control-wrap.ng-valid,
+.ui-select-bootstrap.ng-valid
+  &:after
+    content: "\f05d"
+    color: green
+    width: 30px
+    height: 30px
+    float: right
+    font-family: "fontawesome"
+    position: absolute
+    top: 2px
+    right: -35px
+    font-size: 1.5em
+
+.form-control.ng-invalid.ng-dirty,
+.ui-select-bootstrap.ng-invalid.ng-dirty button
+  border: 1px solid red
+
+.error-messages div
+  color: red
+  font-size: .9em
+  margin-top: 5px

@@ -48,17 +48,4 @@ describe('Select usertype directive', function () {
         expect(choices[1].querySelector('div').textContent).toBe('Agency');
         expect(choices[2].querySelector('div').textContent).toBe('Partner');
     });
-
-    it('should call the passed function on change', function () {
-        element.isolateScope().onChange({});
-
-        expect(scope.userTypeChange).toHaveBeenCalled();
-    });
-
-    it('should pass the selected item to the function', function () {
-        var cos = {name: 'COS'};
-        element.isolateScope().onChange(cos);
-
-        expect(scope.userTypeChange).toHaveBeenCalledWith(cos.name);
-    });
 });

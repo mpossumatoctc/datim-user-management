@@ -1,5 +1,5 @@
 <div class="select-usertype">
-    <ui-select ng-required="true" ng-model="selectbox.selectedItem" on-select="onChange($item, $model)">
+    <ui-select ng-required="true" ng-model="user.userType" on-select="onChange($item, $model)">
         <ui-select-match placeholder="{{selectbox.placeholder}}">{{$select.selected.name}}</ui-select-match>
         <ui-select-choices repeat="item in selectbox.items | filter: $select.search">
             <div>{{item.name}}</div>

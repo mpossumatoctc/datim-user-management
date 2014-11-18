@@ -4,9 +4,9 @@ function userTypeSelectDirective() {
     var directive = {
         restrict: 'E',
         replace: true,
-        require: 'ngModel',
         scope: {
-            userTypes: '='
+            userTypes: '=',
+            user: '='
         },
         templateUrl: 'users/selectusertype.html',
         link: linkFn
@@ -14,14 +14,11 @@ function userTypeSelectDirective() {
 
     return directive;
 
-    function linkFn(scope, element, attrs, ngModel) {
+    function linkFn(scope) {
         scope.selectbox = {
             placeholder: 'Select user type',
-            items: scope.userTypes
-        };
-
-        scope.onChange = function ($item) {
-            ngModel.$setViewValue($item.name);
+            items: scope.userTypes,
+            selected: scope.userType
         };
     }
 }

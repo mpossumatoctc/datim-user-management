@@ -6,19 +6,23 @@
     <!-- build:vendor css/app.css -->
     <link href="../vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
     <link href="../vendor/angular-ui-select/dist/select.css" rel="stylesheet" type="text/css" />
+    <link href="../vendor/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
     <link href="../temp/css/app/app.css" rel="stylesheet" type="text/css" />
     <!-- endbuild -->
 </head>
 <body ng-controller="appController as app">
 
-    <div ng-bind="app.title"></div>
-    <a ui-sref="add" translate>Add user</a>
-    <a ui-sref="list" translate>Manage users</a>
-    <div ui-view></div>
+    <div class="app-content-wrap">
+        <div ng-bind="app.title"></div>
+        <a ui-sref="add" translate>Add user</a>
+        <a ui-sref="list" translate>Manage users</a>
+        <div ui-view></div>
+    </div>
 
     <!-- build:vendor js/vendor.js -->
     <script src="../vendor/lodash/dist/lodash.js"></script>
     <script src="../vendor/angular/angular.js"></script>
+    <script src="../vendor/angular-messages/angular-messages.js"></script>
     <script src="../vendor/ui-router/release/angular-ui-router.js"></script>
     <script src="../vendor/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="../vendor/angular-ui-select/dist/select.js"></script>

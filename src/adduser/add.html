@@ -1,7 +1,32 @@
 Ability to add users here
-<div ng-controller="userTypeController as userType">
-    <select-usertype ng-required="true" ng-model="user.userType" user-types="userType.userTypes"></select-usertype>
-    <agency-select ng-show="userType.isAgency()" user-entity-change="userType.setUserEntity"></agency-select>
-    <partner-select ng-show="userType.isPartner()" user-entity-change="userType.setUserEntity"></partner-select>
-</div>
-<locale-select></locale-select>
+<script type="text/ng-template" id="userFormMessages">
+    <div ng-message="required">This field is required</div>
+</script>
+
+<form name="userForm">
+    <div class="form-controls-wrap select-user-type" ng-controller="userTypeController as userType">
+        <select-usertype user="user" user-types="userType.userTypes"></select-usertype>
+        <agency-select user="user" ng-if="userType.isAgency()"></agency-select>
+        <partner-select user="user" ng-if="userType.isPartner()"></partner-select>
+    </div>
+    <div class="form-controls-wrap">
+        <span class="form-control-wrap" ng-class="{'ng-valid': userForm.emailAddress.$valid}">
+            <input class="form-control" placeholder="E-mail address" name="emailAddress" type="email" ng-required="true" ng-model="user.email">
+        </span>
+        <div class="error-messages" ng-messages="userForm.emailAddress.$error" ng-messages-include="userFormMessages" ng-if='userForm.emailAddress.$dirty'>
+            <div ng-message="email">This field should contain a valid e-mail address</div>
+        </div>
+    </div>
+    <div class="form-controls-wrap">
+        <locale-select user="user"></locale-select>
+    </div>
+    <div class="form-controls-wrap">
+        <button class="btn btn-primary" ng-disabled="!userForm.$valid" ng-click="addUser.addUser()">Add user</button>
+    </div>
+    <div>
+        <div ng-bind="user.userType.name"></div>
+        <div ng-bind="user.userEntity.name"></div>
+        <div ng-bind="user.locale.name"></div>
+        <div ng-bind="user.email"></div>
+    </div>
+</form>

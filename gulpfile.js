@@ -15,6 +15,7 @@ var files = [
     'vendor/restangular/dist/restangular.js',
     'vendor/angular-ui-select/dist/select.js',
     'vendor/angular-bootstrap/ui-bootstrap-tpls.js',
+    'vendor/angular-messages/angular-messages.js',
 
     //Test specific includes
     'test/fixtures/fixtures.js',
@@ -209,12 +210,17 @@ gulp.task('copy-files', function () {
     //TODO: Copy templates
 });
 
+gulp.task('copy-fonts', function () {
+    return gulp.src(['vendor/font-awesome/fonts/**/*.*'], {base: './vendor/font-awesome/'})
+        .pipe(gulp.dest(buildDirectory));
+});
+
 gulp.task('build', function () {
-    runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files');
+    runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts');
 });
 
 gulp.task('build-prod', function () {
-    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'package');
+    return runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', 'package');
 });
 
 gulp.task('clean', function () {
@@ -254,7 +260,7 @@ gulp.task('copy-app', function () {
 });
 
 gulp.task('copy-to-dev', function () {
-    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'modify-manifest', 'copy-app');
+    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', 'modify-manifest', 'copy-app');
 });
 
 gulp.task('travis', function () {

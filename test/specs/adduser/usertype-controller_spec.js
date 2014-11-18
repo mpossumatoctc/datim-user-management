@@ -11,6 +11,7 @@ describe('Usertype controller', function () {
         scope.userTypes = [
             {name: 'Agency'}
         ];
+        scope.user = {};
 
         controller = $controller('userTypeController', {
             $scope: scope
@@ -38,23 +39,19 @@ describe('Usertype controller', function () {
         expect(controller.userTypes).toBe(scope.userTypes);
     });
 
-    it('should have a currentUserType', function () {
-        expect(controller.currentUserType).toBeDefined();
-    });
-
     describe('isAgency', function () {
         it('should be a method', function () {
             expect(controller.isAgency).toBeAFunction();
         });
 
         it('should return false when the usertype is partner', function () {
-            controller.currentUserType = 'Partner';
+            scope.user.userType = {name: 'Partner'};
 
             expect(controller.isAgency()).toBe(false);
         });
 
         it('should return when usertype is agency', function () {
-            controller.currentUserType = 'Agency';
+            scope.user.userType = {name: 'Agency'};
 
             expect(controller.isAgency()).toBe(true);
         });
@@ -66,45 +63,32 @@ describe('Usertype controller', function () {
         });
 
         it('should return false when the usertype is agency', function () {
-            controller.currentUserType = 'Agency';
+            scope.user.userType = {name: 'Agency'};
 
             expect(controller.isPartner()).toBe(false);
         });
 
         it('should return true when the usertype is partner', function () {
-            controller.currentUserType = 'Partner';
+            scope.user.userType = {name: 'Partner'};
 
             expect(controller.isPartner()).toBe(true);
         });
 
         it('should return false on an empty string', function () {
-            controller.currentUserType = '';
+            scope.user.userType = '';
 
             expect(controller.isPartner()).toBe(false);
         });
     });
 
-    describe('setUserType', function () {
-        it('should be a function', function () {
-            expect(controller.setUserType).toBeAFunction();
-        });
+    describe('userType watch', function () {
+        it('should reset userEntity to undefined when userType is interAgency', function () {
+            scope.user.userEntity = 'Abt';
 
-        it('should set the userType on the controller', function () {
-            controller.setUserType('Agency');
+            scope.user.userType = 'Inter-Agency';
+            scope.$apply();
 
-            expect(controller.currentUserType).toBe('Agency');
-        });
-
-        it('should only set the userType if that usertype exists', function () {
-            controller.setUserType('Agency2');
-
-            expect(controller.currentUserType).toBe('');
-        });
-    });
-
-    describe('setUserEntity', function () {
-        it('should be a function', function () {
-            expect(controller.setUserEntity).toBeAFunction();
+            expect(scope.user.userEntity).not.toBeDefined();
         });
     });
 });

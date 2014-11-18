@@ -1,14 +1,23 @@
 angular.module('PEPFAR.usermanagement').controller('userTypeController', userTypeController);
 
-function userTypeController($scope, _) {
+function userTypeController($scope) {
     var vm = this;
 
+    //Scope inherited properties
     vm.userTypes = $scope.userTypes;
-    vm.currentUserType = '';
+    vm.user = $scope.user;
+
     vm.isAgency = isAgency;
     vm.isPartner = isPartner;
-    vm.setUserType = setUserType;
-    vm.setUserEntity = setUserEntity;
+
+    //Reset the userEntity when the userType is changed
+    $scope.$watch(function () {
+        return $scope.user.userType;
+    }, function (newVal) {
+        if (newVal) {
+            $scope.user.userEntity = undefined;
+        }
+    });
 
     function isAgency() {
         return isUserType('Agency');
@@ -21,19 +30,9 @@ function userTypeController($scope, _) {
     function isUserType(userType) {
         if (!angular.isString(userType)) { return false; }
 
-        if (vm.currentUserType === userType) {
+        if ($scope.user && $scope.user.userType && $scope.user.userType.name === userType) {
             return true;
         }
         return false;
-    }
-
-    function setUserType(userType) {
-        if (_.find(vm.userTypes, {name: userType})) {
-            vm.currentUserType = userType;
-        }
-    }
-
-    function setUserEntity() {
-
     }
 }
