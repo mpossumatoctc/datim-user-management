@@ -35,8 +35,7 @@ describe('DataGroupService', function () {
             beforeEach(inject(function ($injector) {
                 $httpBackend = $injector.get('$httpBackend');
 
-                userGroupRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?' +
-                        'fields=id,name&filter=name:eq:Data+SI+access&filter=name:eq:Data+EA+access&filter=name:eq:Data+SIMS+access&paging=false')
+                userGroupRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Data&paging=false')
                     .respond(200, fixtures.get('userGroups'));
                 userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
                         'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')

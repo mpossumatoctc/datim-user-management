@@ -24,7 +24,7 @@ function dataGroupsService($q, Restangular, errorHandler) {
     function loadUserGroups() {
         return Restangular.one('userGroups').withHttpConfig({cache: true}).get({
             fields: ['id', 'name'].join(','),
-            filter: getGroupFilters(),
+            filter: 'name:like:Data',
             paging: false
         }).then(function (response) {
             var userGroups = response.userGroups;
@@ -58,17 +58,6 @@ function dataGroupsService($q, Restangular, errorHandler) {
     function getValuesFilteredByName(valueArray, filterOn) {
         return valueArray.filter(function (userGroup) {
             return filterOn === userGroup.name;
-        });
-    }
-
-    function getGroupFilters() {
-        return dataGroups.filter(function (dataGroup) {
-            return dataGroup && dataGroup.name && typeof dataGroup.name === 'string';
-        }).map(function (dataGroup) {
-            if (dataGroup.name) {
-                return getNameEqualsFilterFor(
-                    getNameFromConfig(dataGroup.name, userGroupNameConfig));
-            }
         });
     }
 

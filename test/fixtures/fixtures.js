@@ -34,7 +34,7 @@
 
     fixtures.locales = ["ar", "ar_IQ", "ar_SD", "bn", "bi", "my", "zh", "dz", "en", "fr", "in", "km", "rw", "lo", "ne", "pt", "pt_BR", "ru", "es", "tg", "vi"];
 
-    fixtures.userGroups = {"userGroups":[{"id":"YbkldVOJMUl","name":"Data EA access"},{"id":"c6hGi8GEZot","name":"Data SI access"},{"id":"iuD8wUFz95X","name":"Data SIMS access"}]}
+    fixtures.userGroups = {"userGroups":[{"id":"YbkldVOJMUl","name":"Data EA access"},{"id":"c6hGi8GEZot","name":"Data SI access"},{"id":"iuD8wUFz95X","name":"Data SIMS access"},{"id":"S6qRafboIIu","name":"Global EA data"},{"id":"XRHKxqIpQ0T","name":"Global Metadata Administrators"},{"id":"l6fLS0atWsv","name":"Global SI data"},{"id":"bP89c2kQQsF","name":"Global SIMS data"},{"id":"ofT4kgxt4h9","name":"OU Ghana Mechanism 16638 - GAC Data Quality Assessment"},{"id":"hFlYeFQLe3O","name":"OU South Africa Mechanism 14847 - PIMS Database"},{"id":"zBucNG6udcd","name":"OU Tanzania Mechanism 12728 - Data warehouse"},{"id":"pbn1BRzeG9w","name":"OU Uganda Mechanism 10281 - Technical Assistance for Data Use/M&E Systems Strenghtening for Implementing Partners"},{"id":"E49I572Cws3","name":"OU Zambia Mechanism 16833 - TBD - Nursing Continuing Education Database"},{"id":"wxguOZ0rZYH","name":"OU Zimbabwe Mechanism 12893 - Building Health Data Dissemination and Information Use Systems"}]};
 
     fixtures.userRoles = {"userRoles":[{"id":"OKKx4bf4ueV","name":"Data Entry EA"},{"id":"k7BWFXkG6zt","name":"Data Entry SI"},{"id":"iXkZzRKD0i4","name":"Data Entry SIMS"}]};
 

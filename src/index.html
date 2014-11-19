@@ -11,12 +11,17 @@
     <!-- endbuild -->
 </head>
 <body ng-controller="appController as app">
-
     <div class="app-content-wrap">
         <div ng-bind="app.title"></div>
             <a ui-sref="add" translate>Add user</a>
             <a ui-sref="list" translate>Manage users</a>
         <div ui-view></div>
+    </div>
+
+    <div class="loading-screen" ng-show="app.isLoading">
+        <div class="waiting-message">
+            <i class="fa fa-circle-o-notch fa-spin"></i><span translate>Loading, please wait...</span>
+        </div>
     </div>
 
     <!-- build:vendor js/vendor.js -->
