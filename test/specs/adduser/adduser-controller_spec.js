@@ -11,7 +11,12 @@ describe('Add user controller', function () {
             controller = $controller('addUserController', {
                 $scope: scope,
                 userTypes: undefined,
-                dataGroups: undefined
+                dataGroups: undefined,
+                userActionsService: {
+                    getActionsFor: function () {
+                        return [];
+                    }
+                }
             });
         }));
 

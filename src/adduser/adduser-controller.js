@@ -1,26 +1,18 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, userActionsService) {
+function addUserController($scope, userTypes, dataGroups, userActionsService, userService) {
     var vm = this;
 
     vm.title = 'Add or delete user';
     vm.dataGroups = dataGroups || [];
-    vm.actions = [];
+    vm.actions = userActionsService.getActionsFor();
     vm.languages = [];
     vm.isProcessingAddUser = false;
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
 
     $scope.userTypes = userTypes || [];
-    $scope.user = {
-        userType: undefined,
-        userEntity: undefined,
-        email: undefined,
-        userActions: {},
-        userGroups: [],
-        userRoles: [],
-        dataGroups: {}
-    };
+    $scope.user = userService.getUserObject();
 
     initialize();
 
@@ -41,6 +33,7 @@ function addUserController($scope, userTypes, dataGroups, userActionsService) {
 
     function addUser() {
         vm.isProcessingAddUser = true;
+        console.log(vm.actions); //jshint ignore:line
     }
 
     function validateDataGroups() {

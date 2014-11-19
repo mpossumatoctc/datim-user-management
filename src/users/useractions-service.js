@@ -1,6 +1,6 @@
-angular.module('PEPFAR.usermanagement').service('userActionsService', userActionsService);
+angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(_) {
+function userActionsService(Restangular, errorHandler) {
     var availableAgencyActions = [
         'Accept data', 'Submit data', 'Manage users'
     ];
@@ -11,18 +11,53 @@ function userActionsService(_) {
         'Capture data', 'Submit data', 'Manage users'
     ];
     var actions = [
-        {name: 'Capture data', userGroup: '', typeDependent: true},
-        {name: 'Capture inter-agency data', userGroup: '', typeDependent: true},
-        {name: 'Accept data', userGroup: 'Data accepter'},
-        {name: 'Submit data', userGroup: 'Data submitter'},
-        {name: 'Manage users', userGroup: 'User administrator'},
-        {name: 'Read data', userGroup: 'Data reader', default: true}
+        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+        {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+        {name: 'Accept data', userRole: 'Data Accepter'},
+        {name: 'Submit data', userRole: 'Data Submitter'},
+        {name: 'Manage users', userRole: 'User Administrator'},
+        {name: 'Read data', userRole: 'Read Only', default: true}
     ];
 
+    initialise();
     return {
         actions: actions,
         getActionsFor: getActionsFor
     };
+
+    function initialise() {
+        Restangular.one('userRoles').withHttpConfig({cache: true}).get({
+            fields: 'id,name',
+            filter: getRoleFilters(),
+            paging: false
+        }).then(function (response) {
+            var userRoles = response.userRoles;
+
+            actions.forEach(function (action) {
+                //Only search roles for type independent actions
+                if (action.typeDependent) { return true; }
+
+                action.userRoleId = userRoles.reduce(function (current, value) {
+                    if (value.name === action.userRole) {
+                        return value.id;
+                    }
+                    return current;
+                }, action.userRoleId);
+            });
+        }, errorHandler.errorFn('Failed to load user roles for actions'));
+    }
+
+    function getRoleFilters() {
+        return actions.filter(function (action) {
+            return action.userRole && (!action.typeDependent || action.typeDependent !== true);
+        }).map(function (action) {
+            return [
+                'name',
+                'eq',
+                action.userRole
+            ].join(':');
+        });
+    }
 
     function getAvailableActionsForUserType(userType) {
         if (typeof userType === 'string') {
@@ -45,7 +80,7 @@ function userActionsService(_) {
     function getActionsFor(userType) {
         var availableActions = getAvailableActionsForUserType(userType);
 
-        return _.filter(actions, function (action) {
+        return actions.filter(function (action) {
             return (availableActions.indexOf(action.name) >= 0) || action.default;
         });
     }

@@ -11,7 +11,7 @@
 .app-content-wrap
   margin: 0 auto
   max-width: 1200px
-  width: 80%
+  width: 60%
 
 .form-control.ng-valid,
 .ui-select-bootstrap.ng-valid button
@@ -24,7 +24,7 @@
 .form-control-wrap.ng-valid,
 .ui-select-bootstrap.ng-valid
   &:after
-    content: "\f05d"
+    content: "\f00c"
     color: green
     width: 30px
     height: 30px
@@ -43,3 +43,24 @@
   color: red
   font-size: .9em
   margin-top: 5px
+
+.half
+  display: inline-block
+  vertical-align: top
+  width: 50%
+
+  fieldset
+    width: 95%
+
+    legend
+      i.valid-icon
+        color: green
+        margin-left: 15px
+
+
+ul.checkbox-group
+  list-style: none
+  padding-left: 15px
+
+  li
+    list-style: none

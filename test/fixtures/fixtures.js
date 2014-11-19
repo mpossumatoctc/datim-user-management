@@ -15,15 +15,31 @@
     ]};
 
     fixtures.actionsList = [
-        {name: 'Capture data', userGroup: '', typeDependent: true},
-        {name: 'Capture inter-agency data', userGroup: '', typeDependent: true},
-        {name: 'Accept data', userGroup: 'Data accepter'},
-        {name: 'Submit data', userGroup: 'Data submitter'},
-        {name: 'Manage users', userGroup: 'User administrator'},
-        {name: 'Read data', userGroup: 'Data reader', default: true}
+        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+        {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+        {name: 'Accept data', userRole: 'Data Accepter'},
+        {name: 'Submit data', userRole: 'Data Submitter'},
+        {name: 'Manage users', userRole: 'User Administrator'},
+        {name: 'Read data', userRole: 'Read Only', default: true}
+    ];
+
+    fixtures.actionsListWithRoles = [
+        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+        {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+        {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+        {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
     ];
 
     fixtures.locales = ["ar", "ar_IQ", "ar_SD", "bn", "bi", "my", "zh", "dz", "en", "fr", "in", "km", "rw", "lo", "ne", "pt", "pt_BR", "ru", "es", "tg", "vi"];
+
+    fixtures.userGroups = {"userGroups":[{"id":"YbkldVOJMUl","name":"Data EA access"},{"id":"c6hGi8GEZot","name":"Data SI access"},{"id":"iuD8wUFz95X","name":"Data SIMS access"}]}
+
+    fixtures.userRoles = {"userRoles":[{"id":"OKKx4bf4ueV","name":"Data Entry EA"},{"id":"k7BWFXkG6zt","name":"Data Entry SI"},{"id":"iXkZzRKD0i4","name":"Data Entry SIMS"}]};
+
+    fixtures.userRolesForActions = {"userRoles":[{"id":"QbxXEPw9xlf","name":"Data Accepter"},{"id":"n777lf1THwQ","name":"Data Submitter"},{"id":"b2uHwX9YLhu","name":"Read Only"},{"id":"KagqnetfxMr","name":"User Administrator"}]};
+
 
     window.fixtures = {
         get: function (fixtureName) {

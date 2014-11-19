@@ -14,8 +14,8 @@
 
     <div class="app-content-wrap">
         <div ng-bind="app.title"></div>
-        <a ui-sref="add" translate>Add user</a>
-        <a ui-sref="list" translate>Manage users</a>
+            <a ui-sref="add" translate>Add user</a>
+            <a ui-sref="list" translate>Manage users</a>
         <div ui-view></div>
     </div>
 
@@ -50,6 +50,8 @@
     <script src="language/locale-service.js"></script>
     <script src="language/locale-select-directive.js"></script>
     <script src="adduser/usertype-controller.js"></script>
+    <script src="users/user-service.js"></script>
+    <script src="errorhandler/errorhandler-service.js"></script>
     <!-- endbuild -->
 
 </body>
