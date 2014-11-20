@@ -49,7 +49,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser,
         vm.isProcessingAddUser = true;
 
         vm.inviteObject = JSON.stringify(
-            userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions),
+            userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser),
             undefined,
             2
         );

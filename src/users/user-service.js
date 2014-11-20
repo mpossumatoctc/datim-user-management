@@ -43,7 +43,7 @@ function userService(Restangular) {
         return Restangular.all('users').post();
     }
 
-    function getUserInviteObject(user, dataGroups, allActions) {
+    function getUserInviteObject(user, dataGroups, allActions, currentUser) {
         var inviteObject = angular.copy(userInviteObjectStructure);
         var selectedDataGroups = getSelectedDataGroups(user, dataGroups);
         var actions = getActionsForGroups(user, selectedDataGroups, allActions);
@@ -61,6 +61,17 @@ function userService(Restangular) {
         });
 
         inviteObject.email = user.email;
+
+        //TODO: Create get functions for these on the userobject?
+        var orgUnits = (currentUser && currentUser.organisationUnits) || [];
+        var dataOrgUnits = (currentUser && currentUser.dataViewOrganisationUnits) || [];
+
+        inviteObject.organisationUnits = orgUnits.map(function (orgUnit) {
+            return {id: orgUnit.id};
+        });
+        inviteObject.dataViewOrganisationUnits = dataOrgUnits.map(function (orgUnit) {
+            return {id: orgUnit.id};
+        });
 
         return inviteObject;
     }

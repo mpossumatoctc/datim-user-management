@@ -1,4 +1,5 @@
 describe('User service', function () {
+    var fixtures = window.fixtures;
     var service;
 
     beforeEach(module('PEPFAR.usermanagement'));
@@ -114,9 +115,9 @@ describe('User service', function () {
                 ],
                 userCredentials: {
                     userAuthorityGroups: [
-                        {id:'k7BWFXkG6zt'},
-                        {id:'KagqnetfxMr'},
-                        {id:'b2uHwX9YLhu'}
+                        {id: 'k7BWFXkG6zt'},
+                        {id: 'KagqnetfxMr'},
+                        {id: 'b2uHwX9YLhu'}
                     ]
                 }
             };
@@ -128,6 +129,26 @@ describe('User service', function () {
 
         it('should return the correct userGroups', function () {
             expect(service.getUserInviteObject(userObject, dataGroups, actions)).toEqual(expectedInviteObject);
+        });
+
+        it('should add the organisation units from the current user', function () {
+            var currentUser =  fixtures.get('currentUser');
+            expectedInviteObject.organisationUnits = [{id: 'HfVjCurKxh2'}];
+            expectedInviteObject.dataViewOrganisationUnits = [{id: 'HfVjCurKxh2'}];
+
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, currentUser))
+                .toEqual(expectedInviteObject);
+        });
+
+        it('should not add roles for which there is no Id', function () {
+            expectedInviteObject.userCredentials.userAuthorityGroups = [
+                {id: 'k7BWFXkG6zt'},
+                {id: 'b2uHwX9YLhu'}
+            ];
+            actions[2].userRoleId = undefined;
+
+            expect(service.getUserInviteObject(userObject, dataGroups, actions))
+                .toEqual(expectedInviteObject);
         });
     });
 });
