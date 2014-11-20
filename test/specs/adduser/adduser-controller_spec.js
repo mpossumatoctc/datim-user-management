@@ -215,5 +215,39 @@ describe('Add user controller', function () {
                 expect(controller.validateDataGroups()).toBe(true);
             });
         });
+
+        describe('dataGroupsInteractedWith', function () {
+            var simulatedForm;
+
+            beforeEach(function () {
+                simulatedForm = {
+                    'dataStream[EA]': {
+                        $dirty: false
+                    },
+                    'dataStream[SI]': {
+                        $dirty: false
+                    },
+                    otherFormField: {
+                        $dirty: false
+                    }
+                };
+            });
+
+            it('should not return true when the datastreams have not been interacted with', function () {
+                expect(controller.dataGroupsInteractedWith(simulatedForm)).toBe(false);
+            });
+
+            it('should return true when the datastreams have been interacted with', function () {
+                simulatedForm['dataStream[EA]'].$dirty = true;
+
+                expect(controller.dataGroupsInteractedWith(simulatedForm)).toBe(true);
+            });
+
+            it('should not return true when other fields have been interacted with', function () {
+                simulatedForm.otherFormField.$dirty = true;
+
+                expect(controller.dataGroupsInteractedWith(simulatedForm)).toBe(false);
+            });
+        });
     });
 });
