@@ -31,8 +31,17 @@ describe('DataGroupService', function () {
             var $httpBackend;
             var userGroupRequest;
             var userRoleRequest;
+            var currentUserRequest;
+            var currentUserAuthoritiesRequest;
 
             beforeEach(inject(function ($injector) {
+                var currentUserResponse = fixtures.get('currentUser');
+                currentUserResponse.groups = [
+                    {"id":"YbkldVOJMUl","name":"Data EA access"},
+                    {"id":"c6hGi8GEZot","name":"Data SI access"},
+                    {"id":"iuD8wUFz95X","name":"Data SIMS access"}
+                ];
+
                 $httpBackend = $injector.get('$httpBackend');
 
                 userGroupRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Data&paging=false')
@@ -40,6 +49,11 @@ describe('DataGroupService', function () {
                 userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
                         'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')
                     .respond(200, fixtures.get('userRoles'));
+
+                currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
+                    .respond(200, currentUserResponse);
+                currentUserAuthoritiesRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
+                    .respond(200, fixtures.get('currentUserAuthorities'));
             }));
 
             afterEach(function () {
@@ -106,6 +120,84 @@ describe('DataGroupService', function () {
                 expect(errorHandler.error).toHaveBeenCalledWith('Failed to load the usergroups');
                 expect(errorHandler.error).toHaveBeenCalledWith('Failed to load the userroles');
                 expect(errorHandler.error.calls.count()).toBe(2);
+            });
+
+            describe('filtered responses', function () {
+                var dataGroups;
+
+                it('should filter the groups based on the users groups', function () {
+                    var expectedDataGroups;
+                    var currentUserResponse = fixtures.get('currentUser');
+
+                    currentUserResponse.groups = [
+                        {"id":"c6hGi8GEZot","name":"Data SI access"}
+                    ];
+                    currentUserRequest.respond(200, currentUserResponse);
+
+                    expectedDataGroups = [
+                        {
+                            name: 'SI',
+                            userGroups: [
+                                {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                            ]
+                        }
+                    ];
+
+                    dataGroupsService.getDataGroups().then(function (data) {
+                        dataGroups = data;
+                    });
+                    $httpBackend.flush();
+
+                    expect(dataGroups).toEqual(expectedDataGroups);
+                });
+
+                it('should return all the options if the user has the all authority', function () {
+                    var expectedDataGroups;
+                    var currentUserResponse = fixtures.get('currentUser');
+
+                    currentUserResponse.groups = [];
+                    currentUserRequest.respond(200, currentUserResponse);
+                    currentUserAuthoritiesRequest
+                        .respond(200, fixtures.get('currentUserAuthorities').concat(['ALL']));
+
+                    expectedDataGroups = [
+                        {
+                            name: 'SI',
+                            userGroups: [
+                                {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                            ]
+                        }, {
+                            name: 'EA',
+                            userGroups: [
+                                {name: 'Data EA access', id: 'YbkldVOJMUl'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
+                            ]
+                        }, {
+                            name: 'SIMS',
+                            userGroups: [
+                                {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
+                            ]
+                        }
+                    ];
+
+                    dataGroupsService.getDataGroups().then(function (data) {
+                        dataGroups = data;
+                    });
+                    $httpBackend.flush();
+
+                    expect(dataGroups).toEqual(expectedDataGroups);
+                });
             });
         });
     });

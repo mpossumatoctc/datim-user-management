@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('dataGroupsService', dataGroupsService);
 
-function dataGroupsService($q, Restangular, errorHandler) {
+function dataGroupsService($q, Restangular, currentUserService, errorHandler) {
     var deferred;
     var dataGroups = [
         {name: 'SI'},
@@ -16,8 +16,21 @@ function dataGroupsService($q, Restangular, errorHandler) {
     };
 
     function initialise() {
-        deferred = $q.all([loadUserGroups(), loadUserRoles()]).then(function () {
-            return dataGroups;
+        deferred = $q.all([loadUserGroups(), loadUserRoles(), currentUserService.getCurrentUser()]).then(function (responses) {
+            var currentUser = responses[2];
+            var currentUserGroups = currentUser.groups || [];
+            var currentUserGroupIds = currentUserGroups.map(function (userGroup) {
+                return userGroup.id;
+            });
+
+            return dataGroups.filter(function (dataGroup) {
+                var userGroups = dataGroup.userGroups || [];
+                return currentUser.hasAllAuthority() || userGroups.some(function (userGroup) {
+                    return currentUserGroupIds.indexOf(userGroup.id) >= 0;
+                });
+
+                return true;
+            });
         });
     }
 
