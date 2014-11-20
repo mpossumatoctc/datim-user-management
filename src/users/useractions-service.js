@@ -71,8 +71,6 @@ function userActionsService(Restangular, errorHandler) {
                 return availablePartnerActions;
             case 'inter-agency':
                 return availableInterAgencyActions;
-            default:
-                return [];
         }
         return [];
     }
