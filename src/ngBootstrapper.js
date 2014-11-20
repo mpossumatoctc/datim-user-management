@@ -90,7 +90,7 @@
      * It adds a factory to the module that returns the data on the response.
      * It looks for a data property on each of the responses.
      *
-     * @param {Array} responses Array of responses that have been recieved from the ajax calls.
+     * @param {Array} responses Array of responses that have been received from the ajax calls.
      */
     NgBootstrapper.prototype.createFactories = function (responses) {
         var module = this.module;
