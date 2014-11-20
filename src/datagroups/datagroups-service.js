@@ -28,8 +28,6 @@ function dataGroupsService($q, Restangular, currentUserService, errorHandler) {
                 return currentUser.hasAllAuthority() || userGroups.some(function (userGroup) {
                     return currentUserGroupIds.indexOf(userGroup.id) >= 0;
                 });
-
-                return true;
             });
         });
     }

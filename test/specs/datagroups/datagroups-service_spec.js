@@ -37,9 +37,9 @@ describe('DataGroupService', function () {
             beforeEach(inject(function ($injector) {
                 var currentUserResponse = fixtures.get('currentUser');
                 currentUserResponse.groups = [
-                    {"id":"YbkldVOJMUl","name":"Data EA access"},
-                    {"id":"c6hGi8GEZot","name":"Data SI access"},
-                    {"id":"iuD8wUFz95X","name":"Data SIMS access"}
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
                 ];
 
                 $httpBackend = $injector.get('$httpBackend');
@@ -130,7 +130,7 @@ describe('DataGroupService', function () {
                     var currentUserResponse = fixtures.get('currentUser');
 
                     currentUserResponse.groups = [
-                        {"id":"c6hGi8GEZot","name":"Data SI access"}
+                        {id: 'c6hGi8GEZot', name: 'Data SI access'}
                     ];
                     currentUserRequest.respond(200, currentUserResponse);
 
