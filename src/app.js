@@ -28,8 +28,16 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 dataGroups: function (dataGroupsService) {
                     return dataGroupsService.getDataGroups();
+                },
+                currentUser: function (currentUserService) {
+                    return currentUserService.getCurrentUser();
                 }
             }
+        })
+        .state('noaccess', {
+            url: '/noaccess',
+            templateUrl: 'noaccess/noaccess.html',
+            controller: 'noAccessController as noAccess'
         });
 }
 

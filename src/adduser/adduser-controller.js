@@ -1,6 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, userActionsService, userService) {
+function addUserController($scope, userTypes, dataGroups, currentUser,
+                           userActionsService, userService, $state) { //jshint ignore:line
     var vm = this;
     var regex = /^dataStream.+$/g;
     var dataStreamIds;
@@ -14,6 +15,7 @@ function addUserController($scope, userTypes, dataGroups, userActionsService, us
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
     vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
+    vm.allowUserAdd = false;
 
     //Temp
     vm.inviteObject = {};
@@ -31,6 +33,10 @@ function addUserController($scope, userTypes, dataGroups, userActionsService, us
     });
 
     function initialize() {
+        if (!currentUser.hasAllAuthority() && !currentUser.hasUserRole('User Administrator')) {
+            $state.go('noaccess');
+        }
+
         vm.dataGroups.reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = false;

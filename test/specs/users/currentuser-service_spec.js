@@ -92,6 +92,24 @@ describe('Current user', function () {
                 expect(currentUser.hasUserRole('Read Only')).toBe(false);
             });
         });
+
+        describe('error handling', function () {
+            var errorHandler;
+
+            beforeEach(inject(function ($injector) {
+                errorHandler = $injector.get('errorHandler');
+
+                spyOn(errorHandler, 'error');
+            }));
+
+            it('should call the error method on the error handler when the request fails', function () {
+                userResponse.respond(404);
+                $httpBackend.flush();
+
+                expect(errorHandler.error).toHaveBeenCalled();
+                expect(errorHandler.error).toHaveBeenCalledWith('Failed to load the current user data');
+            });
+        });
     });
 
     describe('getCurrentUser', function () {

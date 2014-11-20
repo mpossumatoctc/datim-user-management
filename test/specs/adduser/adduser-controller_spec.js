@@ -1,7 +1,25 @@
 describe('Add user controller', function () {
     var scope;
+    var currentUserMock;
 
     beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(function () {
+        currentUserMock = function (options) {
+            return {
+                hasAllAuthority: function () {
+                    if (options && options.allAuthority !== undefined) {
+                        return options.allAuthority;
+                    }
+                    return true;
+                },
+                hasUserRole: function (userAdminRole) {
+                    if (options && options.userAdministrator === userAdminRole) {
+                        return true;
+                    }
+                }
+            };
+        };
+    });
 
     describe('basic structure', function () {
         var controller;
@@ -16,7 +34,9 @@ describe('Add user controller', function () {
                     getActionsFor: function () {
                         return [];
                     }
-                }
+                },
+                currentUser: currentUserMock()
+
             });
         }));
 
@@ -66,7 +86,8 @@ describe('Add user controller', function () {
                     {name: 'MER'},
                     {name: 'EA'},
                     {name: 'SIMS'}
-                ]
+                ],
+                currentUser: currentUserMock()
             });
         }));
 
@@ -109,7 +130,8 @@ describe('Add user controller', function () {
             controller = $controller('addUserController', {
                 $scope: scope,
                 userTypes: undefined,
-                dataGroups: undefined
+                dataGroups: undefined,
+                currentUser: currentUserMock()
             });
         }));
 
@@ -149,7 +171,9 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
-                userActionsService: userActionsServiceMock
+                userActionsService: userActionsServiceMock,
+                currentUser: currentUserMock(),
+                $state: {} //Fake the state to not load the default
             });
             scope.$apply();
         }));
@@ -196,7 +220,8 @@ describe('Add user controller', function () {
                     {name: 'MER'},
                     {name: 'EA'},
                     {name: 'SIMS'}
-                ]
+                ],
+                currentUser: currentUserMock()
             });
         }));
 
@@ -248,6 +273,51 @@ describe('Add user controller', function () {
 
                 expect(controller.dataGroupsInteractedWith(simulatedForm)).toBe(false);
             });
+        });
+    });
+
+    describe('permissions', function () {
+        var $controller;
+        var $state;
+
+        function createController(allAuthority, userRole) {
+            $controller('addUserController', {
+                $scope: scope,
+                userTypes: undefined,
+                dataGroups: undefined,
+                userActionsService: {
+                    getActionsFor: function () {
+                        return [];
+                    }
+                },
+                currentUser: currentUserMock({
+                    allAuthority: allAuthority || false,
+                    userAdministrator: userRole || ''
+                }),
+                $state: $state
+            });
+        }
+
+        beforeEach(inject(function ($injector, $rootScope) {
+            $controller = $injector.get('$controller');
+            scope = $rootScope.$new();
+            $state = $injector.get('$state');
+            spyOn($state, 'go');
+        }));
+
+        it('should switch states when the user does not have permissions', function () {
+            createController();
+            expect($state.go).toHaveBeenCalled();
+        });
+
+        it('should not switch states when the user has the all authority', function () {
+            createController(true, false);
+            expect($state.go).not.toHaveBeenCalled();
+        });
+
+        it('should not switch states when the user has the user manager role', function () {
+            createController(false, 'User Administrator');
+            expect($state.go).not.toHaveBeenCalled();
         });
     });
 });

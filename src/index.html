@@ -15,7 +15,7 @@
         <div ng-bind="app.title"></div>
             <a ui-sref="add" translate>Add user</a>
             <a ui-sref="list" translate>Manage users</a>
-        <div ui-view></div>
+        <div ui-view ng-hide="app.isLoading"></div>
     </div>
 
     <div class="loading-screen" ng-show="app.isLoading">
@@ -57,6 +57,8 @@
     <script src="adduser/usertype-controller.js"></script>
     <script src="users/user-service.js"></script>
     <script src="errorhandler/errorhandler-service.js"></script>
+    <script src="users/currentuser-service.js"></script>
+    <script src="noaccess/noaccess-controller.js"></script>
     <!-- endbuild -->
 
 </body>

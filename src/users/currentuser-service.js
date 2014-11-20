@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('currentUserService', currentUserService);
 
-function currentUserService($q, Restangular) {
+function currentUserService($q, Restangular, errorHandler) {
     var currentUserPromise;
 
     initialise();
@@ -21,7 +21,7 @@ function currentUserService($q, Restangular) {
                 currentUser.hasUserRole = hasUserRole.bind(currentUser);
 
                 return currentUser;
-            });
+            }, errorHandler.errorFn('Failed to load the current user data'));
     }
 
     function requestCurrentUser() {

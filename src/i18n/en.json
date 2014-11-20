@@ -1,5 +1,6 @@
 {
     "user": "User",
     "Select a partner": "Select a partner",
-    "Select an agency": "Select an agency"
+    "Select an agency": "Select an agency",
+    "Your user account does not seem to have the right permissions to access this functionality.": "Your user account does not seem to have the right permissions to access this functionality."
 }

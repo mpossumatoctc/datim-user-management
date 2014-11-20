@@ -14,6 +14,11 @@ describe('Application states', function () {
                 return [];
             }
         });
+        $provide.value('currentUserService', {
+            getCurrentUser: function () {
+                return {};
+            }
+        });
     }));
     beforeEach(inject(function ($templateCache, $injector) {
         injector = $injector;
@@ -21,6 +26,7 @@ describe('Application states', function () {
         $rootScope = $injector.get('$rootScope');
         $templateCache.put('adduser/add.html', '');
         $templateCache.put('userlist/list.html', '');
+        $templateCache.put('noaccess/noaccess.html', '');
     }));
 
     it('should set the default state to list', function () {
@@ -68,5 +74,29 @@ describe('Application states', function () {
         $rootScope.$apply();
 
         expect(injector.invoke($state.current.resolve.dataGroups)).toEqual([]);
+    });
+
+    it('should correctly resolve the current user object', function () {
+        $state.go('add');
+        $rootScope.$apply();
+
+        expect(injector.invoke($state.current.resolve.currentUser)).toEqual({});
+    });
+
+    it('should change the state to noaccess', function () {
+        var expectedState = {
+            name: 'noaccess',
+            url: '/noaccess',
+            templateUrl: 'noaccess/noaccess.html',
+            controller: 'noAccessController as noAccess'
+        };
+
+        $state.go('noaccess');
+        $rootScope.$apply();
+
+        expect($state.current.name).toEqual(expectedState.name);
+        expect($state.current.url).toEqual(expectedState.url);
+        expect($state.current.templateUrl).toEqual(expectedState.templateUrl);
+        expect($state.current.controller).toEqual(expectedState.controller);
     });
 });
