@@ -46,4 +46,88 @@ describe('User service', function () {
             expect(service.createUserInvite()).toBeAPromiseLikeObject();
         });
     });
+
+    describe('getUserInviteObject', function () {
+        var actions;
+        var dataGroups;
+        var userObject;
+        var expectedInviteObject;
+
+        beforeEach(function () {
+            userObject = {
+                userType: {
+                    name: 'Partner',
+                    $$hashKey: 'object:21'
+                },
+                userEntity: {
+                    name: 'African Evangelistic Enterprise',
+                    created: '2014-05-09T23:23:11.387+0000',
+                    lastUpdated: '2014-10-05T13:07:56.195+0000',
+                    id: 'z4WtTPPjD7i',
+                    $$hashKey: 'object:82'
+                },
+                email: 'mark@thedutchies.com',
+                locale: {
+                    name: 'en'
+                },
+                userActions: {
+                    'Manage users': true,
+                    'Capture data': true
+                },
+                userGroups: [],
+                userRoles: [],
+                dataGroups: {
+                    SI: true,
+                    EA: false,
+                    SIMS: false
+                }
+            };
+            actions = [
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, $$hashKey: 'object:70'},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', $$hashKey: 'object:71'},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', $$hashKey: 'object:72'},
+                {name: 'Read data', userRole: 'Read Only', default: true, $$hashKey: 'object:13', userRoleId: 'b2uHwX9YLhu'}
+            ];
+            dataGroups = [
+                {name: 'SI', userRoles: [
+                    {id: 'k7BWFXkG6zt', name: 'Data Entry SI'}
+                ], userGroups: [
+                    {id: 'c6hGi8GEZot', name: 'Data SI access'}
+                ]},
+                {name: 'EA', userRoles: [
+                    {id: 'OKKx4bf4ueV', name: 'Data Entry EA'}
+                ], userGroups: [
+                    {id: 'YbkldVOJMUl', name: 'Data EA access'}
+                ]},
+                {name: 'SIMS', userRoles: [
+                    {id: 'iXkZzRKD0i4', name: 'Data Entry SIMS'}
+                ], userGroups: [
+                    {id: 'iuD8wUFz95X', name: 'Data SIMS access'}
+                ]}
+            ];
+            expectedInviteObject = {
+                email: 'mark@thedutchies.com',
+                organisationUnits: [],
+                dataViewOrganisationUnits: [],
+                groups: [
+                    {id:'c6hGi8GEZot'}
+                ],
+                userCredentials: {
+                    userAuthorityGroups: [
+                        {id:'k7BWFXkG6zt'},
+                        {id:'KagqnetfxMr'},
+                        {id:'b2uHwX9YLhu'}
+                    ]
+                }
+            };
+        });
+
+        it('should be a function', function () {
+            expect(service.getUserInviteObject).toBeAFunction();
+        });
+
+        it('should return the correct userGroups', function () {
+            expect(service.getUserInviteObject(userObject, dataGroups, actions)).toEqual(expectedInviteObject);
+        });
+    });
 });

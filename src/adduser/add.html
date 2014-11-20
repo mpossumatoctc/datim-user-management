@@ -13,7 +13,7 @@ Ability to add users here
         <span class="form-control-wrap" ng-class="{'ng-valid': userForm.emailAddress.$valid}">
             <input class="form-control" placeholder="E-mail address" name="emailAddress" type="email" ng-required="true" ng-model="user.email">
         </span>
-        <div class="error-messages" ng-messages="userForm.emailAddress.$error" ng-messages-include="userFormMessages" ng-if='userForm.emailAddress.$dirty'>
+        <div class="error-messages" ng-messages="userForm.emailAddress.$error" ng-messages-include="userFormMessages" ng-if="userForm.emailAddress.$dirty">
             <div ng-message="email">This field should contain a valid e-mail address</div>
         </div>
     </div>
@@ -31,8 +31,8 @@ Ability to add users here
                     </li>
                 </ul>
             </fieldset>
-            <div ng-messages="userForm.dataStream.$error">
-                <div ng-message="oneSelected">This field should contain a valid e-mail address</div>
+            <div class="error-messages" ng-if="addUser.dataGroupsInteractedWith(userForm) && !addUser.validateDataGroups()">
+                <div>Please select one or more data streams</div>
             </div>
         </div>
         <div class="half">
@@ -48,12 +48,9 @@ Ability to add users here
         </div>
     </div>
     <div class="form-controls-wrap">
-        <button class="btn btn-primary" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">Add user</button>
+        <button class="btn btn-primary" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()"><i class="fa fa-circle-o-notch fa-spin"></i><span>Add user</span></span></button>
     </div>
     <div>
-        <div ng-bind="user.userType.name"></div>
-        <div ng-bind="user.userEntity.name"></div>
-        <div ng-bind="user.locale.name"></div>
-        <div ng-bind="user.email"></div>
+        <textarea ng-bind="addUser.inviteObject"></textarea>
     </div>
 </form>

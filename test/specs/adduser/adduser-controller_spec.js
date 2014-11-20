@@ -167,6 +167,15 @@ describe('Add user controller', function () {
 
             expect(controller.actions).toEqual(expectedActions);
         });
+
+        it('should reset the users actions', function () {
+            scope.user.userActions = {'Submit data': true};
+
+            scope.user.userType = {name: 'Partner'};
+            scope.$apply();
+
+            expect(scope.user.userActions).toEqual({});
+        });
     });
 
     describe('validation for', function () {

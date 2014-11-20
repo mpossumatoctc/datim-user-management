@@ -2,6 +2,9 @@ angular.module('PEPFAR.usermanagement').controller('addUserController', addUserC
 
 function addUserController($scope, userTypes, dataGroups, userActionsService, userService) {
     var vm = this;
+    var regex = /^dataStream.+$/g;
+    var dataStreamIds;
+    var dataStreamInteractedWith = false;
 
     vm.title = 'Add or delete user';
     vm.dataGroups = dataGroups || [];
@@ -10,6 +13,10 @@ function addUserController($scope, userTypes, dataGroups, userActionsService, us
     vm.isProcessingAddUser = false;
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
+    vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
+
+    //Temp
+    vm.inviteObject = {};
 
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
@@ -18,6 +25,7 @@ function addUserController($scope, userTypes, dataGroups, userActionsService, us
 
     $scope.$watch('user.userType', function (newVal, oldVal) {
         if (newVal !== oldVal && newVal.name) {
+            $scope.user.userActions = {};
             vm.actions = userActionsService.getActionsFor(newVal.name);
         }
     });
@@ -33,7 +41,12 @@ function addUserController($scope, userTypes, dataGroups, userActionsService, us
 
     function addUser() {
         vm.isProcessingAddUser = true;
-        console.log(vm.actions); //jshint ignore:line
+
+        vm.inviteObject = JSON.stringify(
+            userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions),
+            undefined,
+            2
+        );
     }
 
     function validateDataGroups() {
@@ -46,5 +59,17 @@ function addUserController($scope, userTypes, dataGroups, userActionsService, us
         }, valid);
 
         return valid;
+    }
+
+    function dataGroupsInteractedWith(form) {
+        var groups = dataStreamIds || (dataStreamIds = Object.keys(form).filter(function (key) {
+            return regex.test(key);
+        }));
+
+        groups.forEach(function (key) {
+            if (form[key].$dirty) { dataStreamInteractedWith = true; }
+        });
+
+        return dataStreamInteractedWith;
     }
 }
