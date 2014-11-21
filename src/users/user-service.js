@@ -43,8 +43,34 @@ function userService(Restangular) {
         return Restangular.all('users').post();
     }
 
+    function getInviteObject() {
+        var inviteObject = Object.create(getUserInviteProto());
+        return angular.extend(inviteObject, userInviteObjectStructure);
+    }
+
+    function getUserInviteProto() {
+        return {
+            addDimensionConstraint: addDimensionConstraint,
+            addEmail: addEmail
+        };
+
+        function addDimensionConstraint(dimension) {
+            if (!this.userCredentials.catDimensionConstraints) {
+                this.userCredentials.catDimensionConstraints = [];
+            }
+            if (dimension && dimension.id) {
+                this.userCredentials.catDimensionConstraints.push({id: dimension.id});
+            }
+
+        }
+
+        function addEmail(email) {
+            this.email = email;
+        }
+    }
+
     function getUserInviteObject(user, dataGroups, allActions, currentUser) {
-        var inviteObject = angular.copy(userInviteObjectStructure);
+        var inviteObject = getInviteObject();
         var selectedDataGroups = getSelectedDataGroups(user, dataGroups);
         var actions = getActionsForGroups(user, selectedDataGroups, allActions);
 
@@ -62,8 +88,6 @@ function userService(Restangular) {
             }
         });
 
-        inviteObject.email = user.email;
-
         //TODO: Create get functions for these on the userobject?
         var orgUnits = (currentUser && currentUser.organisationUnits) || [];
         var dataOrgUnits = (currentUser && currentUser.dataViewOrganisationUnits) || [];
@@ -74,6 +98,8 @@ function userService(Restangular) {
         inviteObject.dataViewOrganisationUnits = dataOrgUnits.map(function (orgUnit) {
             return {id: orgUnit.id};
         });
+
+        inviteObject.addEmail(user.email);
 
         return inviteObject;
     }

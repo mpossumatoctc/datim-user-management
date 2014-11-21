@@ -30,6 +30,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 userActionsService: {
                     getActionsFor: function () {
                         return [];
@@ -67,6 +68,10 @@ describe('Add user controller', function () {
         it('should have a flag for if the form is processing', function () {
             expect(controller.isProcessingAddUser).toBe(false);
         });
+
+        it('should have a dimensionConstraint', function () {
+            expect(controller.dimensionConstraint).toEqual({});
+        });
     });
 
     describe('load data into the controller through injectables', function () {
@@ -87,6 +92,7 @@ describe('Add user controller', function () {
                     {name: 'EA'},
                     {name: 'SIMS'}
                 ],
+                dimensionConstraint: {},
                 currentUser: currentUserMock()
             });
         }));
@@ -131,6 +137,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 currentUser: currentUserMock()
             });
         }));
@@ -171,6 +178,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 userActionsService: userActionsServiceMock,
                 currentUser: currentUserMock(),
                 $state: {} //Fake the state to not load the default
@@ -221,6 +229,7 @@ describe('Add user controller', function () {
                     {name: 'EA'},
                     {name: 'SIMS'}
                 ],
+                dimensionConstraint: {},
                 currentUser: currentUserMock()
             });
         }));
@@ -285,6 +294,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 userActionsService: {
                     getActionsFor: function () {
                         return [];
@@ -318,6 +328,28 @@ describe('Add user controller', function () {
         it('should not switch states when the user has the user manager role', function () {
             createController(false, 'User Administrator');
             expect($state.go).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('permissions', function () {
+        var controller;
+
+        beforeEach(inject(function ($controller, $rootScope) {
+            scope = $rootScope.$new();
+
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: [],
+                dataGroups: [],
+                dimensionConstraint: {id: 'SomeID'},
+                currentUser: currentUserMock()
+            });
+        }));
+
+        it('should add the dimension constraint', function () {
+            controller.addUser();
+
+            expect(controller.userInviteObject.userCredentials.catDimensionConstraints[0].id).toEqual('SomeID');
         });
     });
 });

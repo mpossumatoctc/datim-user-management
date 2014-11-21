@@ -31,6 +31,9 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 currentUser: function (currentUserService) {
                     return currentUserService.getCurrentUser();
+                },
+                categoriesService: function (categoriesService) {
+                    return categoriesService.getDimensionConstraint();
                 }
             }
         })

@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, currentUser,
-                           userActionsService, userService, $state) { //jshint ignore:line
+function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
+                           userActionsService, userService, $state) {
     var vm = this;
     var regex = /^dataStream.+$/g;
     var dataStreamIds;
@@ -16,6 +16,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser,
     vm.validateDataGroups = validateDataGroups;
     vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
     vm.allowUserAdd = false;
+    vm.dimensionConstraint = dimensionConstraint;
 
     //Temp
     vm.inviteObject = {};
@@ -46,10 +47,15 @@ function addUserController($scope, userTypes, dataGroups, currentUser,
     }
 
     function addUser() {
+        var userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser);
+
+        userInviteObject.addDimensionConstraint(dimensionConstraint);
+
         vm.isProcessingAddUser = true;
 
-        vm.inviteObject = JSON.stringify(
-            userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser),
+        vm.userInviteObject = userInviteObject;
+        vm.inviteObjectDisplay = JSON.stringify(
+            userInviteObject,
             undefined,
             2
         );
