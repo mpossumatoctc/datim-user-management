@@ -57,7 +57,9 @@ function userService(Restangular) {
 
         //Add the user actions to the invite object
         actions.forEach(function (action) {
-            inviteObject.userCredentials.userAuthorityGroups.push({id: action.userRoleId});
+            if (action.userRoleId) {
+                inviteObject.userCredentials.userAuthorityGroups.push({id: action.userRoleId});
+            }
         });
 
         inviteObject.email = user.email;
