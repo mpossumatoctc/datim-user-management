@@ -20,12 +20,14 @@ describe('Partners service', function () {
         var fixtures = window.fixtures;
         var userRequest;
         var partnersRequest;
+        var userGroupsRequest;
 
         function withFakeUserGroups(expectedAgencies) {
             return {
-                items: expectedAgencies.items.map(function (agency) {
-                    agency.userGroup = {id: 'fakeId'};
-                    return agency;
+                items: expectedAgencies.items.map(function (partner) {
+                    partner.mechUserGroup = {id: 'fakeId'};
+                    partner.userUserGroup = {id: 'fakeUserId'};
+                    return partner;
                 })
             };
         }
@@ -46,7 +48,7 @@ describe('Partners service', function () {
 
             partnersRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/BOyWrF33hiR/items?paging=false')
                 .respond(200, fixtures.get('partnerList'));
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&filter=name:like:mechanisms&paging=false')
+            userGroupsRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&paging=false')
                 .respond(200, {
                     userGroups: [
                     ]
@@ -83,8 +85,7 @@ describe('Partners service', function () {
         });
 
         it('should request the userGroups for partners', function () {
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&filter=name:like:mechanisms&paging=false')
-                .respond(200, fixtures.get('rwandaUserGroup'));
+            partnersRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
             partnersService.getPartners();
             $httpBackend.flush();
@@ -92,45 +93,56 @@ describe('Partners service', function () {
 
         it('should add the usergroups to the partner objects', function () {
             var partners;
-            var expectedAgency = {
-                name: 'Abt Associates',
-                created: '2014-05-09T23:23:08.834+0000',
-                lastUpdated: '2014-10-05T13:07:56.049+0000',
-                id: 'JkisvjF4ahe',
-                userGroup: fixtures.get('kenyaPartnerAbtUserGroup')
+            var expectedPartner = {
+                name: 'Banana',
+                created: '2014-05-28T19:50:31.398+0000',
+                lastUpdated: '2014-10-05T13:07:56.182+0000',
+                id: 'pBimh5znu2H',
+                mechUserGroup: {
+                    id: 'tICoPGZAWNk',
+                    name: 'OU Kenya Partner 10001 all mechanisms - Banana'
+                },
+                userUserGroup: {
+                    id: 'pGh2wzc7bMY',
+                    name: 'OU Kenya Partner 10001 users - Banana'
+                },
+                userAdminUserGroup: {
+                    id: 'UCnkwxHKAAm',
+                    name: 'OU Kenya Partner 10001 user administrators - Banana'
+                }
             };
 
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&filter=name:like:mechanisms&paging=false')
-                .respond(200, fixtures.get('kenyaPartnerUserGroups'));
+            userGroupsRequest.respond(200, fixtures.get('kenyaPartnerUserGroups'));
 
             partnersService.getPartners().then(function (data) {
                 partners = data;
             });
             $httpBackend.flush();
 
-            expect(partners[0]).toEqual(expectedAgency);
+            expect(partners[0]).toEqual(expectedPartner);
         });
 
-        it('should only load the partners that have usergroups', function () {
+        it('should only load the partners that have a mechusergroup and userusergroup', function () {
             var partners;
 
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&filter=name:like:mechanisms&paging=false')
-                .respond(200, fixtures.get('kenyaPartnerUserGroups'));
+            userGroupsRequest.respond(200, fixtures.get('kenyaPartnerUserGroups'));
 
             partnersService.getPartners().then(function (data) {
                 partners = data;
             });
             $httpBackend.flush();
 
-            expect(partners.length).toEqual(1);
-            expect(partners[0].userGroup.id).toBe('hxgit9fvIVv');
+            expect(partners.length).toEqual(2);
+            expect(partners[0].mechUserGroup.id).toBe('tICoPGZAWNk');
+            expect(partners[1].mechUserGroup.id).toBe('f8t4yjDIfiY');
+            expect(partners[0].userUserGroup.id).toBe('pGh2wzc7bMY');
+            expect(partners[1].userUserGroup.id).toBe('eUXnF1aIa1Y');
         });
 
         it('should reject promise when there are no partners', function () {
             var catchFunction = jasmine.createSpy();
 
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&filter=name:like:mechanisms&paging=false')
-                .respond(200, []);
+            partnersRequest.respond(200, []);
 
             partnersService.getPartners().catch(catchFunction);
             $httpBackend.flush();

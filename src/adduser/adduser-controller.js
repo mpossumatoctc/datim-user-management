@@ -47,24 +47,32 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     }
 
     function addUser() {
-        var userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser);
-
-        userInviteObject.addDimensionConstraint(dimensionConstraint);
-
-        //Add the all mechanisms group from the user entity
-        if ($scope.user.userEntity && $scope.user.userEntity.userGroup) {
-            console.log($scope.user.userEntity.userGroup); //jshint ignore:line
-            userInviteObject.addEntityUserGroup($scope.user.userEntity.userGroup);
-        }
+        var managerRole = 'Manage users';
 
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = userInviteObject;
+        vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser);
+        vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+
+        //Add the all mechanisms group from the user entity
+        if ($scope.user.userEntity && $scope.user.userEntity.mechUserGroup && $scope.user.userEntity.userUserGroup) {
+            console.log($scope.user.userEntity); //jshint ignore:line
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
+        }
+
+        if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
+        }
+        console.log($scope.user.userEntity); //jshint ignore:line
+
         vm.inviteObjectDisplay = JSON.stringify(
-            userInviteObject,
+            vm.userInviteObject,
             undefined,
             2
         );
+
+        //vm.isProcessingAddUser = false;
     }
 
     function validateDataGroups() {

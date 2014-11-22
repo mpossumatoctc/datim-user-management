@@ -52,8 +52,7 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
         queryParams = {
             fields: 'id,name',
             filter: [
-                ['name', 'like', organisationUnitName.trim()].join(':'),
-                ['name', 'like', 'mechanisms'].join(':')
+                ['name', 'like', [organisationUnitName.trim(), 'Agency'].join(' ')].join(':')
             ],
             paging: false
         };
@@ -68,17 +67,33 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
     function matchAgenciesWithUserGroups(agencies, userGroups, organisationUnitName) {
         return agencies.map(addUserGroups(userGroups, organisationUnitName))
             .filter(function (agency) {
-                return angular.isObject(agency.userGroup) && agency.userGroup !== null;
+                return angular.isObject(agency.mechUserGroup) && agency.mechUserGroup !== null &&
+                    angular.isObject(agency.userUserGroup) && agency.userUserGroup;
             });
     }
 
     function addUserGroups(userGroups, organisationUnitName) {
-        var userGroupRegex;
+        var mechUserGroupRegex;
+        var userUserGroupRegex;
+        var userAdminUserGroupRegex;
+
         return function (agency) {
+            mechUserGroupRegex = new RegExp(['^OU', organisationUnitName, 'Agency', agency.name, 'all mechanisms$'].join(' '));
+            userUserGroupRegex = new RegExp(['^OU', organisationUnitName, 'Agency', agency.name, 'users$'].join(' '));
+            userAdminUserGroupRegex = new RegExp(['^OU', organisationUnitName, 'Agency', agency.name, 'user administrators$'].join(' '));
+
             userGroups.reduce(function (current, userGroup) {
-                userGroupRegex = new RegExp(['OU', organisationUnitName, 'Agency', agency.name, 'all mechanisms'].join(' '));
-                if (userGroupRegex.test(userGroup.name)) {
-                    agency.userGroup = userGroup;
+                if (mechUserGroupRegex.test(userGroup.name)) {
+                    agency.mechUserGroup = userGroup;
+                    return agency;
+                }
+                if (userUserGroupRegex.test(userGroup.name)) {
+                    agency.userUserGroup = userGroup;
+                    return agency;
+                }
+                if (userAdminUserGroupRegex.test(userGroup.name)) {
+                    agency.userAdminUserGroup =  userGroup;
+                    return agency;
                 }
                 return agency;
             }, agency);

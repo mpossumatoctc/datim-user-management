@@ -24,11 +24,13 @@ describe('Agencies service', function () {
         var fixtures = window.fixtures;
         var agenciesRequest;
         var userRequest;
+        var userGroupRequest;
 
         function withFakeUserGroups(expectedAgencies) {
             return {
                 items: expectedAgencies.items.map(function (agency) {
-                    agency.userGroup = {};
+                    agency.mechUserGroup = {};
+                    agency.userUserGroup = {};
                     return agency;
                 })
             };
@@ -50,7 +52,7 @@ describe('Agencies service', function () {
 
             agenciesRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/bw8KHXzxd9i/items?paging=false')
                 .respond(200, fixtures.get('agenciesList'));
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Rwanda&filter=name:like:mechanisms&paging=false')
+            userGroupRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Rwanda+Agency&paging=false')
                 .respond(200, {
                     userGroups: [
                     ]
@@ -81,8 +83,7 @@ describe('Agencies service', function () {
         });
 
         it('should request the userGroups for agencies', function () {
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Rwanda&filter=name:like:mechanisms&paging=false')
-                .respond(200, fixtures.get('rwandaUserGroup'));
+            userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
             agenciesService.getAgencies();
             $httpBackend.flush();
@@ -95,11 +96,22 @@ describe('Agencies service', function () {
                 created: '2014-05-09T23:23:06.953+0000',
                 lastUpdated: '2014-10-05T13:07:55.940+0000',
                 id: 'FPUgmtt8HRi',
-                userGroup: fixtures.get('rwandaUserGroup').userGroups[1]
+                mechUserGroup: {
+                    id: 'Stc8jiohyTg',
+                    name: 'OU Rwanda Agency HHS/CDC all mechanisms'
+                },
+                userUserGroup: {
+                    id: 'hjLU7Ug0vKG',
+                    name: 'OU Rwanda Agency HHS/CDC users'
+                },
+                userAdminUserGroup: {
+                    id: 'x47aP9pWYlu',
+                    name: 'OU Rwanda Agency HHS/CDC user administrators'
+                }
+
             };
 
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Rwanda&filter=name:like:mechanisms&paging=false')
-                .respond(200, fixtures.get('rwandaUserGroup'));
+            userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
             agenciesService.getAgencies().then(function (data) {
                 agencies = data;
@@ -109,11 +121,22 @@ describe('Agencies service', function () {
             expect(agencies[0]).toEqual(expectedAgency);
         });
 
-        it('should not return any agencies without groups', function () {
+        it('should not return any agencies without userUserGroup groups', function () {
             var agencies;
+            userGroupRequest.respond(200, fixtures.get('rwandaUserGroupWithoutUSAIDUserGroup'));
 
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Rwanda&filter=name:like:mechanisms&paging=false')
-                .respond(200, fixtures.get('rwandaUserGroup'));
+            agenciesService.getAgencies().then(function (data) {
+                agencies = data;
+            });
+            $httpBackend.flush();
+
+            expect(agencies.length).toBe(1);
+            expect(agencies[0].userUserGroup.id).toBe('hjLU7Ug0vKG');
+        });
+
+        it('should not return any agencies without mechUserGroup groups', function () {
+            var agencies;
+            userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
             agenciesService.getAgencies().then(function (data) {
                 agencies = data;
@@ -121,8 +144,22 @@ describe('Agencies service', function () {
             $httpBackend.flush();
 
             expect(agencies.length).toBe(2);
-            expect(agencies[0].userGroup.id).toBe('Stc8jiohyTg');
-            expect(agencies[1].userGroup.id).toBe('FzwHJqJ81DO');
+            expect(agencies[0].mechUserGroup.id).toBe('Stc8jiohyTg');
+            expect(agencies[1].mechUserGroup.id).toBe('FzwHJqJ81DO');
+        });
+
+        it('should be able to return agencies without userAdminUserGroup', function () {
+            var agencies;
+            userGroupRequest.respond(200, fixtures.get('rwandaUserGroupWithoutUSAIDAdminUserGroup'));
+
+            agenciesService.getAgencies().then(function (data) {
+                agencies = data;
+            });
+            $httpBackend.flush();
+
+            expect(agencies.length).toBe(2);
+            expect(agencies[0].userAdminUserGroup.id).toBe('x47aP9pWYlu');
+            expect(agencies[1].userAdminUserGroup).not.toBeDefined();
         });
 
         it('should reject the promise with an error', function () {

@@ -40,29 +40,39 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
     function addUserGroupsToPartners(userGroups) {
         return function (partner) {
-            var partnerNameRegExp = new RegExp('OU .+? Partner .+? all mechanisms - ' + partner.name, 'i');
+            var partnerMechRegExp = new RegExp('^OU .+? Partner .+? all mechanisms - ' + partner.name + '$', 'i');
+            var partnerUserRegExp = new RegExp('^OU .+? Partner .+? users - ' + partner.name + '$', 'i');
+            var userAdminUserGroup = new RegExp('^OU .+? Partner .+? user administrators - ' + partner.name + '$', 'i');
 
-            partner.userGroup = userGroups.reduce(function (curr, userGroup) {
-                if (partnerNameRegExp.test(userGroup.name)) {
-                    return userGroup;
+            userGroups.forEach(function (userGroup) {
+                if (partnerMechRegExp.test(userGroup.name)) {
+                    partner.mechUserGroup = userGroup;
                 }
-                return curr;
-            }, partner.userGroup);
+
+                if (partnerUserRegExp.test(userGroup.name)) {
+                    partner.userUserGroup = userGroup;
+                }
+
+                if (userAdminUserGroup.test(userGroup.name)) {
+                    partner.userAdminUserGroup = userGroup;
+                }
+            });
+
             return partner;
         };
     }
 
     function partnersWithUserGroupId(partner) {
-        return partner.userGroup && partner.userGroup.id;
+        return partner.mechUserGroup && partner.mechUserGroup.id &&
+            partner.userUserGroup && partner.userUserGroup.id;
     }
 
     function getPartnersFromApi() {
         return Restangular
             .all('dimensions')
             .all('BOyWrF33hiR')
-            .get('items', {
-                paging: 'false'
-            }).then(function (response) {
+            .get('items', {paging: 'false'})
+            .then(function (response) {
                 return response.items;
             });
     }
@@ -71,8 +81,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
         var queryParams = {
             fields: 'id,name',
             filter: [
-                ['name', 'like', [organisationUnitName, 'partner'].join(' ')].join(':'),
-                ['name', 'like', 'mechanisms'].join(':')
+                ['name', 'like', [organisationUnitName, 'partner'].join(' ')].join(':')
             ],
             paging: false
         };

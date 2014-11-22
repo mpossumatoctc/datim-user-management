@@ -352,15 +352,53 @@ describe('Add user controller', function () {
             expect(controller.userInviteObject.userCredentials.catDimensionConstraints[0].id).toEqual('SomeID');
         });
 
-        it('should add the entityUserGroup', function () {
+        it('should add the entityUserGroups', function () {
             scope.user.userEntity = {
-                userGroup: {
-                    id: 'agencyGroupId'
+                mechUserGroup: {
+                    id: 'agencyGroupIdMech'
+                },
+                userUserGroup: {
+                    id: 'agencyGroupIdUsers'
                 }
             };
             controller.addUser();
 
-            expect(controller.userInviteObject.groups[0]).toEqual({id: 'agencyGroupId'});
+            expect(controller.userInviteObject.groups[0]).toEqual({id: 'agencyGroupIdMech'});
+            expect(controller.userInviteObject.groups[1]).toEqual({id: 'agencyGroupIdUsers'});
+        });
+
+        describe('user manager usergroup', function () {
+            beforeEach(function () {
+                scope.user.userActions['Manage users'] = true;
+                scope.user.userEntity = {
+                    userAdminUserGroup: {
+                        id: 'userAdminUserGroup'
+                    }
+                };
+            });
+
+            it('should add the user manager group when the user manager role is present', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.groups[0]).toEqual({id: 'userAdminUserGroup'});
+            });
+
+            it('should not add the user manager group when the user manager role is present but false', function () {
+                scope.user.userActions['Manage users'] = false;
+
+                controller.addUser();
+
+                expect(controller.userInviteObject.groups.length).toBe(0);
+            });
+
+            it('should not add the user manager group when the user manager role is present but not the group', function () {
+                scope.user.userEntity = {
+                };
+
+                controller.addUser();
+
+                expect(controller.userInviteObject.groups.length).toBe(0);
+            });
         });
     });
 });
