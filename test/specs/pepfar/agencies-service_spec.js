@@ -3,7 +3,7 @@ describe('Agencies service', function () {
     var agenciesService;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
-        $provide.value('$window', { alert: function () {}});
+        $provide.value('$window', {alert: function () {}});
     }));
     beforeEach(inject(function ($injector) {
         errorHandler = $injector.get('errorHandler');

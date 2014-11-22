@@ -10,7 +10,7 @@ function errorHandlerService($q, $log, $window) {
     this.alert = alert;
     this.errorFn = function (message) {
             return function () {
-                sv.error(message);
+                return sv.error(message);
             };
         };
 
