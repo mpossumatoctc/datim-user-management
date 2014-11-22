@@ -11,7 +11,7 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
             var organisationUnitName;
 
             if (!(user.organisationUnits && user.organisationUnits[0] && user.organisationUnits[0].name)) {
-                return [];
+                return $q.reject('No organisation unit found on the current user');
             }
             organisationUnitName = user.organisationUnits[0].name;
 

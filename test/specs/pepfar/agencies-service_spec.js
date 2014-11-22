@@ -2,7 +2,9 @@ describe('Agencies service', function () {
     var errorHandler;
     var agenciesService;
 
-    beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.value('$window', { alert: function () {}});
+    }));
     beforeEach(inject(function ($injector) {
         errorHandler = $injector.get('errorHandler');
         spyOn(errorHandler, 'error').and.callThrough();
@@ -21,6 +23,7 @@ describe('Agencies service', function () {
         var $httpBackend;
         var fixtures = window.fixtures;
         var agenciesRequest;
+        var userRequest;
 
         function withFakeUserGroups(expectedAgencies) {
             return {
@@ -34,7 +37,7 @@ describe('Agencies service', function () {
         beforeEach(inject(function ($injector) {
             $httpBackend = $injector.get('$httpBackend');
 
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
+            userRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
                 .respond(200, {
                     organisationUnits: [
                         {
@@ -42,8 +45,6 @@ describe('Agencies service', function () {
                         }
                     ]
                 });
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
-                .respond(200, {});
             $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
                 .respond(200, []);
 
@@ -133,6 +134,20 @@ describe('Agencies service', function () {
 
             expect(catchFunction).toHaveBeenCalled();
             expect(errorHandler.error).toHaveBeenCalled();
+        });
+
+        it('should reject the promise with the correct message on no org unit', function () {
+            var agenciesMessage;
+            userRequest.respond(200, {});
+            agenciesRequest.respond(200, fixtures.get('agenciesList'));
+
+            agenciesService.getAgencies().catch(function (response) {
+                agenciesMessage = response;
+            });
+            $httpBackend.resetExpectations();
+            $httpBackend.flush();
+
+            expect(agenciesMessage).toEqual('No organisation unit found on the current user');
         });
     });
 });
