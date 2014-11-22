@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').service('errorHandler', errorHandlerService);
 
-function errorHandlerService($log, $window) {
+function errorHandlerService($q, $log, $window) {
     var errorMessages = {
         404: 'Requested resource was not found'
     };
@@ -20,6 +20,7 @@ function errorHandlerService($log, $window) {
         } else {
             alert(message);
         }
+        return $q.reject(message);
     }
 
     function alert(message) {

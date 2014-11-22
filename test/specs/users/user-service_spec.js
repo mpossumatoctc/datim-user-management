@@ -150,5 +150,25 @@ describe('User service', function () {
             expect(service.getUserInviteObject(userObject, dataGroups, actions))
                 .toEqual(expectedInviteObject);
         });
+
+        it('should have a addEntityUserGroup method', function () {
+            expect(service.getUserInviteObject(userObject, dataGroups, actions).addEntityUserGroup)
+                .toBeAFunction();
+        });
+
+        it('addEntityUserGroup should add the userGroup to the entity', function () {
+            var inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions);
+
+            inviteEntity.addEntityUserGroup({id: 'userGroupId'});
+
+            expect(inviteEntity.groups.some(hasId('userGroupId')))
+                .toBe(true);
+
+            function hasId(requestedId) {
+                return function (item) {
+                    return item.id === requestedId;
+                };
+            }
+        });
     });
 });

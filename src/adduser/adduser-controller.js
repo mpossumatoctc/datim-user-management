@@ -51,6 +51,12 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         userInviteObject.addDimensionConstraint(dimensionConstraint);
 
+        //Add the all mechanisms group from the user entity
+        if ($scope.user.userEntity && $scope.user.userEntity.userGroup) {
+            console.log($scope.user.userEntity.userGroup); //jshint ignore:line
+            userInviteObject.addEntityUserGroup($scope.user.userEntity.userGroup);
+        }
+
         vm.isProcessingAddUser = true;
 
         vm.userInviteObject = userInviteObject;

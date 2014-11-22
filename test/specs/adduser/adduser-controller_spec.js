@@ -331,7 +331,7 @@ describe('Add user controller', function () {
         });
     });
 
-    describe('permissions', function () {
+    describe('userInviteObject', function () {
         var controller;
 
         beforeEach(inject(function ($controller, $rootScope) {
@@ -350,6 +350,17 @@ describe('Add user controller', function () {
             controller.addUser();
 
             expect(controller.userInviteObject.userCredentials.catDimensionConstraints[0].id).toEqual('SomeID');
+        });
+
+        it('should add the entityUserGroup', function () {
+            scope.user.userEntity = {
+                userGroup: {
+                    id: 'agencyGroupId'
+                }
+            };
+            controller.addUser();
+
+            expect(controller.userInviteObject.groups[0]).toEqual({id: 'agencyGroupId'});
         });
     });
 });

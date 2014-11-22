@@ -51,7 +51,8 @@ function userService(Restangular) {
     function getUserInviteProto() {
         return {
             addDimensionConstraint: addDimensionConstraint,
-            addEmail: addEmail
+            addEmail: addEmail,
+            addEntityUserGroup: addEntityUserGroup
         };
 
         function addDimensionConstraint(dimension) {
@@ -66,6 +67,14 @@ function userService(Restangular) {
 
         function addEmail(email) {
             this.email = email;
+        }
+
+        function addEntityUserGroup(userGroup) {
+            this.groups = this.groups || [];
+
+            if (userGroup && userGroup.id) {
+                this.groups.push({id: userGroup.id});
+            }
         }
     }
 
