@@ -56,7 +56,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         //Add the all mechanisms group from the user entity
         if ($scope.user.userEntity && $scope.user.userEntity.mechUserGroup && $scope.user.userEntity.userUserGroup) {
-            console.log($scope.user.userEntity); //jshint ignore:line
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
         }
@@ -64,15 +63,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
         }
-        console.log($scope.user.userEntity); //jshint ignore:line
 
-        vm.inviteObjectDisplay = JSON.stringify(
-            vm.userInviteObject,
-            undefined,
-            2
-        );
-
-        //vm.isProcessingAddUser = false;
+        userService.inviteUser(vm.userInviteObject)
+            .then(function (response) {
+                console.log(response); //jshint ignore:line
+                window.alert('user added');
+                vm.isProcessingAddUser = false;
+            });
     }
 
     function validateDataGroups() {

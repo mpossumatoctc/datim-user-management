@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService(Restangular) {
+function userService($q, Restangular) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -23,7 +23,8 @@ function userService(Restangular) {
     return {
         getUserObject: getUserObject,
         createUserInvite: createUserInvite,
-        getUserInviteObject: getUserInviteObject
+        getUserInviteObject: getUserInviteObject,
+        inviteUser: inviteUser
     };
 
     function getUserObject() {
@@ -161,5 +162,34 @@ function userService(Restangular) {
             }
             return false;
         });
+    }
+
+    function inviteUser(inviteData) {
+        if (!angular.isObject(inviteData) && !null) {
+            return $q.reject('Invalid invite data');
+        }
+
+        return Restangular
+            .all('users')
+            .all('invite')
+            .post(inviteData)
+            .then(function (response) {
+                if (response.status !== 'SUCCESS' ||
+                    response.importCount.imported !== 1 ||
+                    response.importCount.updated !== 0 ||
+                    response.importCount.ignored !== 0 ||
+                    response.importCount.ignored !== 0) {
+                    return $q.reject('Invite response not as expected');
+                }
+                return Restangular
+                    .all('users')
+                    .get(response.lastImported);
+            })
+            .catch(function (error) {
+                if (angular.isString(error)) {
+                    return $q.reject(error);
+                }
+                return $q.reject('Invite failed');
+            });
     }
 }

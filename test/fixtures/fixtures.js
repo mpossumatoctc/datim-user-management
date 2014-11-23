@@ -109,6 +109,79 @@
         ]
     };
 
+    fixtures.successInvite = {
+        "status": "SUCCESS",
+        "importCount": {
+            "imported": 1,
+            "updated": 0,
+            "ignored": 0,
+            "deleted": 0
+        },
+        "type": "User",
+        "importConflicts": [
+            {
+                "object": "(TBD) (TBD)",
+                "value": "Unknown reference to IdentifiableObject{id=0, uid='PUSy6gGOQGb', code='invite-mark@thedutchies.com-q6mvxfQ7dcH', name='invite-mark@thedutchies.com-q6mvxfQ7dcH', created=Sat Nov 22 23:04:30 CET 2014, lastUpdated=Sat Nov 22 23:04:30 CET 2014} (UserCredentials) on object IdentifiableObject{id=0, uid='null', code='null', name='(TBD) (TBD)', created=null, lastUpdated=null} (User)."
+            }
+        ],
+        "lastImported": "b4H1KaR7YYa"
+    };
+
+    fixtures.sampleInviteObject = {
+        "email": "mark@thedutchies.com",
+        "organisationUnits": [
+            {
+                "id": "XtxUYCsDWrR"
+            }
+        ],
+        "dataViewOrganisationUnits": [
+            {
+                "id": "XtxUYCsDWrR"
+            },
+            {
+                "id": "ybg3MO3hcf4"
+            }
+        ],
+        "groups": [
+            {
+                "id": "c6hGi8GEZot"
+            },
+            {
+                "id": "YbkldVOJMUl"
+            },
+            {
+                "id": "IvMcZJNUPzr"
+            },
+            {
+                "id": "vLqc4P1P20l"
+            },
+            {
+                "id": "H0c4i5mOtkB"
+            }
+        ],
+        "userCredentials": {
+            "userAuthorityGroups": [
+                {
+                    "id": "k7BWFXkG6zt"
+                },
+                {
+                    "id": "n777lf1THwQ"
+                },
+                {
+                    "id": "KagqnetfxMr"
+                },
+                {
+                    "id": "b2uHwX9YLhu"
+                }
+            ],
+            "catDimensionConstraints": [
+                {
+                    "id": "SH885jaRe0o"
+                }
+            ]
+        }
+    };
+
     window.fixtures = {
         get: function (fixtureName) {
             if (fixtures[fixtureName])

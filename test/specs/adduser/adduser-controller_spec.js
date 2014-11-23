@@ -333,16 +333,24 @@ describe('Add user controller', function () {
 
     describe('userInviteObject', function () {
         var controller;
+        var userservice;
 
-        beforeEach(inject(function ($controller, $rootScope) {
+        beforeEach(inject(function ($controller, $rootScope, userService) {
             scope = $rootScope.$new();
+            userservice = userService;
+            spyOn(userService, 'inviteUser').and.returnValue({
+                then: function () {
+
+                }
+            });
 
             controller = $controller('addUserController', {
                 $scope: scope,
                 userTypes: [],
                 dataGroups: [],
                 dimensionConstraint: {id: 'SomeID'},
-                currentUser: currentUserMock()
+                currentUser: currentUserMock(),
+                userService: userservice
             });
         }));
 
@@ -398,6 +406,11 @@ describe('Add user controller', function () {
                 controller.addUser();
 
                 expect(controller.userInviteObject.groups.length).toBe(0);
+            });
+
+            it('should call the inviteUser method on the user service', function () {
+                controller.addUser();
+                expect(userservice.inviteUser).toHaveBeenCalled();
             });
         });
     });

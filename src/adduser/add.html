@@ -48,9 +48,6 @@ Ability to add users here
         </div>
     </div>
     <div class="form-controls-wrap">
-        <button class="btn btn-primary" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()"><i class="fa fa-circle-o-notch fa-spin"></i><span>Add user</span></span></button>
-    </div>
-    <div>
-        <textarea ng-bind="addUser.inviteObjectDisplay"></textarea>
+        <button class="btn btn-primary add-user-button" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()"><i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i><span ng-if="!addUser.isProcessingAddUser">Add user</span></span></button>
     </div>
 </form>

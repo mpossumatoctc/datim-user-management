@@ -171,4 +171,97 @@ describe('User service', function () {
             }
         });
     });
+
+    describe('inviteUser', function () {
+        it('should be a function', function () {
+            expect(service.inviteUser).toBeAFunction();
+        });
+
+        describe('invite request', function () {
+            var $httpBackend;
+            var $rootScope;
+            var inviteRequest;
+
+            beforeEach(inject(function ($injector) {
+                $httpBackend = $injector.get('$httpBackend');
+                $rootScope = $injector.get('$rootScope');
+
+                inviteRequest = $httpBackend.expectPOST('http://localhost:8080/dhis/api/users/invite', fixtures.get('sampleInviteObject'))
+                    .respond(200, fixtures.get('successInvite'));
+
+                $httpBackend.whenGET('http://localhost:8080/dhis/api/users/b4H1KaR7YYa')
+                    .respond(200, {});
+            }));
+
+            afterEach(function () {
+                $httpBackend.verifyNoOutstandingExpectation();
+                $httpBackend.verifyNoOutstandingRequest();
+            });
+
+            it('should send the request to the invite endpoint', function () {
+                service.inviteUser(fixtures.get('sampleInviteObject'));
+                $httpBackend.flush();
+            });
+
+            it('should not post if the inviteObject is undefined', function () {
+                $httpBackend.resetExpectations();
+                service.inviteUser();
+            });
+
+            it('should return a promise like object on failure', function () {
+                $httpBackend.resetExpectations();
+                var promise = service.inviteUser();
+                var errorMessage;
+
+                promise.catch(function (response) {
+                    errorMessage = response;
+                });
+                $rootScope.$apply();
+
+                expect(promise).toBeAPromiseLikeObject();
+                expect(errorMessage).toBe('Invalid invite data');
+            });
+
+            it('should reject the promise when the invite fails', function () {
+                var promise;
+                var errorMessage;
+
+                inviteRequest.respond(500);
+                promise = service.inviteUser(fixtures.get('sampleInviteObject'));
+
+                promise.catch(function (response) {
+                    errorMessage = response;
+                });
+                $httpBackend.flush();
+
+                expect(promise).toBeAPromiseLikeObject();
+                expect(errorMessage).toBe('Invite failed');
+            });
+
+            it('should reject the promise when the the import was not successful', function () {
+                var promise;
+                var errorMessage;
+
+                inviteRequest.respond(200, {});
+                promise = service.inviteUser(fixtures.get('sampleInviteObject'));
+
+                promise.catch(function (response) {
+                    errorMessage = response;
+                });
+                $httpBackend.flush();
+
+                expect(promise).toBeAPromiseLikeObject();
+                expect(errorMessage).toBe('Invite response not as expected');
+            });
+
+            it('should request the inserted user object on success', function () {
+                $httpBackend.expectGET('http://localhost:8080/dhis/api/users/b4H1KaR7YYa')
+                    .respond(200, {});
+
+                service.inviteUser(fixtures.get('sampleInviteObject'));
+
+                $httpBackend.flush();
+            });
+        });
+    });
 });
