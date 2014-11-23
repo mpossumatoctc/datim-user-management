@@ -26,15 +26,10 @@ function headerBar() {
         replace: true,
         transclude: true,
         scope: {
-            title: '=',
-            link: '=',
-            logo: '='
+            headerTitle: '=title',
+            headerLink: '=link',
+            headerLogo: '=logo'
         },
-        templateUrl: 'headerbar/headerbar.html',
-        link: function (scope) {
-            scope.headerTitle = scope.title || 'District Health Information Software 2';
-            scope.headerLink = scope.link || '../dhis-web-dashboard-integration/index.action';
-            scope.headerLogo = scope.logo || '../dhis-web-commons/css/light_blue/logo_banner.png';
-        }
+        templateUrl: 'headerbar/headerbar.html'
     };
 }

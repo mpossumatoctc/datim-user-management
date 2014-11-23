@@ -5,6 +5,11 @@ function appController($scope, Restangular, webappManifest) {
 
     vm.title = 'User management';
     vm.isLoading = false;
+    vm.headerBar = {
+        title: '',
+        logo: '',
+        link: ''
+    };
 
     initialise();
 
@@ -25,13 +30,13 @@ function appController($scope, Restangular, webappManifest) {
                 var baseUrl = webappManifest.activities.dhis.href;
 
                 if (systemSettings.keyCustomTopMenuLogo === true) {
-                    $scope.headerLogo = [
+                    vm.headerBar.logo = [
                         baseUrl,
                         '/external-static/logo_banner.png'
                     ].join('');
                 }
-                $scope.headerTitle = systemSettings.applicationTitle || '';
-                $scope.headerLink = [baseUrl, systemSettings.startModule, 'index.action'].join('/');
+                vm.headerBar.title = systemSettings.applicationTitle || '';
+                vm.headerBar.link = [baseUrl, systemSettings.startModule, 'index.action'].join('/');
             });
     }
 }

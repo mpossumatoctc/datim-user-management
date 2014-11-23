@@ -68,9 +68,25 @@ describe('App controller', function () {
             $httpBackend.verifyNoOutstandingRequest();
         });
 
+        it('should have a headerBar property', function () {
+            $httpBackend.flush();
+            expect(controller.headerBar).toBeDefined();
+        });
+
+        it('headerbar property should have the expected structure', function () {
+            var expectedStructure = {
+                title: '',
+                logo: '',
+                link: ''
+            };
+
+            expect(controller.headerBar).toEqual(expectedStructure);
+            $httpBackend.flush();
+        });
+
         it('should set the logo to /external-static/logo_banner.png if customlogo is set', function () {
             $httpBackend.flush();
-            expect(scope.headerLogo).toEqual('http://localhost:8080/dhis/external-static/logo_banner.png');
+            expect(controller.headerBar.logo).toEqual('http://localhost:8080/dhis/external-static/logo_banner.png');
         });
 
         it('should not set the logo if a custom logo has not been enabled', function () {
@@ -81,17 +97,17 @@ describe('App controller', function () {
             });
             $httpBackend.flush();
 
-            expect(scope.headerLogo).not.toBeDefined();
+            expect(controller.headerBar.logo).toEqual('');
         });
 
         it('should set the application title', function () {
             $httpBackend.flush();
-            expect(scope.headerTitle).toBe('DATIM');
+            expect(controller.headerBar.title).toBe('DATIM');
         });
 
         it('should set the header link to the given startModule', function () {
             $httpBackend.flush();
-            expect(scope.headerLink).toBe('http://localhost:8080/dhis/dhis-web-dashboard-integration/index.action');
+            expect(controller.headerBar.link).toBe('http://localhost:8080/dhis/dhis-web-dashboard-integration/index.action');
         });
     });
 });
