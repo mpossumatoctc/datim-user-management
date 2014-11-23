@@ -114,7 +114,7 @@ describe('User service', function () {
                     {id:'c6hGi8GEZot'}
                 ],
                 userCredentials: {
-                    userAuthorityGroups: [
+                    userRoles: [
                         {id: 'k7BWFXkG6zt'},
                         {id: 'KagqnetfxMr'},
                         {id: 'b2uHwX9YLhu'}
@@ -141,7 +141,7 @@ describe('User service', function () {
         });
 
         it('should not add roles for which there is no Id', function () {
-            expectedInviteObject.userCredentials.userAuthorityGroups = [
+            expectedInviteObject.userCredentials.userRoles = [
                 {id: 'k7BWFXkG6zt'},
                 {id: 'b2uHwX9YLhu'}
             ];

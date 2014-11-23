@@ -14,7 +14,7 @@ function userService($q, Restangular) {
             //{'id':'gh9tn4QBbKZ'}
         ],
         userCredentials:{
-            userAuthorityGroups:[
+            userRoles:[
                 //{'id':'b2uHwX9YLhu'}
             ]
         }
@@ -94,7 +94,7 @@ function userService($q, Restangular) {
         //Add the user actions to the invite object
         actions.forEach(function (action) {
             if (action.userRoleId) {
-                inviteObject.userCredentials.userAuthorityGroups.push({id: action.userRoleId});
+                inviteObject.userCredentials.userRoles.push({id: action.userRoleId});
             }
         });
 

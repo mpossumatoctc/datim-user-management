@@ -12,10 +12,11 @@ describe('Add user controller', function () {
                     }
                     return true;
                 },
-                hasUserRole: function (userAdminRole) {
-                    if (options && options.userAdministrator === userAdminRole) {
+                isUserAdministrator: function () {
+                    if (options && options.userAdministrator) {
                         return true;
                     }
+                    return false;
                 }
             };
         };

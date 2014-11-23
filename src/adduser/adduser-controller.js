@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
-                           userActionsService, userService, $state) {
+                           userActionsService, userService, $state, notify) {
     var vm = this;
     var regex = /^dataStream.+$/g;
     var dataStreamIds;
@@ -34,7 +34,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     });
 
     function initialize() {
-        if (!currentUser.hasAllAuthority() && !currentUser.hasUserRole('User Administrator')) {
+        if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             $state.go('noaccess');
         }
 
@@ -65,9 +65,12 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
 
         userService.inviteUser(vm.userInviteObject)
-            .then(function (response) {
-                console.log(response); //jshint ignore:line
-                window.alert('user added');
+            .then(function () {
+                notify.success('User added successfully');
+                vm.isProcessingAddUser = false;
+                $state.go('add', {}, {reload: true});
+            }, function () {
+                notify.error('Request to add the user failed');
                 vm.isProcessingAddUser = false;
             });
     }
