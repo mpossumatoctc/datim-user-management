@@ -2,11 +2,14 @@ describe('App controller', function () {
     var controller;
     var $rootScope;
     var scope;
+    var $httpBackend;
 
     beforeEach(module('ui.router'));
     beforeEach(module('PEPFAR.usermanagement'));
     beforeEach(inject(function ($controller, $injector) {
         $rootScope = $injector.get('$rootScope');
+        $httpBackend = $injector.get('$httpBackend');
+        $httpBackend.whenGET('http://localhost:8080/dhis/api/systemSettings').respond(200, {});
 
         scope = $rootScope.$new();
         controller = $controller('appController', {
@@ -46,5 +49,49 @@ describe('App controller', function () {
         expect(controller.isLoading).toBe(false);
 
         expect(controller.isLoading).toBe(false);
+    });
+
+    describe('header bar settings', function () {
+        var systemSettingsResponse;
+
+        beforeEach(function () {
+            systemSettingsResponse = $httpBackend.expectGET('http://localhost:8080/dhis/api/systemSettings')
+                .respond(200, {
+                    keyCustomTopMenuLogo: true,
+                    applicationTitle: 'DATIM',
+                    startModule: 'dhis-web-dashboard-integration'
+                });
+        });
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should set the logo to /external-static/logo_banner.png if customlogo is set', function () {
+            $httpBackend.flush();
+            expect(scope.headerLogo).toEqual('http://localhost:8080/dhis/external-static/logo_banner.png')
+        });
+
+        it('should not set the logo if a custom logo has not been enabled', function () {
+            systemSettingsResponse.respond(200, {
+                keyCustomTopMenuLogo: false,
+                applicationTitle: 'DATIM',
+                startModule: 'dhis-web-dashboard-integration'
+            });
+            $httpBackend.flush();
+
+            expect(scope.headerLogo).not.toBeDefined();
+        });
+
+        it('should set the application title', function () {
+            $httpBackend.flush();
+            expect(scope.headerTitle).toBe('DATIM');
+        });
+
+        it('should set the header link to the given startModule', function () {
+            $httpBackend.flush();
+            expect(scope.headerLink).toBe('http://localhost:8080/dhis/dhis-web-dashboard-integration/index.action');
+        });
     });
 });
