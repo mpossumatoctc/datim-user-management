@@ -70,7 +70,7 @@ describe('App controller', function () {
 
         it('should set the logo to /external-static/logo_banner.png if customlogo is set', function () {
             $httpBackend.flush();
-            expect(scope.headerLogo).toEqual('http://localhost:8080/dhis/external-static/logo_banner.png')
+            expect(scope.headerLogo).toEqual('http://localhost:8080/dhis/external-static/logo_banner.png');
         });
 
         it('should not set the logo if a custom logo has not been enabled', function () {
