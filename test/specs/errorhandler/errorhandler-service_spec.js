@@ -1,16 +1,17 @@
 describe('Error handler service', function () {
     var service;
-    var $window;
+    var notify;
     var $log;
 
     beforeEach(module('PEPFAR.usermanagement'));
     beforeEach(inject(function ($injector, errorHandler) {
         service = errorHandler;
-        $window = $injector.get('$window');
+        notify = $injector.get('notify');
         $log = $injector.get('$log');
 
-        spyOn($window, 'alert');
         spyOn($log, 'error');
+        spyOn(notify, 'error');
+        spyOn(notify, 'warning');
     }));
 
     it('should be an object', function () {
@@ -18,9 +19,6 @@ describe('Error handler service', function () {
     });
 
     describe('error', function () {
-        beforeEach(function () {
-            spyOn(service, 'alert');
-        });
         it('should be a function', function () {
             expect(service.error).toBeAFunction();
         });
@@ -37,26 +35,50 @@ describe('Error handler service', function () {
 
             expect($log.error).toHaveBeenCalledWith('ErrorString');
         });
+
+        it('should extract the message from the error object', function () {
+            service.error({
+                status: 404
+            });
+            expect(notify.error).toHaveBeenCalledWith('Requested resource was not found');
+        });
+
+        it('should call with just the message if the message is a string', function () {
+            service.error('ErrorString');
+
+            expect(notify.error).toHaveBeenCalledWith('ErrorString');
+        });
     });
 
-    describe('alert', function () {
+    describe('warning', function () {
         it('should be a function', function () {
-            expect(service.alert).toBeAFunction();
+            expect(service.warning).toBeAFunction();
         });
 
-        it('should call alert on the window', function () {
-            service.alert();
-            expect($window.alert).toHaveBeenCalled();
+        it('should extract the message from the error object', function () {
+            service.warning({
+                status: 404
+            });
+            expect($log.error).toHaveBeenCalledWith('Requested resource was not found');
         });
 
-        it('should call alert with the correct message', function () {
-            service.alert('Error message');
-            expect($window.alert).toHaveBeenCalledWith('Error message');
+        it('should call with just the message if the message is a string', function () {
+            service.warning('ErrorString');
+
+            expect($log.error).toHaveBeenCalledWith('ErrorString');
         });
 
-        it('should call $log.error with the correct message', function () {
-            service.alert('Error message');
-            expect($log.error).toHaveBeenCalledWith('Error message');
+        it('should extract the message from the error object an', function () {
+            service.warning({
+                status: 404
+            });
+            expect(notify.warning).toHaveBeenCalledWith('Requested resource was not found');
+        });
+
+        it('should call with just the message if the message is a string', function () {
+            service.warning('ErrorString');
+
+            expect(notify.warning).toHaveBeenCalledWith('ErrorString');
         });
     });
 
@@ -83,6 +105,32 @@ describe('Error handler service', function () {
             service.errorFn('ErrorMessage')();
 
             expect(service.error).toHaveBeenCalledWith('ErrorMessage');
+        });
+    });
+
+    describe('warningFn', function () {
+        it('should be a function', function () {
+            expect(service.warningFn).toBeAFunction();
+        });
+
+        it('should return a function', function () {
+            expect(service.warningFn('ErrorMessage')).toBeAFunction();
+        });
+
+        it('the returned function should call the error function', function () {
+            spyOn(service, 'warning');
+
+            service.warningFn('ErrorMessage')();
+
+            expect(service.warning).toHaveBeenCalled();
+        });
+
+        it('the returned function should call the error function with the right message', function () {
+            spyOn(service, 'warning');
+
+            service.warningFn('ErrorMessage')();
+
+            expect(service.warning).toHaveBeenCalledWith('ErrorMessage');
         });
     });
 });

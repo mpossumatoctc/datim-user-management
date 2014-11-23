@@ -7,7 +7,7 @@ describe('Agencies service', function () {
     }));
     beforeEach(inject(function ($injector) {
         errorHandler = $injector.get('errorHandler');
-        spyOn(errorHandler, 'error').and.callThrough();
+        spyOn(errorHandler, 'warning').and.callThrough();
         agenciesService = $injector.get('agenciesService');
     }));
 
@@ -162,7 +162,7 @@ describe('Agencies service', function () {
             expect(agencies[1].userAdminUserGroup).not.toBeDefined();
         });
 
-        it('should reject the promise with an error', function () {
+        it('should reject the promise with a warning', function () {
             var catchFunction = jasmine.createSpy();
             agenciesRequest.respond(200, fixtures.get('agenciesList'));
 
@@ -170,7 +170,7 @@ describe('Agencies service', function () {
             $httpBackend.flush();
 
             expect(catchFunction).toHaveBeenCalled();
-            expect(errorHandler.error).toHaveBeenCalled();
+            expect(errorHandler.warning).toHaveBeenCalledWith('No agencies found in Rwanda that you can access all mechanisms for');
         });
 
         it('should reject the promise with the correct message on no org unit', function () {

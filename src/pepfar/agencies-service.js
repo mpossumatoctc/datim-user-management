@@ -22,14 +22,12 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
 
                     var agencies = matchAgenciesWithUserGroups(agencyDimensionResponse, userGroups, organisationUnitName);
                     if (!agencies || agencies.length === 0) {
-                        return $q.reject([
-                            'No agencies found matching available usergroups to',
-                            organisationUnitName,
-                            'all mechanisms'].join(' '));
+
+                        return $q.reject(['No agencies found in', organisationUnitName, 'that you can access all mechanisms for'].join(' '));
                     }
                     return agencies;
                 });
-        }).catch(errorHandler.error);
+        }).catch(errorHandler.warning);
     }
 
     function getAgencyObjects() {

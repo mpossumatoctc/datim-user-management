@@ -7,7 +7,7 @@ describe('Partners service', function () {
     }));
     beforeEach(inject(function ($injector) {
         errorHandler = $injector.get('errorHandler');
-        spyOn(errorHandler, 'error').and.callThrough();
+        spyOn(errorHandler, 'warning').and.callThrough();
         partnersService = $injector.get('partnersService');
     }));
 
@@ -148,7 +148,7 @@ describe('Partners service', function () {
             $httpBackend.flush();
 
             expect(catchFunction).toHaveBeenCalled();
-            expect(errorHandler.error).toHaveBeenCalledWith('No partners found in Kenya that you can access all mechanisms for');
+            expect(errorHandler.warning).toHaveBeenCalledWith('No partners found in Kenya that you can access all mechanisms for');
         });
     });
 });
