@@ -1,8 +1,6 @@
-Ability to add users here
 <script type="text/ng-template" id="userFormMessages">
     <div ng-message="required">This field is required</div>
 </script>
-
 <form name="userForm">
     <div class="form-controls-wrap select-user-type" ng-controller="userTypeController as userType">
         <select-usertype user="user" user-types="userType.userTypes"></select-usertype>
@@ -48,6 +46,9 @@ Ability to add users here
         </div>
     </div>
     <div class="form-controls-wrap">
-        <button class="btn btn-primary add-user-button" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()"><i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i><span ng-if="!addUser.isProcessingAddUser">Add user</span></span></button>
+        <button class="btn btn-primary add-user-button" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">
+            <i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i>
+            <span ng-if="!addUser.isProcessingAddUser">Invite user</span>
+        </button>
     </div>
 </form>

@@ -10,10 +10,37 @@
   &.select-user-type > div
     margin-bottom: 15px
 
+h1, h2
+  font-weight: 100
+  margin-bottom: 30px
+  margin-top: 0
+
+h1
+  color: #3E606F
+  font-size: 3em
+
+  &.main-title
+    margin-bottom: 0
+
+h2.sub-title
+  font-size: 1.2em
+  color: #DDD
+
+.button-group
+  float: right
+
+  a
+    i
+      margin-right: 5px
+      
+    &:hover i
+      transform-style: preserve-3d
+      transition: transform 0.5s
+      transform: rotateY( -180deg )
 
 .app-content-wrap
   margin: 0 auto
-  margin-top: 60px
+  margin-top: 75px
   max-width: 1200px
   width: 60%
 
@@ -96,6 +123,10 @@ ul.checkbox-group
 
 .add-user-button
   width: 25%
+
+legend
+  font-size: 1.5em
+  font-weight: 200
 
 /**
  * Css over rides for toastr.css

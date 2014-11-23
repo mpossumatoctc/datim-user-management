@@ -4,6 +4,7 @@ function appController($scope, Restangular, webappManifest) {
     var vm = this;
 
     vm.title = 'User management';
+    vm.subTitle = '';
     vm.isLoading = false;
     vm.headerBar = {
         title: '',
@@ -11,13 +12,20 @@ function appController($scope, Restangular, webappManifest) {
         link: ''
     };
 
+    vm.subTitles = {
+        add: 'Invite user',
+        list: 'Manage users'
+    };
+
     initialise();
 
     $scope.$on('$stateChangeStart', function () {
         vm.isLoading = true;
     });
-    $scope.$on('$stateChangeSuccess', function () {
+    $scope.$on('$stateChangeSuccess', function (event, toState) {
         vm.isLoading = false;
+        vm.currentState = toState.name;
+        vm.subTitle = vm.subTitles[toState.name] || '';
     });
     $scope.$on('$stateChangeError', function () {
         vm.isLoading = false;

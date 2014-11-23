@@ -37,7 +37,7 @@ describe('App controller', function () {
 
     it('should set isLoading to false on $stateChangeSuccess', function () {
         controller.isLoading = true;
-        $rootScope.$broadcast('$stateChangeSuccess');
+        $rootScope.$broadcast('$stateChangeSuccess', [undefined, {name: ''}]);
 
         expect(controller.isLoading).toBe(false);
     });
