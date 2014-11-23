@@ -58,7 +58,9 @@ angular.module('PEPFAR.usermanagement', [
     'ui.select',
     'ui.bootstrap',
     'ui.validate',
-    'ngMessages'
+    'ngMessages',
+    'd2-headerbar',
+    'd2Menu'
 ]);
 
 //==================================================================================
@@ -79,6 +81,15 @@ angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifes
 //==================================================================================
 // Bootstrap the app manually
 //
+function basePathResolver(url, injectables) {
+    return [injectables.webappManifest.activities.dhis.href, url].join('/');
+}
+
 window.getBootstrapper('PEPFAR.usermanagement', document)
+    .setBasePathResolver(basePathResolver)
     .addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.menu.js')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
+    .loadStylesheet('/dhis-web-commons/css/menu.css')
     .bootstrap();

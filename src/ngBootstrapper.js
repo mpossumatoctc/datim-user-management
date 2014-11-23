@@ -15,6 +15,12 @@
         //Will throw an error if the module does not exist
         angular.module(appName);
 
+        if (element === window.document) {
+            this.element = document.body;
+        } else {
+            this.element = element;
+        }
+
         this.appName = appName;
         this.remoteInjectableConfigs = [];
 
@@ -23,6 +29,13 @@
 
         //Create a new injector for this bootstrapper
         this.injector = angular.injector(window.getBootstrapper.$inject);
+
+        this.injectables = {};
+        this.scripts = [];
+        this.stylesheets = [];
+        this.basePathResolver = function (url) {
+            return url;
+        };
 
         //Defer the bootstrapping by setting the name flag
         window.name = 'NG_DEFER_BOOTSTRAP!';
@@ -56,6 +69,47 @@
             remoteUrl: url
         });
 
+        return this;
+    };
+
+    /**
+     * Load an external script into the document
+     * The urlModifier can be used to get a hold of remoteinjectables that might influence
+     * the url of the file, like a base path definition.
+     *
+     * @param {String} scriptUrl The url of the script to be loaded
+     * @param {Function} urlModifier Url modifier to modify the url path based on earlier resolved dependencies
+     *
+     * @returns {NgBootstrapper} Returns itself for chaining
+     */
+    NgBootstrapper.prototype.loadScript = function (scriptUrl, urlModifier) {
+        if (typeof scriptUrl === 'string') {
+            this.scripts.push({
+                url: scriptUrl,
+                resolve: urlModifier
+            });
+        }
+        return this;
+    };
+
+    /**
+     * Load an external stylesheet and add it to the document head
+     * Adds href for the provided url and sets rel to stylesheet and type to text/css.
+     * The urlModifier can be used to get a hold of remoteinjectables that might influence
+     * the url of the file, like a base path definition.
+     *
+     * @param {String} stylesheetUrl The url of the stylesheet to be loaded
+     * @param {Function} urlModifier Url modifier to modify the url path based on earlier resolved dependencies
+     *
+     * @returns {NgBootstrapper} Returns itself for chaining
+     */
+    NgBootstrapper.prototype.loadStylesheet = function (stylesheetUrl, urlModifier) {
+        if (typeof stylesheetUrl === 'string') {
+            this.stylesheets.push({
+                url: stylesheetUrl,
+                resolve: urlModifier
+            });
+        }
         return this;
     };
 
@@ -94,7 +148,9 @@
      */
     NgBootstrapper.prototype.createFactories = function (responses) {
         var module = this.module;
+        var injectables = this.injectables;
         angular.forEach(responses, function (response) {
+            injectables[response.name] = response.data;
             module.factory(response.name, function () {
                 return response.data;
             });
@@ -110,18 +166,62 @@
     NgBootstrapper.prototype.bootstrap = function () {
         var self = this;
         var $q = this.injector.get('$q');
+        var scripts = this.scripts;
+        var stylesheets = this.stylesheets;
+        var element = this.element;
+        var injectables = this.injectables;
+        var basePathResolver = this.basePathResolver;
 
         if (this.remoteInjectableConfigs.length > 0) {
-            $q.all(this.executeRemoteCalls()).then(function (responses) {
-                self.createFactories(responses);
-                angular.resumeBootstrap([self.appName + '.injectables']);
-            });
+            $q.all(this.executeRemoteCalls())
+                .then(function (responses) {
+                    self.createFactories(responses);
+                })
+                .then(function () {
+                    function getBasePath(urlDef) {
+                        var resolverFunction = urlDef.resolve || basePathResolver;
+                        return resolverFunction.call(null, urlDef.url, injectables);
+                    }
+
+                    addScripts.bind(element)(scripts.map(getBasePath));
+                    addStylesheets(stylesheets.map(getBasePath));
+                })
+                .then(function () {
+                    angular.resumeBootstrap([self.appName + '.injectables']);
+                });
         } else {
             angular.resumeBootstrap();
         }
 
         return this;
     };
+
+    NgBootstrapper.prototype.setBasePathResolver = function (resolverFunction) {
+        if (typeof resolverFunction === 'function') {
+            this.basePathResolver = resolverFunction;
+        }
+        return this;
+    };
+
+    function addScripts(scriptUrls) {
+        scriptUrls.forEach(function (scriptUrl) {
+            var scriptElement = document.createElement('script');
+
+            scriptElement.setAttribute('src', scriptUrl);
+            this.appendChild(scriptElement);
+        }, this);
+    }
+
+    function addStylesheets(stylesheetUrls) {
+        stylesheetUrls.forEach(function (stylesheetUrl) {
+            var stylesheetElement = document.createElement('link');
+            stylesheetElement.setAttribute('href', stylesheetUrl);
+            stylesheetElement.setAttribute('rel', 'stylesheet');
+            stylesheetElement.setAttribute('type', 'text/css');
+
+            document.head.appendChild(stylesheetElement);
+        }, this);
+    }
 
     /**
      * Exposed method on the window to get a new bootstrapper.

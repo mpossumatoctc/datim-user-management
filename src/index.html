@@ -11,6 +11,10 @@
     <!-- endbuild -->
 </head>
 <body ng-controller="appController as app">
+    <header-bar logo="app.headerBar.logo" title="app.headerBar.title" link="app.headerBar.link">
+        <div d2-menu></div>
+    </header-bar>
+
     <div class="app-content-wrap">
         <div ng-bind="app.title"></div>
             <a ui-sref="add" translate>Add user</a>
@@ -60,6 +64,7 @@
     <script src="users/currentuser-service.js"></script>
     <script src="noaccess/noaccess-controller.js"></script>
     <script src="categories/categories-service.js"></script>
+    <script src="headerbar/headerbar-directive.js"></script>
     <!-- endbuild -->
 
 </body>
