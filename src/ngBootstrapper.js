@@ -24,13 +24,12 @@
         this.appName = appName;
         this.remoteInjectableConfigs = [];
 
-        //Create an injectables module
-        this.module = angular.module(this.appName + '.injectables', []);
-
         //Create a new injector for this bootstrapper
         this.injector = angular.injector(window.getBootstrapper.$inject);
 
         this.injectables = {};
+        this.runFunctions = [];
+        this.modules = [];
         this.scripts = [];
         this.stylesheets = [];
         this.basePathResolver = function (url) {
@@ -92,6 +91,21 @@
         return this;
     };
 
+    NgBootstrapper.prototype.loadModule = function (scriptUrl, moduleName, urlModifier) {
+        if (typeof scriptUrl === 'string' && typeof moduleName === 'string') {
+            this.loadScript(scriptUrl, urlModifier);
+            this.modules.push(moduleName);
+        }
+        return this;
+    };
+
+    NgBootstrapper.prototype.execute = function (executeFunction) {
+        if (typeof executeFunction === 'function' && executeFunction.call) {
+            this.runFunctions.push(executeFunction);
+        }
+        return this;
+    };
+
     /**
      * Load an external stylesheet and add it to the document head
      * Adds href for the provided url and sets rel to stylesheet and type to text/css.
@@ -144,10 +158,10 @@
      * It adds a factory to the module that returns the data on the response.
      * It looks for a data property on each of the responses.
      *
+     * @param {Object} module Angular module that should be injected into the app
      * @param {Array} responses Array of responses that have been received from the ajax calls.
      */
-    NgBootstrapper.prototype.createFactories = function (responses) {
-        var module = this.module;
+    NgBootstrapper.prototype.createFactories = function (module, responses) {
         var injectables = this.injectables;
         angular.forEach(responses, function (response) {
             injectables[response.name] = response.data;
@@ -164,6 +178,9 @@
      * @returns {NgBootstrapper} Returns itself for chaining purposes
      */
     NgBootstrapper.prototype.bootstrap = function () {
+        //Create an injectables module
+        var module = this.module = angular.module(this.appName + '.injectables', this.modules);
+
         var self = this;
         var $q = this.injector.get('$q');
         var scripts = this.scripts;
@@ -175,7 +192,10 @@
         if (this.remoteInjectableConfigs.length > 0) {
             $q.all(this.executeRemoteCalls())
                 .then(function (responses) {
-                    self.createFactories(responses);
+                    self.createFactories(module, responses);
+                    self.runFunctions.forEach(function (runFunction) {
+                        runFunction.call(self, injectables);
+                    });
                 })
                 .then(function () {
                     function getBasePath(urlDef) {
@@ -183,14 +203,35 @@
                         return resolverFunction.call(null, urlDef.url, injectables);
                     }
 
-                    addScripts.bind(element)(scripts.map(getBasePath));
                     addStylesheets(stylesheets.map(getBasePath));
+                    addScripts.bind(element)(scripts.map(getBasePath));
+
+                    setIsLoadedFlag();
                 })
                 .then(function () {
-                    angular.resumeBootstrap([self.appName + '.injectables']);
+                    resumeBootstrapWhenLoaded.bind(self)();
                 });
         } else {
-            angular.resumeBootstrap();
+            resumeBootstrapWhenLoaded();
+        }
+
+        function setIsLoadedFlag() {
+            var loadedElement = document.createElement('script');
+            //jscs disable
+            loadedElement.textContent = 'window.ngBootstrapperScriptFilesLoaded = true; // = window.__ngBootstrapperLoaded || {}).isScriptsLoaded = true';
+            //jscs enable
+            element.appendChild(loadedElement);
+        }
+
+        function resumeBootstrapWhenLoaded() {
+            try {
+                this.modules.forEach(function (moduleName) {
+                    angular.module(moduleName);
+                });
+                angular.resumeBootstrap([self.appName + '.injectables']);
+            } catch (e) {
+                window.setTimeout(resumeBootstrapWhenLoaded.bind(this), 10);
+            }
         }
 
         return this;

@@ -315,7 +315,7 @@ describe('ngBootstrapper', function () {
             });
         });
 
-        it('should have a loadStylesheet function', function () {
+        it('should be a function', function () {
             $httpBackend.resetExpectations();
             expect(ngBootstrapper.loadStylesheet).toBeAFunction();
         });
@@ -361,6 +361,83 @@ describe('ngBootstrapper', function () {
 
             expect(document.head.querySelectorAll('link').length).toBe(currentLinkTags + 1);
             expect(styleSheetElement.getAttribute('href')).toBe('localhost:8080/myStylesheet.css');
+        });
+    });
+
+    describe('loadModule', function () {
+        it('should be a function', function () {
+            expect(ngBootstrapper.loadModule).toBeAFunction();
+        });
+
+        it('should call the loadScript function with the script url', function () {
+            spyOn(ngBootstrapper, 'loadScript');
+
+            ngBootstrapper.loadModule('myModule.js', 'myModule');
+
+            expect(ngBootstrapper.loadScript).toHaveBeenCalledWith('myModule.js', undefined);
+        });
+
+        it('should return itself for chaining', function () {
+            expect(ngBootstrapper.loadModule()).toBe(ngBootstrapper);
+        });
+
+        it('should add the model name to the modules property', function () {
+            ngBootstrapper.loadModule('myModule.js', 'myModule');
+
+            expect(ngBootstrapper.modules).toContain('myModule');
+        });
+    });
+
+    describe('execute', function () {
+        var $httpBackend;
+
+        beforeEach(function () {
+            $httpBackend = ngBootstrapper.injector.get('$httpBackend');
+            $httpBackend.expectGET('manifest.webapp').respond(200, {
+                name: 'User Management',
+                activities: {
+                    dhis: {
+                        href: 'localhost:8080'
+                    }
+                }
+            });
+
+            angular.bootstrap.calls.reset();
+
+            ngBootstrapper.addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp');
+        });
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should be a function', function () {
+            $httpBackend.resetExpectations();
+
+            expect(ngBootstrapper.execute).toBeAFunction();
+        });
+
+        it('should execute the given function on bootstrap', function () {
+            var executeFunction = jasmine.createSpy();
+
+            ngBootstrapper.execute(executeFunction);
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            expect(executeFunction).toHaveBeenCalled();
+        });
+
+        it('should not fail when the passed parameter is not a function', function () {
+            ngBootstrapper.execute();
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+        });
+
+        it('should return itself for chaining', function () {
+            $httpBackend.resetExpectations();
+
+            expect(ngBootstrapper.execute()).toBe(ngBootstrapper);
         });
     });
 });
