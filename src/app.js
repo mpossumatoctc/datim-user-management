@@ -92,8 +92,8 @@ window.getBootstrapper('PEPFAR.usermanagement', document)
         window.dhis2.settings = window.dhis2.settings || {};
         window.dhis2.settings.baseUrl = injectables.webappManifest.activities.dhis.href.replace(window.location.origin, '').replace(/^\//, '');
     })
-    .loadStylesheet('dhis-web-commons/css/menu.css')
-    .loadScript('dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
-    .loadModule('dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2Menu')
-    .loadScript('dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
+    .loadStylesheet('/dhis-web-commons/css/menu.css')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
+    .loadModule('/dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2Menu')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
     .bootstrap();
