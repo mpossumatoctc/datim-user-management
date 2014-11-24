@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
-                           userActionsService, userService, $state, notify) {
+                           userActionsService, userService, $state, notify, interAgencyService) {
     var vm = this;
     var regex = /^dataStream.+$/g;
     var dataStreamIds;
@@ -30,6 +30,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         if (newVal !== oldVal && newVal.name) {
             $scope.user.userActions = {};
             vm.actions = userActionsService.getActionsFor(newVal.name);
+
+            if (newVal.name === 'Inter-Agency') {
+                interAgencyService.getUserGroups().then(function (interAgencyUserGroups) {
+                    console.log(interAgencyUserGroups); //jshint ignore:line
+                    $scope.user.userEntity = interAgencyUserGroups;
+                });
+            }
         }
     });
 

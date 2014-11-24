@@ -2,7 +2,9 @@ describe('Add user controller', function () {
     var scope;
     var currentUserMock;
 
-    beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.value('interAgencyService', {getUserGroups: function () {}});
+    }));
     beforeEach(function () {
         currentUserMock = function (options) {
             return {
@@ -38,7 +40,6 @@ describe('Add user controller', function () {
                     }
                 },
                 currentUser: currentUserMock()
-
             });
         }));
 
