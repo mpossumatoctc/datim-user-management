@@ -35,7 +35,7 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
             paging: 'false'
         };
 
-        return Restangular.all('dimensions')
+        return Restangular.all('dimensions').withHttpConfig({cache: true})
             .all('bw8KHXzxd9i')
             .get('items', queryParams)
             .then(function (response) {
@@ -55,7 +55,7 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
             paging: false
         };
 
-        return Restangular.one('userGroups')
+        return Restangular.one('userGroups').withHttpConfig({cache: true})
             .get(queryParams)
             .then(function (userGroups) {
                 return userGroups.userGroups;

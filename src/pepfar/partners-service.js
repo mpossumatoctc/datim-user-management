@@ -69,8 +69,8 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
     function getPartnersFromApi() {
         return Restangular
-            .all('dimensions')
-            .all('BOyWrF33hiR')
+            .all('dimensions').withHttpConfig({cache: true})
+            .all('BOyWrF33hiR').withHttpConfig({cache: true})
             .get('items', {paging: 'false'})
             .then(function (response) {
                 return response.items;
@@ -87,7 +87,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
         };
 
         return Restangular
-            .one('userGroups')
+            .one('userGroups').withHttpConfig({cache: true})
             .get(queryParams)
             .then(function (userGroups) {
                 return userGroups.userGroups || [];
