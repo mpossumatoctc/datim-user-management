@@ -9,9 +9,30 @@
     ]};
 
     fixtures.partnerList = {"items": [
-        {"name": "Abt Associates", "created": "2014-05-09T23:23:08.834+0000", "lastUpdated": "2014-10-05T13:07:56.049+0000", "id": "JkisvjF4ahe"},
-        {"name": "African Evangelistic Enterprise", "created": "2014-05-09T23:23:11.387+0000", "lastUpdated": "2014-10-05T13:07:56.195+0000", "id": "z4WtTPPjD7i"},
-        {"name": "World Learning", "created": "2014-05-09T23:23:10.013+0000", "lastUpdated": "2014-10-05T13:07:56.229+0000", "id": "sDFvhYDa4sX"}
+        {
+            name: "Apple",
+            created: "2014-05-28T19:50:31.075+0000",
+            lastUpdated: "2014-10-05T13:07:56.175+0000",
+            id: "Cs2c30KKxg6"
+        },
+        {
+            name: "Banana",
+            created: "2014-05-28T19:50:31.398+0000",
+            lastUpdated: "2014-10-05T13:07:56.182+0000",
+            id: "pBimh5znu2H"
+        },
+        {
+            name: "Cranberry",
+            created: "2014-05-28T19:50:31.576+0000",
+            lastUpdated: "2014-10-05T13:07:56.178+0000",
+            id: "e9F2oANoK6F"
+        },
+        {
+            name: "Dragon Fruit",
+            created: "2014-05-28T19:50:31.967+0000",
+            lastUpdated: "2014-10-05T13:07:56.171+0000",
+            id: "xQ0xjBfQzI8"
+        }
     ]};
 
     fixtures.actionsList = [
@@ -40,13 +61,163 @@
 
     fixtures.userRolesForActions = {"userRoles":[{"id":"QbxXEPw9xlf","name":"Data Accepter"},{"id":"n777lf1THwQ","name":"Data Submitter"},{"id":"b2uHwX9YLhu","name":"Read Only"},{"id":"KagqnetfxMr","name":"User Administrator"}]};
 
-    fixtures.currentUser = {"name":"kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","created":"2014-09-12T13:16:38.843+0000","lastUpdated":"2014-11-20T11:06:25.617+0000","surname":"Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","firstName":"kp1001ea","userCredentials":{"code":"kp1001ea","name":"kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","created":"2014-09-12T13:16:38.843+0000","lastUpdated":"2014-11-20T11:26:48.495+0000","username":"kp1001ea","passwordLastUpdated":"2014-11-20T11:06:25.617+0000","userAuthorityGroups":[{"name":"Read Only","created":"2014-02-20T02:47:44.417+0000","lastUpdated":"2014-10-20T13:39:20.109+0000","id":"b2uHwX9YLhu"},{"name":"Data Entry EA","created":"2014-09-13T21:11:15.686+0000","lastUpdated":"2014-10-20T13:39:20.120+0000","id":"OKKx4bf4ueV"}],"catDimensionConstraints":[{"name":"Funding Mechanism","created":"2014-02-18T07:51:04.612+0000","lastUpdated":"2014-10-16T12:18:02.751+0000","id":"SH885jaRe0o"}],"lastLogin":"2014-11-20T11:06:25.756+0000","selfRegistered":false,"disabled":false,"id":"fpYv7pe4Kbh"},
+    fixtures.currentUser = {"name":"kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","created":"2014-09-12T13:16:38.843+0000","lastUpdated":"2014-11-20T11:06:25.617+0000","surname":"Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","firstName":"kp1001ea","userCredentials":{"code":"kp1001ea","name":"kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","created":"2014-09-12T13:16:38.843+0000","lastUpdated":"2014-11-20T11:26:48.495+0000","username":"kp1001ea","passwordLastUpdated":"2014-11-20T11:06:25.617+0000","userRoles":[{"name":"Read Only","created":"2014-02-20T02:47:44.417+0000","lastUpdated":"2014-10-20T13:39:20.109+0000","id":"b2uHwX9YLhu"},{"name":"Data Entry EA","created":"2014-09-13T21:11:15.686+0000","lastUpdated":"2014-10-20T13:39:20.120+0000","id":"OKKx4bf4ueV"}],"catDimensionConstraints":[{"name":"Funding Mechanism","created":"2014-02-18T07:51:04.612+0000","lastUpdated":"2014-10-16T12:18:02.751+0000","id":"SH885jaRe0o"}],"lastLogin":"2014-11-20T11:06:25.756+0000","selfRegistered":false,"disabled":false,"id":"fpYv7pe4Kbh"},
         "groups":[
             {"name":"OU Kenya Mechanism 1001 - Banana USAID Mechanism","created":"2014-09-29T13:08:16.040+0000","lastUpdated":"2014-10-16T16:47:55.750+0000","id":"UUejaqD9UNe"},
             {"name":"OU Kenya Partner 10001 users - Banana","created":"2014-09-29T13:08:16.357+0000","lastUpdated":"2014-10-18T12:52:38.664+0000","id":"pGh2wzc7bMY"}
         ],"organisationUnits":[{"code":"ke","name":"Kenya","created":"2013-03-14T01:25:38.231+0000","lastUpdated":"2014-10-20T19:17:09.897+0000","id":"HfVjCurKxh2"}],"dataViewOrganisationUnits":[{"code":"ke","name":"Kenya","created":"2013-03-14T01:25:38.231+0000","lastUpdated":"2014-10-20T19:17:09.897+0000","id":"HfVjCurKxh2"}],"id":"BukIlLTCbz9"};
 
     fixtures.currentUserAuthorities = ["F_DATAVALUE_DELETE","M_dhis-web-sms","M_dhis-web-reporting","M_dhis-web-light","F_DATAVALUE_ADD","M_dhis-web-maintenance-datadictionary","F_INDICATOR_PRIVATE_ADD","F_REPORT_PUBLIC_ADD","M_dhis-web-mapping","M_dhis-web-validationrule","M_dhis-web-pivot","F_RUN_VALIDATION","M_dhis-web-dashboard-integration","F_DOCUMENT_PRIVATE_ADD","M_dhis-web-importexport","F_VALIDATIONRULE_ADD","M_dhis-web-caseentry","M_dhis-web-visualizer","M_dhis-web-mobile"];
+
+    fixtures.rwandaUserGroup = {"userGroups":[{"id":"k6IKG8UtvJQ","name":"OU Rwanda Agency DOD all mechanisms"},{"id":"yi4l7yIWRQM","name":"OU Rwanda Agency DOD user administrators"},{"id":"f8uYL2O1IFH","name":"OU Rwanda Agency DOD users"},{"id":"Stc8jiohyTg","name":"OU Rwanda Agency HHS/CDC all mechanisms"},{"id":"x47aP9pWYlu","name":"OU Rwanda Agency HHS/CDC user administrators"},{"id":"hjLU7Ug0vKG","name":"OU Rwanda Agency HHS/CDC users"},{"id":"wIY2oMvmLmk","name":"OU Rwanda Agency PC all mechanisms"},{"id":"OjIScdFujry","name":"OU Rwanda Agency PC user administrators"},{"id":"WMAyDS3iOIa","name":"OU Rwanda Agency PC users"},{"id":"HlttAyxuL82","name":"OU Rwanda Agency State/PRM all mechanisms"},{"id":"R048ZoOnLxr","name":"OU Rwanda Agency State/PRM user administrators"},{"id":"BPupZKeCY01","name":"OU Rwanda Agency State/PRM users"},{"id":"FzwHJqJ81DO","name":"OU Rwanda Agency USAID all mechanisms"},{"id":"J19zR2dMaWa","name":"OU Rwanda Agency USAID user administrators"},{"id":"s7jeIAC1Psa","name":"OU Rwanda Agency USAID users"}]};
+    fixtures.rwandaUserGroupWithoutUSAIDUserGroup = {"userGroups":[{"id":"k6IKG8UtvJQ","name":"OU Rwanda Agency DOD all mechanisms"},{"id":"yi4l7yIWRQM","name":"OU Rwanda Agency DOD user administrators"},{"id":"f8uYL2O1IFH","name":"OU Rwanda Agency DOD users"},{"id":"Stc8jiohyTg","name":"OU Rwanda Agency HHS/CDC all mechanisms"},{"id":"x47aP9pWYlu","name":"OU Rwanda Agency HHS/CDC user administrators"},{"id":"hjLU7Ug0vKG","name":"OU Rwanda Agency HHS/CDC users"},{"id":"wIY2oMvmLmk","name":"OU Rwanda Agency PC all mechanisms"},{"id":"OjIScdFujry","name":"OU Rwanda Agency PC user administrators"},{"id":"WMAyDS3iOIa","name":"OU Rwanda Agency PC users"},{"id":"HlttAyxuL82","name":"OU Rwanda Agency State/PRM all mechanisms"},{"id":"R048ZoOnLxr","name":"OU Rwanda Agency State/PRM user administrators"},{"id":"BPupZKeCY01","name":"OU Rwanda Agency State/PRM users"},{"id":"FzwHJqJ81DO","name":"OU Rwanda Agency USAID all mechanisms"},{"id":"J19zR2dMaWa","name":"OU Rwanda Agency USAID user administrators"}]};
+    fixtures.rwandaUserGroupWithoutUSAIDAdminUserGroup = {"userGroups":[{"id":"k6IKG8UtvJQ","name":"OU Rwanda Agency DOD all mechanisms"},{"id":"yi4l7yIWRQM","name":"OU Rwanda Agency DOD user administrators"},{"id":"f8uYL2O1IFH","name":"OU Rwanda Agency DOD users"},{"id":"Stc8jiohyTg","name":"OU Rwanda Agency HHS/CDC all mechanisms"},{"id":"x47aP9pWYlu","name":"OU Rwanda Agency HHS/CDC user administrators"},{"id":"hjLU7Ug0vKG","name":"OU Rwanda Agency HHS/CDC users"},{"id":"wIY2oMvmLmk","name":"OU Rwanda Agency PC all mechanisms"},{"id":"OjIScdFujry","name":"OU Rwanda Agency PC user administrators"},{"id":"WMAyDS3iOIa","name":"OU Rwanda Agency PC users"},{"id":"HlttAyxuL82","name":"OU Rwanda Agency State/PRM all mechanisms"},{"id":"R048ZoOnLxr","name":"OU Rwanda Agency State/PRM user administrators"},{"id":"BPupZKeCY01","name":"OU Rwanda Agency State/PRM users"},{"id":"FzwHJqJ81DO","name":"OU Rwanda Agency USAID all mechanisms"},{"id":"s7jeIAC1Psa","name":"OU Rwanda Agency USAID users"}]};
+    fixtures.kenyaPartnerAbtUserGroup = {
+        id: "hxgit9fvIVv",
+        name: "OU Kenya Partner 440 all mechanisms - Abt Associates"
+    };
+    fixtures.kenyaPartnerUserGroups = {
+        userGroups: [
+            {
+                id: "PPER63aZQ1e",
+                name: "OU Kenya Partner 10000 all mechanisms - Apple"
+            },
+            {
+                id: "tICoPGZAWNk",
+                name: "OU Kenya Partner 10001 all mechanisms - Banana"
+            },
+            {
+                id: "UCnkwxHKAAm",
+                name: "OU Kenya Partner 10001 user administrators - Banana"
+            },
+            {
+                id: "pGh2wzc7bMY",
+                name: "OU Kenya Partner 10001 users - Banana"
+            },
+            {
+                id: "f8t4yjDIfiY",
+                name: "OU Kenya Partner 10002 all mechanisms - Cranberry"
+            },
+            {
+                id: "w1VeUZljmE8",
+                name: "OU Kenya Partner 10002 user administrators - Cranberry"
+            },
+            {
+                id: "eUXnF1aIa1Y",
+                name: "OU Kenya Partner 10002 users - Cranberry"
+            }
+        ]
+    };
+
+    fixtures.successInvite = {
+        "status": "SUCCESS",
+        "importCount": {
+            "imported": 1,
+            "updated": 0,
+            "ignored": 0,
+            "deleted": 0
+        },
+        "type": "User",
+        "importConflicts": [
+            {
+                "object": "(TBD) (TBD)",
+                "value": "Unknown reference to IdentifiableObject{id=0, uid='PUSy6gGOQGb', code='invite-mark@thedutchies.com-q6mvxfQ7dcH', name='invite-mark@thedutchies.com-q6mvxfQ7dcH', created=Sat Nov 22 23:04:30 CET 2014, lastUpdated=Sat Nov 22 23:04:30 CET 2014} (UserCredentials) on object IdentifiableObject{id=0, uid='null', code='null', name='(TBD) (TBD)', created=null, lastUpdated=null} (User)."
+            }
+        ],
+        "lastImported": "b4H1KaR7YYa"
+    };
+
+    fixtures.sampleInviteObject = {
+        "email": "mark@thedutchies.com",
+        "organisationUnits": [
+            {
+                "id": "XtxUYCsDWrR"
+            }
+        ],
+        "dataViewOrganisationUnits": [
+            {
+                "id": "XtxUYCsDWrR"
+            },
+            {
+                "id": "ybg3MO3hcf4"
+            }
+        ],
+        "groups": [
+            {
+                "id": "c6hGi8GEZot"
+            },
+            {
+                "id": "YbkldVOJMUl"
+            },
+            {
+                "id": "IvMcZJNUPzr"
+            },
+            {
+                "id": "vLqc4P1P20l"
+            },
+            {
+                "id": "H0c4i5mOtkB"
+            }
+        ],
+        "userCredentials": {
+            "userRoles": [
+                {
+                    "id": "k7BWFXkG6zt"
+                },
+                {
+                    "id": "n777lf1THwQ"
+                },
+                {
+                    "id": "KagqnetfxMr"
+                },
+                {
+                    "id": "b2uHwX9YLhu"
+                }
+            ],
+            "catDimensionConstraints": [
+                {
+                    "id": "SH885jaRe0o"
+                }
+            ]
+        }
+    };
+
+    fixtures.interAgencyGroupUsers = {userGroups: [
+        {
+            id: "LqrnY1CgnCv",
+            name: "OU Rwanda Country team"
+        }
+    ]};
+
+    fixtures.interAgencyGroupAdmin = {
+        pager: {
+            page: 1,
+            pageCount: 1,
+            total: 1
+        },
+        userGroups: [
+            {
+                id: "sJSLgsi6KjY",
+                name: "OU Rwanda User administrators"
+            }
+        ]
+    };
+
+    fixtures.interAgencyGroupMech = {
+        pager: {
+            page: 1,
+            pageCount: 1,
+            total: 1
+        },
+        userGroups: [
+            {
+                id: "OGAFubEVJK0",
+                name: "OU Rwanda All mechanisms"
+            }
+        ]
+    };
+
+
 
     window.fixtures = {
         get: function (fixtureName) {

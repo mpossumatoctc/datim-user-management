@@ -122,6 +122,20 @@ describe('DataGroupService', function () {
                 expect(errorHandler.error.calls.count()).toBe(2);
             });
 
+            it('should not error when userroles request is empty', function () {
+                userRoleRequest.respond(200, {});
+
+                dataGroupsService.getDataGroups();
+                $httpBackend.flush();
+            });
+
+            it('should not error when usergroups request is empty', function () {
+                userGroupRequest.respond(200, {});
+
+                dataGroupsService.getDataGroups();
+                $httpBackend.flush();
+            });
+
             describe('filtered responses', function () {
                 var dataGroups;
 

@@ -1,8 +1,6 @@
-Ability to add users here
 <script type="text/ng-template" id="userFormMessages">
     <div ng-message="required">This field is required</div>
 </script>
-
 <form name="userForm">
     <div class="form-controls-wrap select-user-type" ng-controller="userTypeController as userType">
         <select-usertype user="user" user-types="userType.userTypes"></select-usertype>
@@ -40,17 +38,17 @@ Ability to add users here
                 <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                 <ul class="checkbox-group">
                     <li ng-repeat="action in addUser.actions">
-                        <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default" type="checkbox">
-                        <label ng-bind="action.name"></label>
+                        <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
+                        <label for="userActions[{{::action.name}}]" ng-bind="action.name"></label>
                     </li>
                 </ul>
             </fieldset>
         </div>
     </div>
     <div class="form-controls-wrap">
-        <button class="btn btn-primary" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()"><i class="fa fa-circle-o-notch fa-spin"></i><span>Add user</span></span></button>
-    </div>
-    <div>
-        <textarea ng-bind="addUser.inviteObject"></textarea>
+        <button class="btn btn-primary add-user-button" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">
+            <i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i>
+            <span ng-if="!addUser.isProcessingAddUser">Invite user</span>
+        </button>
     </div>
 </form>

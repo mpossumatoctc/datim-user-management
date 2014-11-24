@@ -31,6 +31,9 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 currentUser: function (currentUserService) {
                     return currentUserService.getCurrentUser();
+                },
+                dimensionConstraint: function (categoriesService) {
+                    return categoriesService.getDimensionConstraint();
                 }
             }
         })
@@ -55,7 +58,8 @@ angular.module('PEPFAR.usermanagement', [
     'ui.select',
     'ui.bootstrap',
     'ui.validate',
-    'ngMessages'
+    'ngMessages',
+    'd2-headerbar'
 ]);
 
 //==================================================================================
@@ -76,6 +80,20 @@ angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifes
 //==================================================================================
 // Bootstrap the app manually
 //
+function basePathResolver(url, injectables) {
+    return [injectables.webappManifest.activities.dhis.href, url].join('/');
+}
+
 window.getBootstrapper('PEPFAR.usermanagement', document)
+    .setBasePathResolver(basePathResolver)
     .addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp')
+    .execute(function (injectables) {
+        window.dhis2 = window.dhis2 || {};
+        window.dhis2.settings = window.dhis2.settings || {};
+        window.dhis2.settings.baseUrl = injectables.webappManifest.activities.dhis.href.replace(window.location.origin, '').replace(/^\//, '');
+    })
+    .loadStylesheet('dhis-web-commons/css/menu.css')
+    .loadScript('dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
+    .loadModule('dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2Menu')
+    .loadScript('dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
     .bootstrap();

@@ -1,0 +1,33 @@
+@import "../variables"
+
+$header-background-color: $dhis-color
+$header-text-color: $dhis-light-text-color
+
+.header-bar
+  background-color: $header-background-color
+  height: 44px
+  position: fixed
+  z-index: 10
+  top: 0
+  left: 0
+  right: 0
+  box-shadow: 0 0 3px #222
+
+  a.title-link
+    position: absolute
+    top: 11px
+    left: 55px
+
+  img.header-logo
+    cursor: pointer
+    top: 2px
+    position: relative
+    vertical-align: initial
+
+  span.header-text
+    cursor: pointer
+    font-weight: bold
+    color: $header-text-color
+    font-size: 16px
+    position: relative
+    left: 50px

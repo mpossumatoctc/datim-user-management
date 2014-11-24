@@ -9,6 +9,8 @@ var buildDirectory = 'build';
 
 var files = [
     //Vendor dependency files
+    'vendor/jquery/dist/jquery.js',
+    'vendor/toastr/toastr.js',
     'vendor/angular/angular.js',
     'vendor/ui-router/release/angular-ui-router.js',
     'vendor/lodash/dist/lodash.js',

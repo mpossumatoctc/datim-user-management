@@ -19,6 +19,7 @@ function currentUserService($q, Restangular, errorHandler) {
                 //Add convenience methods to the userObject
                 currentUser.hasAllAuthority = hasAllAuthority.bind(currentUser.authorities);
                 currentUser.hasUserRole = hasUserRole.bind(currentUser);
+                currentUser.isUserAdministrator = isUserAdministrator.bind(currentUser);
 
                 return currentUser;
             }, errorHandler.errorFn('Failed to load the current user data'));
@@ -43,12 +44,16 @@ function currentUserService($q, Restangular, errorHandler) {
     }
 
     function hasUserRole(userRoleName) {
-        if (!this.userCredentials || !this.userCredentials.userAuthorityGroups) {
+        if (!this.userCredentials || !this.userCredentials.userRoles) {
             return false;
         }
 
-        return this.userCredentials.userAuthorityGroups.some(function (userRole) {
+        return this.userCredentials.userRoles.some(function (userRole) {
             return userRoleName === userRole.name;
         });
+    }
+
+    function isUserAdministrator() {
+        return this.hasUserRole('User Administrator');
     }
 }

@@ -67,6 +67,10 @@ function dataGroupsService($q, Restangular, currentUserService, errorHandler) {
     }
 
     function getValuesFilteredByName(valueArray, filterOn) {
+        if (!angular.isArray(valueArray)) {
+            return [];
+        }
+
         return valueArray.filter(function (userGroup) {
             return filterOn === userGroup.name;
         });

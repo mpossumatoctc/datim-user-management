@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>User management - PEPFAR</title>
 
     <!-- build:vendor css/app.css -->
     <link href="../vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
     <link href="../vendor/angular-ui-select/dist/select.css" rel="stylesheet" type="text/css" />
     <link href="../vendor/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <link href="../vendor/toastr/toastr.css" rel="stylesheet" type="text/css" />
     <link href="../temp/css/app/app.css" rel="stylesheet" type="text/css" />
     <!-- endbuild -->
 </head>
 <body ng-controller="appController as app">
+    <header-bar logo="app.headerBar.logo" title="app.headerBar.title" link="app.headerBar.link">
+        <div d2-menu></div>
+    </header-bar>
+
     <div class="app-content-wrap">
-        <div ng-bind="app.title"></div>
-            <a ui-sref="add" translate>Add user</a>
-            <a ui-sref="list" translate>Manage users</a>
+        <div class="button-group">
+            <a ng-disabled="app.currentState == 'add'" class="btn btn-default" ui-sref="add"><i class="fa fa-plus-square-o"></i><span translate>Add user</span></a>
+            <a ng-disabled="app.currentState == 'list'" class="btn btn-default" ui-sref="list"><i class="fa fa-users"></i><span translate>Manage users</span</a>
+        </div>
+        <h1 class="main-title" ng-bind="app.subTitle"></h1>
+        <h2 class="sub-title" ng-bind="app.title"></h2>
         <div ui-view ng-hide="app.isLoading"></div>
     </div>
 
@@ -25,6 +33,8 @@
     </div>
 
     <!-- build:vendor js/vendor.js -->
+    <script src="../vendor/jquery/dist/jquery.js"></script>
+    <script src="../vendor/toastr/toastr.js"></script>
     <script src="../vendor/lodash/dist/lodash.js"></script>
     <script src="../vendor/angular/angular.js"></script>
     <script src="../vendor/angular-messages/angular-messages.js"></script>
@@ -60,6 +70,10 @@
     <script src="errorhandler/errorhandler-service.js"></script>
     <script src="users/currentuser-service.js"></script>
     <script src="noaccess/noaccess-controller.js"></script>
+    <script src="categories/categories-service.js"></script>
+    <script src="headerbar/headerbar-directive.js"></script>
+    <script src="notify/notify-service.js"></script>
+    <script src="users/interagency-service.js"></script>
     <!-- endbuild -->
 
 </body>

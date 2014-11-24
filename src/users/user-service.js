@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService(Restangular) {
+function userService($q, Restangular) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -14,7 +14,7 @@ function userService(Restangular) {
             //{'id':'gh9tn4QBbKZ'}
         ],
         userCredentials:{
-            userAuthorityGroups:[
+            userRoles:[
                 //{'id':'b2uHwX9YLhu'}
             ]
         }
@@ -23,7 +23,8 @@ function userService(Restangular) {
     return {
         getUserObject: getUserObject,
         createUserInvite: createUserInvite,
-        getUserInviteObject: getUserInviteObject
+        getUserInviteObject: getUserInviteObject,
+        inviteUser: inviteUser
     };
 
     function getUserObject() {
@@ -43,8 +44,43 @@ function userService(Restangular) {
         return Restangular.all('users').post();
     }
 
+    function getInviteObject() {
+        var inviteObject = Object.create(getUserInviteProto());
+        return angular.extend(inviteObject, userInviteObjectStructure);
+    }
+
+    function getUserInviteProto() {
+        return {
+            addDimensionConstraint: addDimensionConstraint,
+            addEmail: addEmail,
+            addEntityUserGroup: addEntityUserGroup
+        };
+
+        function addDimensionConstraint(dimension) {
+            if (!this.userCredentials.catDimensionConstraints) {
+                this.userCredentials.catDimensionConstraints = [];
+            }
+            if (dimension && dimension.id) {
+                this.userCredentials.catDimensionConstraints.push({id: dimension.id});
+            }
+
+        }
+
+        function addEmail(email) {
+            this.email = email;
+        }
+
+        function addEntityUserGroup(userGroup) {
+            this.groups = this.groups || [];
+
+            if (userGroup && userGroup.id) {
+                this.groups.push({id: userGroup.id});
+            }
+        }
+    }
+
     function getUserInviteObject(user, dataGroups, allActions, currentUser) {
-        var inviteObject = angular.copy(userInviteObjectStructure);
+        var inviteObject = getInviteObject();
         var selectedDataGroups = getSelectedDataGroups(user, dataGroups);
         var actions = getActionsForGroups(user, selectedDataGroups, allActions);
 
@@ -57,10 +93,10 @@ function userService(Restangular) {
 
         //Add the user actions to the invite object
         actions.forEach(function (action) {
-            inviteObject.userCredentials.userAuthorityGroups.push({id: action.userRoleId});
+            if (action.userRoleId) {
+                inviteObject.userCredentials.userRoles.push({id: action.userRoleId});
+            }
         });
-
-        inviteObject.email = user.email;
 
         //TODO: Create get functions for these on the userobject?
         var orgUnits = (currentUser && currentUser.organisationUnits) || [];
@@ -72,6 +108,8 @@ function userService(Restangular) {
         inviteObject.dataViewOrganisationUnits = dataOrgUnits.map(function (orgUnit) {
             return {id: orgUnit.id};
         });
+
+        inviteObject.addEmail(user.email);
 
         return inviteObject;
     }
@@ -124,5 +162,34 @@ function userService(Restangular) {
             }
             return false;
         });
+    }
+
+    function inviteUser(inviteData) {
+        if (!angular.isObject(inviteData) && !null) {
+            return $q.reject('Invalid invite data');
+        }
+
+        return Restangular
+            .all('users')
+            .all('invite')
+            .post(inviteData)
+            .then(function (response) {
+                if (response.status !== 'SUCCESS' ||
+                    response.importCount.imported !== 1 ||
+                    response.importCount.updated !== 0 ||
+                    response.importCount.ignored !== 0 ||
+                    response.importCount.ignored !== 0) {
+                    return $q.reject('Invite response not as expected');
+                }
+                return Restangular
+                    .all('users')
+                    .get(response.lastImported);
+            })
+            .catch(function (error) {
+                if (angular.isString(error)) {
+                    return $q.reject(error);
+                }
+                return $q.reject('Invite failed');
+            });
     }
 }

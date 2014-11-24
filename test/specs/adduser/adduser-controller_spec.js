@@ -2,7 +2,9 @@ describe('Add user controller', function () {
     var scope;
     var currentUserMock;
 
-    beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.value('interAgencyService', {getUserGroups: function () {}});
+    }));
     beforeEach(function () {
         currentUserMock = function (options) {
             return {
@@ -12,10 +14,11 @@ describe('Add user controller', function () {
                     }
                     return true;
                 },
-                hasUserRole: function (userAdminRole) {
-                    if (options && options.userAdministrator === userAdminRole) {
+                isUserAdministrator: function () {
+                    if (options && options.userAdministrator) {
                         return true;
                     }
+                    return false;
                 }
             };
         };
@@ -30,13 +33,13 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 userActionsService: {
                     getActionsFor: function () {
                         return [];
                     }
                 },
                 currentUser: currentUserMock()
-
             });
         }));
 
@@ -67,6 +70,10 @@ describe('Add user controller', function () {
         it('should have a flag for if the form is processing', function () {
             expect(controller.isProcessingAddUser).toBe(false);
         });
+
+        it('should have a dimensionConstraint', function () {
+            expect(controller.dimensionConstraint).toEqual({});
+        });
     });
 
     describe('load data into the controller through injectables', function () {
@@ -87,6 +94,7 @@ describe('Add user controller', function () {
                     {name: 'EA'},
                     {name: 'SIMS'}
                 ],
+                dimensionConstraint: {},
                 currentUser: currentUserMock()
             });
         }));
@@ -131,6 +139,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 currentUser: currentUserMock()
             });
         }));
@@ -171,6 +180,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 userActionsService: userActionsServiceMock,
                 currentUser: currentUserMock(),
                 $state: {} //Fake the state to not load the default
@@ -221,6 +231,7 @@ describe('Add user controller', function () {
                     {name: 'EA'},
                     {name: 'SIMS'}
                 ],
+                dimensionConstraint: {},
                 currentUser: currentUserMock()
             });
         }));
@@ -285,6 +296,7 @@ describe('Add user controller', function () {
                 $scope: scope,
                 userTypes: undefined,
                 dataGroups: undefined,
+                dimensionConstraint: {},
                 userActionsService: {
                     getActionsFor: function () {
                         return [];
@@ -318,6 +330,90 @@ describe('Add user controller', function () {
         it('should not switch states when the user has the user manager role', function () {
             createController(false, 'User Administrator');
             expect($state.go).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('userInviteObject', function () {
+        var controller;
+        var userservice;
+
+        beforeEach(inject(function ($controller, $rootScope, userService) {
+            scope = $rootScope.$new();
+            userservice = userService;
+            spyOn(userService, 'inviteUser').and.returnValue({
+                then: function () {
+
+                }
+            });
+
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: [],
+                dataGroups: [],
+                dimensionConstraint: {id: 'SomeID'},
+                currentUser: currentUserMock(),
+                userService: userservice
+            });
+        }));
+
+        it('should add the dimension constraint', function () {
+            controller.addUser();
+
+            expect(controller.userInviteObject.userCredentials.catDimensionConstraints[0].id).toEqual('SomeID');
+        });
+
+        it('should add the entityUserGroups', function () {
+            scope.user.userEntity = {
+                mechUserGroup: {
+                    id: 'agencyGroupIdMech'
+                },
+                userUserGroup: {
+                    id: 'agencyGroupIdUsers'
+                }
+            };
+            controller.addUser();
+
+            expect(controller.userInviteObject.groups[0]).toEqual({id: 'agencyGroupIdMech'});
+            expect(controller.userInviteObject.groups[1]).toEqual({id: 'agencyGroupIdUsers'});
+        });
+
+        describe('user manager usergroup', function () {
+            beforeEach(function () {
+                scope.user.userActions['Manage users'] = true;
+                scope.user.userEntity = {
+                    userAdminUserGroup: {
+                        id: 'userAdminUserGroup'
+                    }
+                };
+            });
+
+            it('should add the user manager group when the user manager role is present', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.groups[0]).toEqual({id: 'userAdminUserGroup'});
+            });
+
+            it('should not add the user manager group when the user manager role is present but false', function () {
+                scope.user.userActions['Manage users'] = false;
+
+                controller.addUser();
+
+                expect(controller.userInviteObject.groups.length).toBe(0);
+            });
+
+            it('should not add the user manager group when the user manager role is present but not the group', function () {
+                scope.user.userEntity = {
+                };
+
+                controller.addUser();
+
+                expect(controller.userInviteObject.groups.length).toBe(0);
+            });
+
+            it('should call the inviteUser method on the user service', function () {
+                controller.addUser();
+                expect(userservice.inviteUser).toHaveBeenCalled();
+            });
         });
     });
 });

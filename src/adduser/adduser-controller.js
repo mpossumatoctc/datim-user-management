@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, currentUser,
-                           userActionsService, userService, $state) { //jshint ignore:line
+function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
+                           userActionsService, userService, $state, notify, interAgencyService) {
     var vm = this;
     var regex = /^dataStream.+$/g;
     var dataStreamIds;
@@ -16,6 +16,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser,
     vm.validateDataGroups = validateDataGroups;
     vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
     vm.allowUserAdd = false;
+    vm.dimensionConstraint = dimensionConstraint;
 
     //Temp
     vm.inviteObject = {};
@@ -29,11 +30,18 @@ function addUserController($scope, userTypes, dataGroups, currentUser,
         if (newVal !== oldVal && newVal.name) {
             $scope.user.userActions = {};
             vm.actions = userActionsService.getActionsFor(newVal.name);
+
+            if (newVal.name === 'Inter-Agency') {
+                interAgencyService.getUserGroups().then(function (interAgencyUserGroups) {
+                    console.log(interAgencyUserGroups); //jshint ignore:line
+                    $scope.user.userEntity = interAgencyUserGroups;
+                });
+            }
         }
     });
 
     function initialize() {
-        if (!currentUser.hasAllAuthority() && !currentUser.hasUserRole('User Administrator')) {
+        if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             $state.go('noaccess');
         }
 
@@ -46,13 +54,32 @@ function addUserController($scope, userTypes, dataGroups, currentUser,
     }
 
     function addUser() {
+        var managerRole = 'Manage users';
+
         vm.isProcessingAddUser = true;
 
-        vm.inviteObject = JSON.stringify(
-            userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser),
-            undefined,
-            2
-        );
+        vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser);
+        vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+
+        //Add the all mechanisms group from the user entity
+        if ($scope.user.userEntity && $scope.user.userEntity.mechUserGroup && $scope.user.userEntity.userUserGroup) {
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
+        }
+
+        if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
+        }
+
+        userService.inviteUser(vm.userInviteObject)
+            .then(function () {
+                notify.success('User added successfully');
+                vm.isProcessingAddUser = false;
+                $state.go('add', {}, {reload: true});
+            }, function () {
+                notify.error('Request to add the user failed');
+                vm.isProcessingAddUser = false;
+            });
     }
 
     function validateDataGroups() {

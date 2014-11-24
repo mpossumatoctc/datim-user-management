@@ -19,6 +19,11 @@ describe('Application states', function () {
                 return {};
             }
         });
+        $provide.value('categoriesService', {
+            getDimensionConstraint: function () {
+                return {};
+            }
+        });
     }));
     beforeEach(inject(function ($templateCache, $injector) {
         injector = $injector;
@@ -98,5 +103,50 @@ describe('Application states', function () {
         expect($state.current.url).toEqual(expectedState.url);
         expect($state.current.templateUrl).toEqual(expectedState.templateUrl);
         expect($state.current.controller).toEqual(expectedState.controller);
+    });
+});
+
+describe('Application state error handling', function () {
+    var injector;
+    var $state;
+    var $rootScope;
+
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.value('userTypesService', {
+            getUserTypes: function () {
+                return [];
+            }
+        });
+        $provide.value('dataGroupsService', {
+            getDataGroups: function () {
+                return [];
+            }
+        });
+        $provide.value('currentUserService', {
+            getCurrentUser: function () {
+                return {};
+            }
+        });
+        $provide.factory('categoriesService', {
+            getDimensionConstraint: function ($q) {
+                return $q.reject('Some Error');
+            }
+        });
+    }));
+
+    beforeEach(inject(function ($templateCache, $injector) {
+        injector = $injector;
+        $state = $injector.get('$state');
+        $rootScope = $injector.get('$rootScope');
+        $templateCache.put('adduser/add.html', '');
+        $templateCache.put('userlist/list.html', '');
+        $templateCache.put('noaccess/noaccess.html', '');
+    }));
+
+    it('should reject the add state and redirect to list', function () {
+        $state.go('add');
+        $rootScope.$apply();
+
+        expect($state.current.name).toEqual('list');
     });
 });

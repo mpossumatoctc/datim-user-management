@@ -84,7 +84,7 @@ describe('Current user', function () {
 
             it('should return false when a user does not have any roles', function () {
                 var userResponseWithoutGroups = fixtures.get('currentUser');
-                userResponseWithoutGroups.userCredentials.userAuthorityGroups = undefined;
+                userResponseWithoutGroups.userCredentials.userRoles = undefined;
                 userResponse.respond(200, userResponseWithoutGroups);
 
                 $httpBackend.flush();

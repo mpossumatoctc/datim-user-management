@@ -204,4 +204,240 @@ describe('ngBootstrapper', function () {
             expect($log.error).toHaveBeenCalled();
         });
     });
+
+    it('should set the element on the bootstrapper', function () {
+        var bootstrapper = getBootstrapper('PEPFAR.usermanagement', 'element');
+
+        expect(bootstrapper.element).toEqual('element');
+    });
+
+    it('should set the body element as the element if the provided one is the document object', function () {
+        var bootstrapper = getBootstrapper('PEPFAR.usermanagement', document);
+
+        expect(bootstrapper.element).toEqual(document.body);
+    });
+
+    describe('loadScript', function () {
+        var $httpBackend;
+
+        beforeEach(function () {
+            $httpBackend = ngBootstrapper.injector.get('$httpBackend');
+            $httpBackend.expectGET('manifest.webapp').respond(200, {
+                name: 'User Management',
+                activities: {
+                    dhis: {
+                        href: 'localhost:8080'
+                    }
+                }
+            });
+
+            angular.bootstrap.calls.reset();
+
+            ngBootstrapper.addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp');
+        });
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should have a loadScript function', function () {
+            $httpBackend.resetExpectations();
+            expect(ngBootstrapper.loadScript).toBeAFunction();
+        });
+
+        it('should add a script tag to the document with the provided function', function () {
+            ngBootstrapper.loadScript('myScript.js');
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            expect(element.querySelector('script').getAttribute('src')).toEqual('myScript.js');
+        });
+
+        it('should return itself for chaining', function () {
+            $httpBackend.resetExpectations();
+
+            expect(ngBootstrapper.loadScript('someScript.js')).toBe(ngBootstrapper);
+        });
+
+        it('should change the path using the path function', function () {
+            ngBootstrapper.loadScript('myScript.js', function (scriptUrl, injectables) {
+                return [injectables.webappManifest.activities.dhis.href, scriptUrl].join('/');
+            });
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            expect(element.querySelector('script').getAttribute('src')).toEqual('localhost:8080/myScript.js');
+        });
+
+        it('should use the set basePathResolver if it has been set', function () {
+            ngBootstrapper.setBasePathResolver(function (scriptUrl, injectables) {
+                return [injectables.webappManifest.activities.dhis.href, scriptUrl].join('/');
+            });
+            ngBootstrapper.loadScript('myScript.js');
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            expect(element.querySelector('script').getAttribute('src')).toEqual('localhost:8080/myScript.js');
+        });
+    });
+
+    it('basepath resolver should return the bootstrapper', function () {
+        expect(ngBootstrapper.setBasePathResolver()).toBe(ngBootstrapper);
+    });
+
+    describe('loadStylesheet', function () {
+        var $httpBackend;
+
+        beforeEach(function () {
+            $httpBackend = ngBootstrapper.injector.get('$httpBackend');
+            $httpBackend.expectGET('manifest.webapp').respond(200, {
+                name: 'User Management',
+                activities: {
+                    dhis: {
+                        href: 'localhost:8080'
+                    }
+                }
+            });
+
+            angular.bootstrap.calls.reset();
+
+            ngBootstrapper.addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp');
+        });
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+
+            //Remove the added link tags from the head
+            Array.prototype.forEach.call(document.head.querySelectorAll('link'), function (element) {
+                element.parentElement.removeChild(element);
+            });
+        });
+
+        it('should be a function', function () {
+            $httpBackend.resetExpectations();
+            expect(ngBootstrapper.loadStylesheet).toBeAFunction();
+        });
+
+        it('should add the link element to the head of the document', function () {
+            var currentLinkTags = document.head.querySelectorAll('link').length;
+
+            ngBootstrapper.loadStylesheet('myStylesheet.css');
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            expect(document.head.querySelectorAll('link').length).toBe(currentLinkTags + 1);
+        });
+
+        it('should set the correct attributes', function () {
+            ngBootstrapper.loadStylesheet('myStylesheet.css');
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            var styleSheetElement = document.head.querySelector('link');
+
+            expect(styleSheetElement.getAttribute('href')).toBe('myStylesheet.css');
+            expect(styleSheetElement.getAttribute('rel')).toBe('stylesheet');
+            expect(styleSheetElement.getAttribute('type')).toBe('text/css');
+        });
+
+        it('should return itself for chaining', function () {
+            $httpBackend.resetExpectations();
+
+            expect(ngBootstrapper.loadStylesheet('')).toBe(ngBootstrapper);
+        });
+
+        it('should change the path using the path function', function () {
+            var currentLinkTags = document.head.querySelectorAll('link').length;
+
+            ngBootstrapper.loadStylesheet('myStylesheet.css', function (stylesheetUrl, injectables) {
+                return [injectables.webappManifest.activities.dhis.href, stylesheetUrl].join('/');
+            });
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            var styleSheetElement = document.head.querySelector('link');
+
+            expect(document.head.querySelectorAll('link').length).toBe(currentLinkTags + 1);
+            expect(styleSheetElement.getAttribute('href')).toBe('localhost:8080/myStylesheet.css');
+        });
+    });
+
+    describe('loadModule', function () {
+        it('should be a function', function () {
+            expect(ngBootstrapper.loadModule).toBeAFunction();
+        });
+
+        it('should call the loadScript function with the script url', function () {
+            spyOn(ngBootstrapper, 'loadScript');
+
+            ngBootstrapper.loadModule('myModule.js', 'myModule');
+
+            expect(ngBootstrapper.loadScript).toHaveBeenCalledWith('myModule.js', undefined);
+        });
+
+        it('should return itself for chaining', function () {
+            expect(ngBootstrapper.loadModule()).toBe(ngBootstrapper);
+        });
+
+        it('should add the model name to the modules property', function () {
+            ngBootstrapper.loadModule('myModule.js', 'myModule');
+
+            expect(ngBootstrapper.modules).toContain('myModule');
+        });
+    });
+
+    describe('execute', function () {
+        var $httpBackend;
+
+        beforeEach(function () {
+            $httpBackend = ngBootstrapper.injector.get('$httpBackend');
+            $httpBackend.expectGET('manifest.webapp').respond(200, {
+                name: 'User Management',
+                activities: {
+                    dhis: {
+                        href: 'localhost:8080'
+                    }
+                }
+            });
+
+            angular.bootstrap.calls.reset();
+
+            ngBootstrapper.addInjectableFromRemoteLocation('webappManifest', 'manifest.webapp');
+        });
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should be a function', function () {
+            $httpBackend.resetExpectations();
+
+            expect(ngBootstrapper.execute).toBeAFunction();
+        });
+
+        it('should execute the given function on bootstrap', function () {
+            var executeFunction = jasmine.createSpy();
+
+            ngBootstrapper.execute(executeFunction);
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+
+            expect(executeFunction).toHaveBeenCalled();
+        });
+
+        it('should not fail when the passed parameter is not a function', function () {
+            ngBootstrapper.execute();
+            ngBootstrapper.bootstrap();
+            $httpBackend.flush();
+        });
+
+        it('should return itself for chaining', function () {
+            $httpBackend.resetExpectations();
+
+            expect(ngBootstrapper.execute()).toBe(ngBootstrapper);
+        });
+    });
 });
