@@ -3,7 +3,7 @@ angular.module('PEPFAR.usermanagement').service('userFilterService', userFilterS
 function userFilterService($q) {
     var deferred = $q.defer();
     var userFilter = [
-        { name: 'Name' },
+        {name: 'Name'},
         {name: 'Username'},
         {name: 'E-Mail'},
         {name: 'Roles'},
