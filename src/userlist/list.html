@@ -1,21 +1,25 @@
 List of searchable users here
 
-<div class="row">
-	<div class="col-sm-6">
-		<select name="filter" id="filter"></select>
+<div class="search-users">
+	<div class="row">
+
+		<div class="col-sm-6">
+			<select name="filter" id="filter" ng-model="filter" ng-options="nameOption.name for nameOption in userFilter" ng-change="setFilterRefine()"></select>
+		</div>
+		<div class="col-sm-6">
+			<select name="filter-secondary" id="filter-secondary" ng-model="filterSecond" ng-options="refineOption.name for refineOption in filterRefine" ng-show="filterRefine.length > 0"></select>
+		</div>
 	</div>
-	<div class="col-sm-6">
-		<select name="filter-secondary" id="filter-secondary" ng-hide=""></select>
+	<div class="row">
+		<div class="col-md-12">
+			<input type="text">	
+		</div>
 	</div>
+
+
+	<div class="search-result" ng-hide="">
+		<ul ng-repeat="user in userList.users">
+		    <li ng-bind="user.name"></li>
+		</ul>	
+	</div>	
 </div>
-<div class="row">
-	<div class="col-md-12">
-		<input type="text">	
-	</div>
-</div>
-
-
-
-<ul ng-repeat="user in userList.users">
-    <li ng-bind="user.name"></li>
-</ul>

@@ -16,7 +16,18 @@ function routerConfig($stateProvider, $urlRouterProvider) {
         .state('list', {
             url: '/list',
             templateUrl: 'userlist/list.html',
-            controller: 'userListController as userList'
+            controller: 'userListController as userList',
+            resolve: {
+                userFilter: function (userFilterService) {
+                    return userFilterService.getUserFilter();
+                },
+                userTypes: function (userTypesService) {
+                    return userTypesService.getUserTypes();
+                },
+                dataGroups: function (dataGroupsService) {
+                    return dataGroupsService.getDataGroups();
+                }
+            }
         })
         .state('add', {
             url: '/add',
