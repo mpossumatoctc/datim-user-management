@@ -182,6 +182,43 @@
         }
     };
 
+    fixtures.interAgencyGroupUsers = {userGroups: [
+        {
+            id: "LqrnY1CgnCv",
+            name: "OU Rwanda Country team"
+        }
+    ]};
+
+    fixtures.interAgencyGroupAdmin = {
+        pager: {
+            page: 1,
+            pageCount: 1,
+            total: 1
+        },
+        userGroups: [
+            {
+                id: "sJSLgsi6KjY",
+                name: "OU Rwanda User administrators"
+            }
+        ]
+    };
+
+    fixtures.interAgencyGroupMech = {
+        pager: {
+            page: 1,
+            pageCount: 1,
+            total: 1
+        },
+        userGroups: [
+            {
+                id: "OGAFubEVJK0",
+                name: "OU Rwanda All mechanisms"
+            }
+        ]
+    };
+
+
+
     window.fixtures = {
         get: function (fixtureName) {
             if (fixtures[fixtureName])
