@@ -1,5 +1,29 @@
 List of searchable users here
+<script type="text/ng-template" id="customTemplate.html">
+  <a>
+      <span bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+  </a>
+</script>
+<div class="search-users">
+	<div class="row">
 
-<ul ng-repeat="user in userList.users">
-    <li ng-bind="user.name"></li>
-</ul>
+		<div class="col-sm-6">
+			<select name="filter" id="filter" ng-model="filter" ng-options="nameOption.name for nameOption in userFilter" ng-change="setFilterRefine()"></select>
+		</div>
+		<div class="col-sm-6">
+			<select name="filter-secondary" id="filter-secondary" ng-model="filterSecond" ng-options="refineOption.name for refineOption in filterRefine" ng-show="filterRefine.length > 0"></select>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<input type="text" ng-model="textFilter" typeahead="usersList for usersList in getUserList($viewValue)">	
+		</div>
+	</div>
+
+
+	<div class="search-result" ng-hide="">
+		<ul ng-repeat="user in userList.users">
+		    <li ng-bind="user.name"></li>
+		</ul>	
+	</div>	
+</div>

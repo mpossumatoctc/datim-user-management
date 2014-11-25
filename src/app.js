@@ -16,7 +16,18 @@ function routerConfig($stateProvider, $urlRouterProvider) {
         .state('list', {
             url: '/list',
             templateUrl: 'userlist/list.html',
-            controller: 'userListController as userList'
+            controller: 'userListController as userList',
+            resolve: {
+                userFilter: function (userFilterService) {
+                    return userFilterService.getUserFilter();
+                },
+                userTypes: function (userTypesService) {
+                    return userTypesService.getUserTypes();
+                },
+                dataGroups: function (dataGroupsService) {
+                    return dataGroupsService.getDataGroups();
+                }
+            }
         })
         .state('add', {
             url: '/add',
@@ -92,8 +103,8 @@ window.getBootstrapper('PEPFAR.usermanagement', document)
         window.dhis2.settings = window.dhis2.settings || {};
         window.dhis2.settings.baseUrl = injectables.webappManifest.activities.dhis.href.replace(window.location.origin, '').replace(/^\//, '');
     })
-    .loadStylesheet('dhis-web-commons/css/menu.css')
-    .loadScript('dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
-    .loadModule('dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2Menu')
-    .loadScript('dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
+    .loadStylesheet('/dhis-web-commons/css/menu.css')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
+    .loadModule('/dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2Menu')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
     .bootstrap();
