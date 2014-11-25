@@ -1,5 +1,9 @@
 List of searchable users here
-
+<script type="text/ng-template" id="customTemplate.html">
+  <a>
+      <span bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+  </a>
+</script>
 <div class="search-users">
 	<div class="row">
 
@@ -12,7 +16,7 @@ List of searchable users here
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<input type="text">	
+			<input type="text" ng-model="textFilter" typeahead="usersList for usersList in getUserList($viewValue)">	
 		</div>
 	</div>
 
