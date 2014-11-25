@@ -70,11 +70,12 @@ function userListController($scope, userFilter, userTypes, dataGroups, Restangul
     };
 
     function getFilterOptions(inputText) {
+        window.console.log('Filter Name: %o    Second Filter: %o  Text Input: %o',
+            $scope.filter, $scope.filterSecond, inputText);
+        //window.console.log($scope.filterRefine);
         inputText = '';
-        window.console.log('Filter Name: %s    Second Filter: %s  Text Input: %s',
-            $scope.filter, $scope.filterRefine, inputText);
-        window.console.log($scope.filterRefine);
-
         return inputText;
     }
+
+    //function buildFilterOption
 }
