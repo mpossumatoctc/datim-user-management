@@ -12,8 +12,6 @@ function userListController($scope, userFilter, userTypes, dataGroups, Restangul
     vm.userTypes = userTypes;
     vm.dataGroups = dataGroups;
 
-    vm.refine = false;
-
     vm.users = [
         {name: 'Mark'},
         {name: 'Paul'}
@@ -42,7 +40,17 @@ function userListController($scope, userFilter, userTypes, dataGroups, Restangul
             filter: getFilterOptions(inputText),
             paging: false
         }).then(function (response) {
-            window.console.log(response);
+            vm.users = [];
+            return response.users.map(function (item) {
+                vm.users.push(item);
+                return item.name;
+            });
+
+/*
+            return response.data.users.map(function (item) {
+                return item.name;
+            });
+*/
             /*
             var inputMatch = response.userRoles;
 
@@ -63,6 +71,10 @@ function userListController($scope, userFilter, userTypes, dataGroups, Restangul
 
     function getFilterOptions(inputText) {
         inputText = '';
+        window.console.log('Filter Name: %s    Second Filter: %s  Text Input: %s',
+            $scope.filter, $scope.filterRefine, inputText);
+        window.console.log($scope.filterRefine);
+
         return inputText;
     }
 }
