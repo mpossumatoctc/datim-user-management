@@ -3,7 +3,51 @@ describe('Select usertype directive', function () {
     var element;
 
     beforeEach(module('users/selectusertype.html'));
-    beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.value('partnersService', {
+            getPartners: function () {
+                return {
+                    then: function (callBack) {
+                        callBack.call();
+                    },
+                    catch: function (callBack) {
+                        callBack.call();
+                    }
+                };
+            }
+        });
+
+        $provide.value('agenciesService', {
+            getAgencies: function () {
+                return {
+                    then: function (callBack) {
+                        callBack.call();
+                    },
+                    catch: function (callBack) {
+                        callBack.call();
+                    }
+                };
+            }
+        });
+
+        $provide.value('interAgencyService', {
+            getUserGroups: function () {
+                return {
+                    then: function (callBack) {
+                        callBack.call(undefined, {
+                            userUserGroup: {
+                                id: 'LqrnY1CgnCv',
+                                name: 'OU Rwanda Country team'
+                            }
+                        });
+                    },
+                    catch: function (callBack) {
+                        callBack.call();
+                    }
+                };
+            }
+        });
+    }));
     beforeEach(inject(function ($injector) {
         var $compile = $injector.get('$compile');
         var $rootScope = $injector.get('$rootScope');

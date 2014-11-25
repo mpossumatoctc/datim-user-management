@@ -26,11 +26,11 @@ function currentUserService($q, Restangular, errorHandler) {
     }
 
     function requestCurrentUser() {
-        return Restangular.one('me').get();
+        return Restangular.one('me').withHttpConfig({cache: true}).get();
     }
 
     function requestUserAuthorities() {
-        return Restangular.all('me').get('authorization');
+        return Restangular.all('me').withHttpConfig({cache: true}).get('authorization');
     }
 
     function getCurrentUser() {

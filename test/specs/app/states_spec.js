@@ -24,6 +24,11 @@ describe('Application states', function () {
                 return {};
             }
         });
+        $provide.value('userFilterService', {
+            getUserFilter: function () {
+                return {};
+            }
+        });
     }));
     beforeEach(inject(function ($templateCache, $injector) {
         injector = $injector;
@@ -130,6 +135,11 @@ describe('Application state error handling', function () {
         $provide.factory('categoriesService', {
             getDimensionConstraint: function ($q) {
                 return $q.reject('Some Error');
+            }
+        });
+        $provide.value('userFilterService', {
+            getUserFilter: function () {
+                return {};
             }
         });
     }));

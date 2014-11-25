@@ -21,7 +21,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
         return $q.all([getPartnersFromApi(), getUserGroups(organisationUnitName)])
             .then(matchPartnersWithUserGroups)
-            .catch(errorHandler.warningFn(['No partners found in', organisationUnitName, 'that you can access all mechanisms for'].join(' ')));
+            .catch(errorHandler.debugFn(['No partners found in', organisationUnitName, 'that you can access all mechanisms for'].join(' ')));
     }
 
     function matchPartnersWithUserGroups(responses) {
@@ -69,8 +69,8 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
     function getPartnersFromApi() {
         return Restangular
-            .all('dimensions')
-            .all('BOyWrF33hiR')
+            .all('dimensions').withHttpConfig({cache: true})
+            .all('BOyWrF33hiR').withHttpConfig({cache: true})
             .get('items', {paging: 'false'})
             .then(function (response) {
                 return response.items;
@@ -87,7 +87,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
         };
 
         return Restangular
-            .one('userGroups')
+            .one('userGroups').withHttpConfig({cache: true})
             .get(queryParams)
             .then(function (userGroups) {
                 return userGroups.userGroups || [];

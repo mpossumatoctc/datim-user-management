@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').factory('interAgencyService', interAgencyService);
 
 function interAgencyService($q, Restangular, currentUserService, errorHandler) {
-    var userGroupEndPoint = Restangular.one('userGroups');
+    var userGroupEndPoint = Restangular.one('userGroups').withHttpConfig({cache: true});
 
     return {
         getUserGroups: getUserGroups
