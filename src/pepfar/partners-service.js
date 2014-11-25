@@ -21,7 +21,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
         return $q.all([getPartnersFromApi(), getUserGroups(organisationUnitName)])
             .then(matchPartnersWithUserGroups)
-            .catch(errorHandler.warningFn(['No partners found in', organisationUnitName, 'that you can access all mechanisms for'].join(' ')));
+            .catch(errorHandler.debugFn(['No partners found in', organisationUnitName, 'that you can access all mechanisms for'].join(' ')));
     }
 
     function matchPartnersWithUserGroups(responses) {

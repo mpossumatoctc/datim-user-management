@@ -6,8 +6,10 @@ function errorHandlerService($q, $log, notify) {
     };
     var sv = this;
 
+    this.isDebugOn = true;
     this.error = error;
     this.warning = warning;
+    this.debug = debug;
     this.errorFn = function (message) {
             return function () {
                 return sv.error(message);
@@ -17,6 +19,12 @@ function errorHandlerService($q, $log, notify) {
     this.warningFn = function (message) {
         return function () {
             return sv.warning(message);
+        };
+    };
+
+    this.debugFn = function (message) {
+        return function () {
+            return sv.debug(message);
         };
     };
 
@@ -32,6 +40,19 @@ function errorHandlerService($q, $log, notify) {
     }
 
     function warning(message) {
+        if (message.status) {
+            $log.error(errorMessages[message.status]);
+            notify.warning(errorMessages[message.status]);
+        } else {
+            $log.error(message);
+            notify.warning(message);
+        }
+        return $q.reject(message);
+    }
+
+    function debug(message) {
+        if (!sv.isDebugOn) { return; }
+
         if (message.status) {
             $log.error(errorMessages[message.status]);
             notify.warning(errorMessages[message.status]);

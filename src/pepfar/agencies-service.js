@@ -27,7 +27,7 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
                     }
                     return agencies;
                 });
-        }).catch(errorHandler.warning);
+        }).catch(errorHandler.debug);
     }
 
     function getAgencyObjects() {

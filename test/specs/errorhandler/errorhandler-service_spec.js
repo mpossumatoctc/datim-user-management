@@ -18,6 +18,10 @@ describe('Error handler service', function () {
         expect(service).toBeAnObject();
     });
 
+    it('should have a debug flag', function () {
+        expect(service.isDebugOn).toBeDefined();
+    });
+
     describe('error', function () {
         it('should be a function', function () {
             expect(service.error).toBeAFunction();
@@ -131,6 +135,71 @@ describe('Error handler service', function () {
             service.warningFn('ErrorMessage')();
 
             expect(service.warning).toHaveBeenCalledWith('ErrorMessage');
+        });
+    });
+
+    describe('debug', function () {
+        it('should be a function', function () {
+            expect(service.debug).toBeAFunction();
+        });
+
+        it('should extract the message from the error object', function () {
+            service.debug({
+                status: 404
+            });
+            expect($log.error).toHaveBeenCalledWith('Requested resource was not found');
+        });
+
+        it('should call with just the message if the message is a string', function () {
+            service.debug('ErrorString');
+
+            expect($log.error).toHaveBeenCalledWith('ErrorString');
+        });
+
+        it('should extract the message from the error object an', function () {
+            service.debug({
+                status: 404
+            });
+            expect(notify.warning).toHaveBeenCalledWith('Requested resource was not found');
+        });
+
+        it('should call with just the message if the message is a string', function () {
+            service.debug('ErrorString');
+
+            expect(notify.warning).toHaveBeenCalledWith('ErrorString');
+        });
+
+        it('should not call the notify service if the debug flag is set to false', function () {
+            service.isDebugOn = false;
+            service.debug('ErrorString');
+
+            expect(notify.warning).not.toHaveBeenCalledWith('ErrorString');
+        });
+    });
+
+    describe('debugFn', function () {
+        it('should be a function', function () {
+            expect(service.debugFn).toBeAFunction();
+        });
+
+        it('should return a function', function () {
+            expect(service.debugFn('ErrorMessage')).toBeAFunction();
+        });
+
+        it('the returned function should call the error function', function () {
+            spyOn(service, 'debug');
+
+            service.debugFn('ErrorMessage')();
+
+            expect(service.debug).toHaveBeenCalled();
+        });
+
+        it('the returned function should call the debug function with the right message', function () {
+            spyOn(service, 'debug');
+
+            service.debugFn('ErrorMessage')();
+
+            expect(service.debug).toHaveBeenCalledWith('ErrorMessage');
         });
     });
 });
