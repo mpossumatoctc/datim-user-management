@@ -38,7 +38,7 @@ function userListController($scope, userFilter, userTypes, dataGroups, Restangul
         window.console.log(inputText);
 
         return Restangular.one('users.json').get({
-            fields: 'id,name',
+            fields: 'id,name,email,userGroups,UserCredentials',
             filter: getFilterOptions(inputText),
             paging: false
         }).then(function (response) {
