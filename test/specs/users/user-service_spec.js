@@ -264,4 +264,78 @@ describe('User service', function () {
             });
         });
     });
+
+    describe('verifyInviteData', function () {
+        var inviteObject;
+
+        beforeEach(function () {
+            inviteObject = {
+                email: 'mark@does.work',
+                organisationUnits:[
+                    {id:'ybg3MO3hcf4'}
+                ],
+                dataViewOrganisationUnits:[
+                    {id:'ybg3MO3hcf4'}
+                ],
+                groups: [
+                    {id:'iuD8wUFz95X'},
+                    {id:'gh9tn4QBbKZ'}
+                ],
+                userCredentials:{
+                    userRoles:[
+                        {id:'b2uHwX9YLhu'}
+                    ]
+                }
+            };
+        });
+
+        it('should be a method', function () {
+            expect(service.verifyInviteData).toBeAFunction();
+        });
+
+        it('should return true for a valid object', function () {
+            expect(service.verifyInviteData(inviteObject)).toBe(true);
+        });
+
+        it('should return false on a an empty email', function () {
+            inviteObject.email = '';
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the org unit is missing', function () {
+            inviteObject.organisationUnits = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the org unit does not have an id', function () {
+            inviteObject.organisationUnits = [{}];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the data view org unit is missing', function () {
+            inviteObject.dataViewOrganisationUnits = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the data view org unit does not have an id', function () {
+            inviteObject.dataViewOrganisationUnits = [{}];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when there are no userGroups', function () {
+            inviteObject.groups = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when there are no roles', function () {
+            inviteObject.userCredentials.userRoles = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+    });
 });

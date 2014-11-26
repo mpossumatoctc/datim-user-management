@@ -179,7 +179,7 @@ describe('Add user controller', function () {
             controller = $controller('addUserController', {
                 $scope: scope,
                 userTypes: undefined,
-                dataGroups: undefined,
+                dataGroups: [{name: 'EA'}],
                 dimensionConstraint: {},
                 userActionsService: userActionsServiceMock,
                 currentUser: currentUserMock(),
@@ -290,12 +290,13 @@ describe('Add user controller', function () {
     describe('permissions', function () {
         var $controller;
         var $state;
+        var dataGroupValues = [{name: 'EA'}];
 
         function createController(allAuthority, userRole) {
             $controller('addUserController', {
                 $scope: scope,
                 userTypes: undefined,
-                dataGroups: undefined,
+                dataGroups: dataGroupValues,
                 dimensionConstraint: {},
                 userActionsService: {
                     getActionsFor: function () {
@@ -331,20 +332,34 @@ describe('Add user controller', function () {
             createController(false, 'User Administrator');
             expect($state.go).not.toHaveBeenCalled();
         });
+
+        it('should switch states if there are no datagroups', function () {
+            dataGroupValues = [];
+            createController(true);
+
+            expect($state.go).toHaveBeenCalled();
+            expect($state.go).toHaveBeenCalledWith('noaccess', {message: 'Your user account does not seem to have access to any of the data streams.'});
+        });
     });
 
-    describe('userInviteObject', function () {
+    describe('addUser', function () {
         var controller;
-        var userservice;
+        var userService;
+        var notify;
 
-        beforeEach(inject(function ($controller, $rootScope, userService) {
+        beforeEach(inject(function ($controller, $rootScope, $injector) {
             scope = $rootScope.$new();
-            userservice = userService;
+            userService = $injector.get('userService');
             spyOn(userService, 'inviteUser').and.returnValue({
                 then: function () {
 
                 }
             });
+            spyOn(userService, 'verifyInviteData').and.returnValue(true);
+
+            notify = $injector.get('notify');
+            spyOn(notify, 'error');
+            spyOn(notify, 'success');
 
             controller = $controller('addUserController', {
                 $scope: scope,
@@ -352,7 +367,7 @@ describe('Add user controller', function () {
                 dataGroups: [],
                 dimensionConstraint: {id: 'SomeID'},
                 currentUser: currentUserMock(),
-                userService: userservice
+                userService: userService
             });
         }));
 
@@ -377,10 +392,31 @@ describe('Add user controller', function () {
             expect(controller.userInviteObject.groups[1]).toEqual({id: 'agencyGroupIdUsers'});
         });
 
+        it('should not call inviteUser when there is no mechGroup', function () {
+            scope.user.userEntity = {
+                mechUserGroup: {
+                    id: 'agencyGroupIdMech'
+                },
+                userUserGroup: {
+                }
+            };
+
+            controller.addUser();
+
+            expect(userService.inviteUser).not.toHaveBeenCalled();
+            expect(notify.error).toHaveBeenCalled();
+        });
+
         describe('user manager usergroup', function () {
             beforeEach(function () {
                 scope.user.userActions['Manage users'] = true;
                 scope.user.userEntity = {
+                    mechUserGroup: {
+                        id: 'agencyGroupIdMech'
+                    },
+                    userUserGroup: {
+                        id: 'agencyGroupIdUsers'
+                    },
                     userAdminUserGroup: {
                         id: 'userAdminUserGroup'
                     }
@@ -390,7 +426,7 @@ describe('Add user controller', function () {
             it('should add the user manager group when the user manager role is present', function () {
                 controller.addUser();
 
-                expect(controller.userInviteObject.groups[0]).toEqual({id: 'userAdminUserGroup'});
+                expect(controller.userInviteObject.groups[2]).toEqual({id: 'userAdminUserGroup'});
             });
 
             it('should not add the user manager group when the user manager role is present but false', function () {
@@ -398,7 +434,7 @@ describe('Add user controller', function () {
 
                 controller.addUser();
 
-                expect(controller.userInviteObject.groups.length).toBe(0);
+                expect(controller.userInviteObject.groups.length).toBe(2);
             });
 
             it('should not add the user manager group when the user manager role is present but not the group', function () {
@@ -412,7 +448,93 @@ describe('Add user controller', function () {
 
             it('should call the inviteUser method on the user service', function () {
                 controller.addUser();
-                expect(userservice.inviteUser).toHaveBeenCalled();
+                expect(userService.inviteUser).toHaveBeenCalled();
+            });
+        });
+
+        describe('verify data', function () {
+            it('should call the verify data on the user service', function () {
+                controller.addUser();
+
+                expect(userService.verifyInviteData).toHaveBeenCalled();
+            });
+
+            it('should log a error when the object does not pass validation', function () {
+                userService.verifyInviteData.and.returnValue(false);
+                controller.addUser();
+
+                expect(notify.error).toHaveBeenCalled();
+            });
+
+            it('should not call the inviteUser function when basic validation failed', function () {
+                userService.verifyInviteData.and.returnValue(false);
+                controller.addUser();
+
+                expect(userService.inviteUser).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('result calls', function () {
+            var $state;
+            beforeEach(inject(function ($injector) {
+                $state = $injector.get('$state');
+                spyOn($state, 'go');
+
+                scope.user.userEntity = {
+                    mechUserGroup: {
+                        id: 'agencyGroupIdMech'
+                    },
+                    userUserGroup: {
+                        id: 'agencyGroupIdUsers'
+                    }
+                };
+
+                userService.verifyInviteData.and.returnValue(true);
+            }));
+
+            describe('success', function () {
+
+                beforeEach(function () {
+                    userService.inviteUser.and.returnValue({
+                        then: function (success) {
+                            success.call();
+                        }
+                    });
+                    controller.addUser();
+                });
+
+                it('should set processing to false', function () {
+                    expect(controller.isProcessingAddUser).toBe(false);
+                });
+
+                it('should have called state.go', function () {
+                    expect($state.go).toHaveBeenCalled();
+                });
+
+                it('should call notify with success', function () {
+                    expect(notify.success).toHaveBeenCalled();
+                    expect(notify.success).toHaveBeenCalledWith('User added successfully');
+                });
+            });
+
+            describe('failure', function () {
+                beforeEach(function () {
+                    userService.inviteUser.and.returnValue({
+                        then: function (success, failure) {
+                            failure.call();
+                        }
+                    });
+                    controller.addUser();
+                });
+
+                it('should set processing to false', function () {
+                    expect(controller.isProcessingAddUser).toBe(false);
+                });
+
+                it('should call the notify with an error', function () {
+                    expect(notify.error).toHaveBeenCalled();
+                    expect(notify.error).toHaveBeenCalledWith('Request to add the user failed');
+                });
             });
         });
     });

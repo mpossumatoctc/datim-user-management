@@ -3,13 +3,17 @@ describe('App controller', function () {
     var $rootScope;
     var scope;
     var $httpBackend;
+    var errorHandler;
 
     beforeEach(module('ui.router'));
     beforeEach(module('PEPFAR.usermanagement'));
     beforeEach(inject(function ($controller, $injector) {
         $rootScope = $injector.get('$rootScope');
         $httpBackend = $injector.get('$httpBackend');
+        errorHandler = $injector.get('errorHandler');
         $httpBackend.whenGET('http://localhost:8080/dhis/api/systemSettings').respond(200, {});
+
+        spyOn(errorHandler, 'debug');
 
         scope = $rootScope.$new();
         controller = $controller('appController', {
@@ -47,8 +51,12 @@ describe('App controller', function () {
         $rootScope.$broadcast('$stateChangeError');
 
         expect(controller.isLoading).toBe(false);
+    });
 
-        expect(controller.isLoading).toBe(false);
+    it('should call the errorhandler or errorstate', function () {
+        $rootScope.$broadcast('$stateChangeError');
+
+        expect(errorHandler.debug).toHaveBeenCalled();
     });
 
     describe('header bar settings', function () {

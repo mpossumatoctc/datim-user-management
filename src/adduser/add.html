@@ -25,7 +25,7 @@
                 <ul class="checkbox-group">
                     <li ng-repeat="(name, value) in user.dataGroups">
                         <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name]" type="checkbox">
-                        <label for="dataStream[{{::name}}]" ng-bind="name"></label>
+                        <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                     </li>
                 </ul>
             </fieldset>

@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('appController', appController);
 
-function appController($scope, Restangular, webappManifest) {
+function appController($scope, Restangular, webappManifest, errorHandler) {
     var vm = this;
 
     vm.title = 'User management';
@@ -27,7 +27,8 @@ function appController($scope, Restangular, webappManifest) {
         vm.currentState = toState.name;
         vm.subTitle = vm.subTitles[toState.name] || '';
     });
-    $scope.$on('$stateChangeError', function () {
+    $scope.$on('$stateChangeError', function (event, toState) {
+        errorHandler.debug(['Failed to switch to ', toState].join(' '));
         vm.isLoading = false;
     });
 

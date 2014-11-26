@@ -37,7 +37,7 @@
 
     fixtures.actionsList = [
         {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
-        {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+        {name: 'Data Entry', userRole: '', typeDependent: true},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
         {name: 'Manage users', userRole: 'User Administrator'},
@@ -46,7 +46,7 @@
 
     fixtures.actionsListWithRoles = [
         {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
-        {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+        {name: 'Data Entry', userRole: '', typeDependent: true},
         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
         {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
