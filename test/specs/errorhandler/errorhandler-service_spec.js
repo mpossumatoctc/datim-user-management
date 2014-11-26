@@ -139,6 +139,10 @@ describe('Error handler service', function () {
     });
 
     describe('debug', function () {
+        beforeEach(function () {
+            service.isDebugOn = true;
+        });
+
         it('should be a function', function () {
             expect(service.debug).toBeAFunction();
         });
@@ -178,6 +182,10 @@ describe('Error handler service', function () {
     });
 
     describe('debugFn', function () {
+        beforeEach(function () {
+            service.isDebugOn = true;
+        });
+
         it('should be a function', function () {
             expect(service.debugFn).toBeAFunction();
         });

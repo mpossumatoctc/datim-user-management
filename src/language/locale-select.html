@@ -1,8 +1,8 @@
 <div class="locale-select">
     <ui-select ng-required="true" ng-model="user.locale" on-select="onChange($item, $model)">
-        <ui-select-match placeholder="{{selectbox.placeholder}}">{{$select.selected.name}}</ui-select-match>
+        <ui-select-match placeholder="{{selectbox.placeholder}}" ng-bind="$select.selected.name | translate"></ui-select-match>
         <ui-select-choices repeat="item in selectbox.items | filter: $select.search">
-            <div>{{item.name}}</div>
+            <div translate>{{item.name}}</div>
         </ui-select-choices>
     </ui-select>
 </div>
