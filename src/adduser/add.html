@@ -38,8 +38,11 @@
                 <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                 <ul class="checkbox-group">
                     <li ng-repeat="action in addUser.actions">
-                        <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
-                        <label for="userActions[{{::action.name}}]" ng-bind="action.name"></label>
+                        <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default || !addUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
+                        <label for="userActions[{{::action.name}}]">
+                            <span ng-bind="action.name"></span>
+                            <span  class="action-datastream" ng-if="action.dataStream" ng-bind="action.dataStream" translate></span>
+                        </label>
                     </li>
                 </ul>
             </fieldset>

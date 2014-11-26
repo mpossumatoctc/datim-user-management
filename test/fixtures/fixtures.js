@@ -37,7 +37,7 @@
 
     fixtures.actionsList = [
         {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
-        {name: 'Data Entry', userRole: '', typeDependent: true},
+        {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
         {name: 'Manage users', userRole: 'User Administrator'},
@@ -46,7 +46,7 @@
 
     fixtures.actionsListWithRoles = [
         {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
-        {name: 'Data Entry', userRole: '', typeDependent: true},
+        {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'},
         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
         {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
@@ -59,7 +59,7 @@
 
     fixtures.userRoles = {"userRoles":[{"id":"OKKx4bf4ueV","name":"Data Entry EA"},{"id":"k7BWFXkG6zt","name":"Data Entry SI"},{"id":"iXkZzRKD0i4","name":"Data Entry SIMS"}]};
 
-    fixtures.userRolesForActions = {"userRoles":[{"id":"QbxXEPw9xlf","name":"Data Accepter"},{"id":"n777lf1THwQ","name":"Data Submitter"},{"id":"b2uHwX9YLhu","name":"Read Only"},{"id":"KagqnetfxMr","name":"User Administrator"}]};
+    fixtures.userRolesForActions = {"userRoles":[{"id":"QbxXEPw9xlf","name":"Data Accepter"},{"id":"n777lf1THwQ","name":"Data Submitter"},{"id":"b2uHwX9YLhu","name":"Read Only"},{"id":"KagqnetfxMr","name":"User Administrator"},{"id":"yYOqiMTxAOF","name":"Data Entry SI Country Team"}]};
 
     fixtures.currentUser = {"name":"kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","created":"2014-09-12T13:16:38.843+0000","lastUpdated":"2014-11-20T11:06:25.617+0000","surname":"Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","firstName":"kp1001ea","userCredentials":{"code":"kp1001ea","name":"kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism","created":"2014-09-12T13:16:38.843+0000","lastUpdated":"2014-11-20T11:26:48.495+0000","username":"kp1001ea","passwordLastUpdated":"2014-11-20T11:06:25.617+0000","userRoles":[{"name":"Read Only","created":"2014-02-20T02:47:44.417+0000","lastUpdated":"2014-10-20T13:39:20.109+0000","id":"b2uHwX9YLhu"},{"name":"Data Entry EA","created":"2014-09-13T21:11:15.686+0000","lastUpdated":"2014-10-20T13:39:20.120+0000","id":"OKKx4bf4ueV"}],"catDimensionConstraints":[{"name":"Funding Mechanism","created":"2014-02-18T07:51:04.612+0000","lastUpdated":"2014-10-16T12:18:02.751+0000","id":"SH885jaRe0o"}],"lastLogin":"2014-11-20T11:06:25.756+0000","selfRegistered":false,"disabled":false,"id":"fpYv7pe4Kbh"},
         "groups":[

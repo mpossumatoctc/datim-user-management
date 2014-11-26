@@ -37,7 +37,7 @@ describe('User actions', function () {
 
         it('should return the user actions available for inter-agency', function () {
             var expectedActions = [
-                {name: 'Data Entry', userRole: '', typeDependent: true},
+                {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
                 {name: 'Accept data', userRole: 'Data Accepter'},
                 {name: 'Submit data', userRole: 'Data Submitter'},
                 {name: 'Manage users', userRole: 'User Administrator'},
@@ -86,7 +86,8 @@ describe('User actions', function () {
             $httpBackend = $injector.get('$httpBackend');
 
             userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
-                    'fields=id,name&filter=name:eq:Data+Accepter&filter=name:eq:Data+Submitter&filter=name:eq:User+Administrator&filter=name:eq:Read+Only&paging=false')
+                    'fields=id,name&filter=name:eq:Data+Entry+SI+Country+Team&filter=name:eq:Data+Accepter' +
+                    '&filter=name:eq:Data+Submitter&filter=name:eq:User+Administrator&filter=name:eq:Read+Only&paging=false')
                 .respond(200, fixtures.get('userRolesForActions'));
         }));
 

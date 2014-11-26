@@ -38,16 +38,6 @@ describe('User service', function () {
         });
     });
 
-    describe('createUserInvite', function () {
-        it('should be a function', function () {
-            expect(service.createUserInvite).toBeAFunction();
-        });
-
-        it('should return a promise like object', function () {
-            expect(service.createUserInvite()).toBeAPromiseLikeObject();
-        });
-    });
-
     describe('getUserInviteObject', function () {
         var actions;
         var dataGroups;
@@ -169,6 +159,30 @@ describe('User service', function () {
                     return item.id === requestedId;
                 };
             }
+        });
+
+        it('should add the action if it restricted by a selected usergroup', function () {
+            var inviteEntity;
+
+            userObject.userActions['Data Entry'] = true;
+            actions.push({name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'});
+
+            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions);
+
+            expect(inviteEntity.userCredentials.userRoles).toContain({id: 'yYOqiMTxAOF'});
+        });
+
+        it('should not add the action if it restricted by a not selected usergroup', function () {
+            var inviteEntity;
+
+            userObject.dataGroups.SI = false;
+            userObject.dataGroups.EA = true;
+            userObject.userActions['Data Entry'] = true;
+            actions.push({name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'});
+
+            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions);
+
+            expect(inviteEntity.userCredentials.userRoles).not.toContain({id: 'yYOqiMTxAOF'});
         });
     });
 
@@ -442,6 +456,38 @@ describe('User service', function () {
 
                 expect(shouldThrow).toThrow(new Error('Locale required'));
             });
+        });
+    });
+
+    describe('getSelectedDataGroups', function () {
+        var dataGroups;
+        var userDataGroups;
+
+        beforeEach(function () {
+            dataGroups = [
+                {name: 'MER'},
+                {name: 'EA'},
+                {name: 'SIMS'}
+            ];
+            userDataGroups = {
+                dataGroups: {
+                    EA: true,
+                    MER: false,
+                    SIMS: true
+                }
+            };
+        });
+
+        it('should be a function', function () {
+            expect(service.getSelectedDataGroups).toBeAFunction();
+        });
+
+        it('should return the selected datagroups', function () {
+            var exectedDataGroups = [
+                {name: 'EA'},
+                {name: 'SIMS'}
+            ];
+            expect(service.getSelectedDataGroups(userDataGroups, dataGroups)).toEqual(exectedDataGroups);
         });
     });
 });
