@@ -19,6 +19,7 @@ describe('Locale select directive', function () {
     }));
 
     beforeEach(inject(function ($injector) {
+        var innerScope;
         $compile = $injector.get('$compile');
         $rootScope = $injector.get('$rootScope');
         scope = $rootScope.$new();
@@ -26,6 +27,10 @@ describe('Locale select directive', function () {
         element = angular.element('<locale-select></locale-select>');
         $compile(element)(scope);
         $rootScope.$digest();
+
+        innerScope = element.find('.ui-select-bootstrap').scope();
+        innerScope.$select.open = true;
+        innerScope.$apply();
     }));
 
     it('should compile', function () {
@@ -33,7 +38,7 @@ describe('Locale select directive', function () {
     });
 
     it('should display the languages provided', function () {
-        var choices = element[0].querySelectorAll('.ui-select-choices-row');
+        var choices = element.find('.ui-select-choices-row');
 
         expect(choices.length).toBe(fixtures.get('locales').length);
     });

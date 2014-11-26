@@ -5,14 +5,14 @@ function userActionsService(Restangular, errorHandler) {
         'Accept data', 'Submit data', 'Manage users'
     ];
     var availableInterAgencyActions = [
-        'Capture inter-agency data', 'Accept data', 'Submit data', 'Manage users'
+        'Data Entry', 'Accept data', 'Submit data', 'Manage users'
     ];
     var availablePartnerActions =  [
         'Capture data', 'Submit data', 'Manage users'
     ];
     var actions = [
         {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
-        {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+        {name: 'Data Entry', userRole: '', typeDependent: true},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
         {name: 'Manage users', userRole: 'User Administrator'},

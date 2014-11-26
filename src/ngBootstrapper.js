@@ -212,14 +212,12 @@
                     resumeBootstrapWhenLoaded.bind(self)();
                 });
         } else {
-            resumeBootstrapWhenLoaded();
+            resumeBootstrapWhenLoaded.bind(self)();
         }
 
         function setIsLoadedFlag() {
             var loadedElement = document.createElement('script');
-            //jscs disable
-            loadedElement.textContent = 'window.ngBootstrapperScriptFilesLoaded = true; // = window.__ngBootstrapperLoaded || {}).isScriptsLoaded = true';
-            //jscs enable
+            loadedElement.textContent = 'window.ngBootstrapperScriptFilesLoaded = true;';
             element.appendChild(loadedElement);
         }
 

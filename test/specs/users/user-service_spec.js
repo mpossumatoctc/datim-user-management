@@ -264,4 +264,184 @@ describe('User service', function () {
             });
         });
     });
+
+    describe('verifyInviteData', function () {
+        var inviteObject;
+
+        beforeEach(function () {
+            inviteObject = {
+                email: 'mark@does.work',
+                organisationUnits:[
+                    {id:'ybg3MO3hcf4'}
+                ],
+                dataViewOrganisationUnits:[
+                    {id:'ybg3MO3hcf4'}
+                ],
+                groups: [
+                    {id:'iuD8wUFz95X'},
+                    {id:'gh9tn4QBbKZ'}
+                ],
+                userCredentials:{
+                    userRoles:[
+                        {id:'b2uHwX9YLhu'}
+                    ]
+                }
+            };
+        });
+
+        it('should be a method', function () {
+            expect(service.verifyInviteData).toBeAFunction();
+        });
+
+        it('should return true for a valid object', function () {
+            expect(service.verifyInviteData(inviteObject)).toBe(true);
+        });
+
+        it('should return false on a an empty email', function () {
+            inviteObject.email = '';
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the org unit is missing', function () {
+            inviteObject.organisationUnits = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the org unit does not have an id', function () {
+            inviteObject.organisationUnits = [{}];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the data view org unit is missing', function () {
+            inviteObject.dataViewOrganisationUnits = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when the data view org unit does not have an id', function () {
+            inviteObject.dataViewOrganisationUnits = [{}];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when there are no userGroups', function () {
+            inviteObject.groups = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+
+        it('should return false when there are no roles', function () {
+            inviteObject.userCredentials.userRoles = [];
+
+            expect(service.verifyInviteData(inviteObject)).toBe(false);
+        });
+    });
+
+    describe('saveUserLocale', function () {
+        it('should be a function', function () {
+            expect(service.saveUserLocale).toBeAFunction();
+        });
+
+        describe('remote calls', function () {
+            var $httpBackend;
+
+            beforeEach(inject(function ($injector) {
+                $httpBackend = $injector.get('$httpBackend');
+
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=markpolak', 'en', {
+                    'Content-Type': 'text/plain',
+                    Accept: 'application/json, text/plain, */*'
+                }).respond(200, 'Success');
+            }));
+
+            afterEach(function () {
+                $httpBackend.verifyNoOutstandingExpectation();
+                $httpBackend.verifyNoOutstandingRequest();
+            });
+
+            it('should call the userSettings endpoint', function () {
+                service.saveUserLocale('markpolak', 'en');
+                $httpBackend.flush();
+            });
+
+            it('should return the new locale on success', function () {
+                var locale;
+                service.saveUserLocale('markpolak', 'en').then(function (newLocale) {
+                    locale = newLocale;
+                });
+                $httpBackend.flush();
+
+                expect(locale).toBe('en');
+            });
+
+            it('should call the api with the correct name', function () {
+                $httpBackend.resetExpectations();
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=johnsnow', 'en')
+                    .respond(200, 'Success');
+
+                service.saveUserLocale('johnsnow', 'en');
+                $httpBackend.flush();
+            });
+
+            it('should call the catch on error', function () {
+                var catchFunction = jasmine.createSpy();
+
+                $httpBackend.resetExpectations();
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=johnsnow', 'en')
+                    .respond(404, 'Fail');
+
+                service.saveUserLocale('johnsnow', 'en').catch(catchFunction);
+                $httpBackend.flush();
+
+                expect(catchFunction).toHaveBeenCalled();
+            });
+
+            it('should call the api with the correct locale', function () {
+                $httpBackend.resetExpectations();
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=johnsnow', 'fr')
+                    .respond(200, 'Success');
+
+                service.saveUserLocale('johnsnow', 'fr');
+                $httpBackend.flush();
+            });
+
+            it('should not call the api if no username was given', function () {
+                function shouldThrow() {
+                    service.saveUserLocale(undefined, 'en');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Username required'));
+            });
+
+            it('should not call the api if no locale was given', function () {
+                function shouldThrow() {
+                    service.saveUserLocale('markpolak');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Locale required'));
+            });
+
+            it('should not accept an empty string as username', function () {
+                function shouldThrow() {
+                    service.saveUserLocale('');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Username required'));
+            });
+
+            it('should not accept an empty string as locale', function () {
+                function shouldThrow() {
+                    service.saveUserLocale('johnsnow', '');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Locale required'));
+            });
+        });
+    });
 });

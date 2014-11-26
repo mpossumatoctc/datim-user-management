@@ -13,3 +13,8 @@ angular.module('pascalprecht.translate').provider('$translate', function () {
         preferredLanguage: function () {}
     };
 });
+angular.module('pascalprecht.translate').filter('translate', function () {
+    return function (value) {
+        return value;
+    }
+});

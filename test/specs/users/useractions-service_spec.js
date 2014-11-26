@@ -37,7 +37,7 @@ describe('User actions', function () {
 
         it('should return the user actions available for inter-agency', function () {
             var expectedActions = [
-                {name: 'Capture inter-agency data', userRole: '', typeDependent: true},
+                {name: 'Data Entry', userRole: '', typeDependent: true},
                 {name: 'Accept data', userRole: 'Data Accepter'},
                 {name: 'Submit data', userRole: 'Data Submitter'},
                 {name: 'Manage users', userRole: 'User Administrator'},

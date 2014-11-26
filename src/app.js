@@ -79,6 +79,7 @@ angular.module('PEPFAR.usermanagement', [
 angular.module('PEPFAR.usermanagement').config(translateConfig);
 angular.module('PEPFAR.usermanagement').config(routerConfig);
 angular.module('PEPFAR.usermanagement').config(angularUiSelectConfig);
+angular.module('PEPFAR.usermanagement').value('DEBUG', false);
 
 //==================================================================================
 // Angular run blocks

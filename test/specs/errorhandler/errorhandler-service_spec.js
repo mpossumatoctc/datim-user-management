@@ -139,6 +139,10 @@ describe('Error handler service', function () {
     });
 
     describe('debug', function () {
+        beforeEach(function () {
+            service.isDebugOn = true;
+        });
+
         it('should be a function', function () {
             expect(service.debug).toBeAFunction();
         });
@@ -175,9 +179,21 @@ describe('Error handler service', function () {
 
             expect(notify.warning).not.toHaveBeenCalledWith('ErrorString');
         });
+
+        it('should still reject the promise if the debug is off', function () {
+            var result;
+            service.isDebugOn = false;
+            result = service.debug('ErrorString');
+
+            expect(result).toBeAPromiseLikeObject();
+        });
     });
 
     describe('debugFn', function () {
+        beforeEach(function () {
+            service.isDebugOn = true;
+        });
+
         it('should be a function', function () {
             expect(service.debugFn).toBeAFunction();
         });

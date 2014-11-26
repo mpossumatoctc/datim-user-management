@@ -24,7 +24,9 @@ function userService($q, Restangular) {
         getUserObject: getUserObject,
         createUserInvite: createUserInvite,
         getUserInviteObject: getUserInviteObject,
-        inviteUser: inviteUser
+        inviteUser: inviteUser,
+        verifyInviteData: verifyInviteData,
+        saveUserLocale: saveUserLocale
     };
 
     function getUserObject() {
@@ -190,6 +192,60 @@ function userService($q, Restangular) {
                     return $q.reject(error);
                 }
                 return $q.reject('Invite failed');
+            });
+    }
+
+    function verifyInviteData(inviteObject) {
+        if (verifyEmail(inviteObject.email) && verifyOrganisationUnits(inviteObject) &&
+            verifyUserRoles(inviteObject.userCredentials) && verifyUserGroups(inviteObject.groups)) {
+            return true;
+        }
+        return false;
+    }
+
+    function verifyEmail(email) {
+        if (email) {
+            return true;
+        }
+        return false;
+    }
+
+    function verifyOrganisationUnits(inviteObject) {
+        if ((inviteObject.organisationUnits.length > 0 && inviteObject.organisationUnits[0].id) &&
+            inviteObject.dataViewOrganisationUnits.length > 0 &&  inviteObject.dataViewOrganisationUnits[0].id) {
+            return true;
+        }
+        return false;
+    }
+
+    function verifyUserRoles(userCredentials) {
+        if (userCredentials && userCredentials.userRoles && userCredentials.userRoles.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    function verifyUserGroups(groups) {
+        if (Array.isArray(groups) && groups.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    function saveUserLocale(username, locale) {
+        if (username === undefined || username === '') {
+            throw new Error('Username required');
+        }
+
+        if (locale === undefined || locale === '') {
+            throw new Error('Locale required');
+        }
+
+        return Restangular.one('userSettings')
+            .one('keyUiLocale')
+            .post(undefined, locale, {user: username}, {'Content-Type': 'text/plain'})
+            .then(function () {
+                return locale;
             });
     }
 }

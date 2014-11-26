@@ -151,5 +151,19 @@ describe('Partners service', function () {
             expect(catchFunction).toHaveBeenCalled();
             expect(errorHandler.debug).toHaveBeenCalledWith('No partners found in Kenya that you can access all mechanisms for');
         });
+
+        it('should reject the promise with the correct message on no org unit', function () {
+            var partnersMessage;
+            userRequest.respond(200, {});
+            partnersRequest.respond(200, fixtures.get('partnerList'));
+
+            partnersService.getPartners().catch(function (response) {
+                partnersMessage = response;
+            });
+            $httpBackend.resetExpectations();
+            $httpBackend.flush();
+
+            expect(partnersMessage).toEqual('No organisation unit found on the current user');
+        });
     });
 });

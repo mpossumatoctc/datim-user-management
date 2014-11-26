@@ -17,8 +17,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
     vm.allowUserAdd = false;
     vm.dimensionConstraint = dimensionConstraint;
-
-    //Temp
     vm.inviteObject = {};
 
     $scope.userTypes = userTypes || [];
@@ -44,6 +42,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             $state.go('noaccess');
         }
 
+        if (vm.dataGroups.length <= 0) {
+            $state.go('noaccess', {message: 'Your user account does not seem to have access to any of the data streams.'});
+        }
+
         vm.dataGroups.reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = false;
@@ -60,10 +62,22 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser);
         vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
 
+        if (!userService.verifyInviteData(vm.userInviteObject)) {
+            notify.error('Invite did not pass basic validation');
+            return;
+        }
+
         //Add the all mechanisms group from the user entity
-        if ($scope.user.userEntity && $scope.user.userEntity.mechUserGroup && $scope.user.userEntity.userUserGroup) {
+        if ($scope.user.userEntity &&
+            $scope.user.userEntity.mechUserGroup &&
+            $scope.user.userEntity.userUserGroup &&
+            $scope.user.userEntity.mechUserGroup.id &&
+            $scope.user.userEntity.userUserGroup.id) {
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
+        } else {
+            notify.error('User groups for mechanism and users not found on selected entity');
+            return false;
         }
 
         if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
@@ -71,10 +85,19 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
 
         userService.inviteUser(vm.userInviteObject)
-            .then(function () {
-                notify.success('User added successfully');
-                vm.isProcessingAddUser = false;
-                $state.go('add', {}, {reload: true});
+            .then(function (newUser) {
+                if (newUser.userCredentials && angular.isString(newUser.userCredentials.code) && $scope.user.locale && $scope.user.locale.name) {
+                    userService.saveUserLocale(newUser.userCredentials.code, $scope.user.locale.name)
+                        .then(function () {
+                            notify.success('User added successfully');
+                            vm.isProcessingAddUser = false;
+                            $state.go('add', {}, {reload: true});
+                        }, function () {
+                            vm.isProcessingAddUser = false;
+                            notify.warning('Saved user but was not able to save the user locale');
+                        });
+                }
+
             }, function () {
                 notify.error('Request to add the user failed');
                 vm.isProcessingAddUser = false;

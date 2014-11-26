@@ -23,31 +23,25 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
 
         interAgencyService.getUserGroups().then(function (interAgency) {
             scope.userTypes.forEach(function (item) {
-                if (item.name) {
-                    if (item.name === 'Inter-Agency' &&
-                        (interAgency.userUserGroup || interAgency.userUserGroup)) {
-                        scope.selectbox.items.push(item);
-                    }
+                if (item.name === 'Inter-Agency' &&
+                    (interAgency.userUserGroup || interAgency.userUserGroup)) {
+                    scope.selectbox.items.push(item);
                 }
             });
         });
 
         agenciesService.getAgencies().then(function () {
             scope.userTypes.forEach(function (item) {
-                if (item.name) {
-                    if (item.name === 'Agency') {
-                        scope.selectbox.items.push(item);
-                    }
+                if (item.name === 'Agency') {
+                    scope.selectbox.items.push(item);
                 }
             });
         });
 
         partnersService.getPartners().then(function () {
             scope.userTypes.forEach(function (item) {
-                if (item.name) {
-                    if (item.name === 'Partner') {
-                        scope.selectbox.items.push(item);
-                    }
+                if (item.name === 'Partner') {
+                    scope.selectbox.items.push(item);
                 }
             });
         });
