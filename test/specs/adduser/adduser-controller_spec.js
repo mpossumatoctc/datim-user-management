@@ -360,6 +360,7 @@ describe('Add user controller', function () {
             notify = $injector.get('notify');
             spyOn(notify, 'error');
             spyOn(notify, 'success');
+            spyOn(notify, 'warning');
 
             controller = $controller('addUserController', {
                 $scope: scope,
@@ -495,9 +496,15 @@ describe('Add user controller', function () {
             describe('success', function () {
 
                 beforeEach(function () {
+                    spyOn(userService, 'saveUserLocale')
+                        .and.returnValue({
+                            then: function (success) {
+                                success.call();
+                            }
+                        });
                     userService.inviteUser.and.returnValue({
                         then: function (success) {
-                            success.call();
+                            success.call(undefined, {name: 'username'});
                         }
                     });
                     controller.addUser();
@@ -534,6 +541,52 @@ describe('Add user controller', function () {
                 it('should call the notify with an error', function () {
                     expect(notify.error).toHaveBeenCalled();
                     expect(notify.error).toHaveBeenCalledWith('Request to add the user failed');
+                });
+            });
+
+            describe('user locale success', function () {
+                beforeEach(function () {
+                    spyOn(userService, 'saveUserLocale')
+                        .and.returnValue({
+                            then: function () {
+                            }
+                        });
+                    userService.inviteUser.and.returnValue({
+                        then: function (success) {
+                            success.call(undefined, {name: 'username'});
+                        }
+                    });
+                    controller.addUser();
+                });
+
+                it('should call the saveUserLocale function on the userService', function () {
+                    expect(userService.saveUserLocale).toHaveBeenCalled();
+                });
+
+                it('should call the saveUserLocale with the username and locale', function () {
+                    expect(userService.saveUserLocale).toHaveBeenCalledWith('username', 'en');
+                });
+            });
+
+            describe('user locale failure', function () {
+                beforeEach(function () {
+                    spyOn(userService, 'saveUserLocale')
+                        .and.returnValue({
+                            then: function (success, failure) {
+                                failure.call();
+                            }
+                        });
+                    userService.inviteUser.and.returnValue({
+                        then: function (success) {
+                            success.call(undefined, {name: 'username'});
+                        }
+                    });
+                    controller.addUser();
+                });
+
+                it('should call warning when the locale save fails', function () {
+                    expect(notify.warning).toHaveBeenCalled();
+                    expect(notify.warning).toHaveBeenCalledWith('Saved user but was not able to save the user locale');
                 });
             });
         });

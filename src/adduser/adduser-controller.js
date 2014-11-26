@@ -85,10 +85,18 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
 
         userService.inviteUser(vm.userInviteObject)
-            .then(function () {
-                notify.success('User added successfully');
-                vm.isProcessingAddUser = false;
-                $state.go('add', {}, {reload: true});
+            .then(function (newUser) {
+                if (newUser && angular.isString(newUser.name) && $scope.user.locale && $scope.user.locale.name) {
+                    userService.saveUserLocale(newUser.name, $scope.user.locale.name)
+                        .then(function () {
+                            notify.success('User added successfully');
+                            vm.isProcessingAddUser = false;
+                            $state.go('add', {}, {reload: true});
+                        }, function () {
+                            notify.warning('Saved user but was not able to save the user locale');
+                        });
+                }
+
             }, function () {
                 notify.error('Request to add the user failed');
                 vm.isProcessingAddUser = false;
