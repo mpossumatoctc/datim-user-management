@@ -86,13 +86,14 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         userService.inviteUser(vm.userInviteObject)
             .then(function (newUser) {
-                if (newUser && angular.isString(newUser.name) && $scope.user.locale && $scope.user.locale.name) {
-                    userService.saveUserLocale(newUser.name, $scope.user.locale.name)
+                if (newUser.userCredentials && angular.isString(newUser.userCredentials.code) && $scope.user.locale && $scope.user.locale.name) {
+                    userService.saveUserLocale(newUser.userCredentials.code, $scope.user.locale.name)
                         .then(function () {
                             notify.success('User added successfully');
                             vm.isProcessingAddUser = false;
                             $state.go('add', {}, {reload: true});
                         }, function () {
+                            vm.isProcessingAddUser = false;
                             notify.warning('Saved user but was not able to save the user locale');
                         });
                 }

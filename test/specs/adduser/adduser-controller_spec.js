@@ -504,7 +504,12 @@ describe('Add user controller', function () {
                         });
                     userService.inviteUser.and.returnValue({
                         then: function (success) {
-                            success.call(undefined, {name: 'username'});
+                            success.call(undefined, {
+                                name: '(TBD), (TBD)',
+                                userCredentials: {
+                                    code: 'username'
+                                }
+                            });
                         }
                     });
                     controller.addUser();
@@ -553,7 +558,12 @@ describe('Add user controller', function () {
                         });
                     userService.inviteUser.and.returnValue({
                         then: function (success) {
-                            success.call(undefined, {name: 'username'});
+                            success.call(undefined, {
+                                name: '(TBD), (TBD)',
+                                userCredentials: {
+                                    code: 'username'
+                                }
+                            });
                         }
                     });
                     controller.addUser();
@@ -578,7 +588,12 @@ describe('Add user controller', function () {
                         });
                     userService.inviteUser.and.returnValue({
                         then: function (success) {
-                            success.call(undefined, {name: 'username'});
+                            success.call(undefined, {
+                                name: '(TBD), (TBD)',
+                                userCredentials: {
+                                    code: 'username'
+                                }
+                            });
                         }
                     });
                     controller.addUser();
@@ -587,6 +602,10 @@ describe('Add user controller', function () {
                 it('should call warning when the locale save fails', function () {
                     expect(notify.warning).toHaveBeenCalled();
                     expect(notify.warning).toHaveBeenCalledWith('Saved user but was not able to save the user locale');
+                });
+
+                it('should set processing to false', function () {
+                    expect(controller.isProcessingAddUser).toBe(false);
                 });
             });
         });

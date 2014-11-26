@@ -241,10 +241,11 @@ function userService($q, Restangular) {
             throw new Error('Locale required');
         }
 
-        return Restangular.one('userSettings').post(undefined, 'en', {
-            user: username
-        }).then(function () {
-            return locale;
-        });
+        return Restangular.one('userSettings')
+            .one('keyUiLocale')
+            .post(undefined, locale, {user: username}, {'Content-Type': 'text/plain'})
+            .then(function () {
+                return locale;
+            });
     }
 }
