@@ -49,6 +49,7 @@ describe('Select usertype directive', function () {
         });
     }));
     beforeEach(inject(function ($injector) {
+        var innerScope;
         var $compile = $injector.get('$compile');
         var $rootScope = $injector.get('$rootScope');
         scope = $rootScope.$new();
@@ -68,6 +69,10 @@ describe('Select usertype directive', function () {
 
         $compile(element)(scope);
         $rootScope.$digest();
+
+        innerScope = element.find('.ui-select-bootstrap').scope();
+        innerScope.$select.open = true;
+        innerScope.$apply();
     }));
 
     it('should compile', function () {

@@ -18,6 +18,7 @@ describe('Agency select directive', function () {
     }));
 
     beforeEach(inject(function ($injector) {
+        var innerScope;
         var $compile = $injector.get('$compile');
         $rootScope = $injector.get('$rootScope');
 
@@ -27,6 +28,10 @@ describe('Agency select directive', function () {
 
         $compile(element)($scope);
         $rootScope.$digest();
+
+        innerScope = element.find('.ui-select-bootstrap').scope();
+        innerScope.$select.open = true;
+        innerScope.$apply();
     }));
 
     it('should compile', function () {
