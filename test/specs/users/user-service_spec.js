@@ -338,4 +338,99 @@ describe('User service', function () {
             expect(service.verifyInviteData(inviteObject)).toBe(false);
         });
     });
+
+    describe('saveUserLocale', function () {
+        it('should be a function', function () {
+            expect(service.saveUserLocale).toBeAFunction();
+        });
+
+        describe('remote calls', function () {
+            var $httpBackend;
+
+            beforeEach(inject(function ($injector) {
+                $httpBackend = $injector.get('$httpBackend');
+
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings?user=markpolak', 'en')
+                    .respond(200, 'Success')
+            }));
+
+            afterEach(function () {
+                $httpBackend.verifyNoOutstandingExpectation();
+                $httpBackend.verifyNoOutstandingRequest();
+            });
+
+            it('should call the userSettings endpoint', function () {
+                service.saveUserLocale('markpolak', 'en');
+                $httpBackend.flush();
+            });
+
+            it('should return the new locale on success', function () {
+                var locale;
+                service.saveUserLocale('markpolak', 'en').then(function (newLocale) {
+                    locale = newLocale;
+                });
+                $httpBackend.flush();
+
+                expect(locale).toBe('en');
+            });
+
+            it('should call the api with the correct name', function () {
+                $httpBackend.resetExpectations();
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings?user=johnsnow', 'en')
+                    .respond(200, 'Success')
+
+                service.saveUserLocale('johnsnow', 'en');
+                $httpBackend.flush();
+            });
+
+            it('should call the catch on error', function () {
+                var catchFunction = jasmine.createSpy();
+
+                $httpBackend.resetExpectations();
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings?user=johnsnow', 'en')
+                    .respond(404, 'Fail')
+
+                service.saveUserLocale('johnsnow', 'en').catch(catchFunction);
+                $httpBackend.flush();
+
+                expect(catchFunction).toHaveBeenCalled();
+            });
+
+            it('should not call the api if no username was given', function () {
+                function shouldThrow() {
+                    service.saveUserLocale(undefined, 'en');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Username required'));
+            });
+
+            it('should not call the api if no locale was given', function () {
+                function shouldThrow() {
+                    service.saveUserLocale('markpolak');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Locale required'));
+            });
+
+            it('should not accept an empty string as username', function () {
+                function shouldThrow() {
+                    service.saveUserLocale('');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Username required'));
+            });
+
+            it('should not accept an empty string as locale', function () {
+                function shouldThrow() {
+                    service.saveUserLocale('johnsnow', '');
+                }
+                $httpBackend.resetExpectations();
+
+                expect(shouldThrow).toThrow(new Error('Locale required'));
+            });
+        });
+    });
 });

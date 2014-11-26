@@ -25,7 +25,8 @@ function userService($q, Restangular) {
         createUserInvite: createUserInvite,
         getUserInviteObject: getUserInviteObject,
         inviteUser: inviteUser,
-        verifyInviteData: verifyInviteData
+        verifyInviteData: verifyInviteData,
+        saveUserLocale: saveUserLocale
     };
 
     function getUserObject() {
@@ -229,5 +230,21 @@ function userService($q, Restangular) {
             return true;
         }
         return false;
+    }
+
+    function saveUserLocale(username, locale) {
+        if (username === undefined || username === '') {
+            throw new Error('Username required');
+        }
+
+        if (locale === undefined || locale === '') {
+            throw new Error('Locale required');
+        }
+
+        return Restangular.one('userSettings').post(undefined, 'en', {
+            user: username
+        }).then(function () {
+            return locale;
+        });
     }
 }
