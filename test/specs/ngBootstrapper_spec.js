@@ -386,6 +386,24 @@ describe('ngBootstrapper', function () {
 
             expect(ngBootstrapper.modules).toContain('myModule');
         });
+
+        it('should call angular.module when resuming the bootstrap', function () {
+            spyOn(angular, 'module');
+            ngBootstrapper.loadModule('myModule.js', 'myModule');
+            ngBootstrapper.bootstrap();
+
+            expect(angular.module).toHaveBeenCalledWith('myModule');
+        });
+
+        it('should set timeout when a module has not been loaded', function () {
+            spyOn(angular, 'module').and.callThrough();
+            spyOn(window, 'setTimeout');
+            ngBootstrapper.loadModule('myModule.js', 'myModule');
+            ngBootstrapper.bootstrap();
+
+            expect(angular.module).toHaveBeenCalledWith('myModule');
+            expect(window.setTimeout).toHaveBeenCalled();
+        });
     });
 
     describe('execute', function () {

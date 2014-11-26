@@ -351,7 +351,7 @@ describe('User service', function () {
                 $httpBackend = $injector.get('$httpBackend');
 
                 $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings?user=markpolak', 'en')
-                    .respond(200, 'Success')
+                    .respond(200, 'Success');
             }));
 
             afterEach(function () {
@@ -377,7 +377,7 @@ describe('User service', function () {
             it('should call the api with the correct name', function () {
                 $httpBackend.resetExpectations();
                 $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings?user=johnsnow', 'en')
-                    .respond(200, 'Success')
+                    .respond(200, 'Success');
 
                 service.saveUserLocale('johnsnow', 'en');
                 $httpBackend.flush();
@@ -388,7 +388,7 @@ describe('User service', function () {
 
                 $httpBackend.resetExpectations();
                 $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings?user=johnsnow', 'en')
-                    .respond(404, 'Fail')
+                    .respond(404, 'Fail');
 
                 service.saveUserLocale('johnsnow', 'en').catch(catchFunction);
                 $httpBackend.flush();
