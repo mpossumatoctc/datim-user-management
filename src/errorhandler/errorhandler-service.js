@@ -51,7 +51,7 @@ function errorHandlerService($q, $log, notify, DEBUG) {
     }
 
     function debug(message) {
-        if (!sv.isDebugOn) { return; }
+        if (!sv.isDebugOn) { return $q.reject(message); }
 
         if (message.status) {
             $log.error(errorMessages[message.status]);
