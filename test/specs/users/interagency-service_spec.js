@@ -19,13 +19,14 @@ describe('Inter agency service', function () {
         var $httpBackend;
         var userGroupRequest;
         var errorHandler;
+        var userRequest;
 
         beforeEach(inject(function ($injector) {
             $httpBackend = $injector.get('$httpBackend');
             errorHandler = $injector.get('errorHandler');
             spyOn(errorHandler, 'errorFn');
 
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/me')
+            userRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/me')
                 .respond(200, {
                     organisationUnits: [{name: 'Rwanda'}]
                 });
@@ -90,6 +91,37 @@ describe('Inter agency service', function () {
             $httpBackend.flush();
 
             expect(errorHandler.errorFn).toHaveBeenCalled();
+        });
+
+        it('should filter the userGroup with the correct name', function () {
+            var expectedUserGroup = {name: 'OU Rwanda Country team'};
+            var actualUserGroups;
+            userGroupRequest.respond(200, {userGroups: [
+                {name: 'OU Kenya Country team'},
+                {name: 'OU Rwanda Country team'},
+                {name: 'Some Group'}
+            ]});
+
+            service.getUserGroups().then(function (userGroups) {
+                actualUserGroups = userGroups;
+            });
+            $httpBackend.flush();
+
+            expect(actualUserGroups.userUserGroup).toEqual(expectedUserGroup);
+        });
+
+        it('should reject the promise if there is no org unit', function () {
+            var catchFunction = jasmine.createSpy();
+            $httpBackend.resetExpectations();
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/me')
+                .respond(200, {});
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/me/authorization')
+                .respond(200, {});
+
+            service.getUserGroups().catch(catchFunction);
+            $httpBackend.flush();
+
+            expect(catchFunction).toHaveBeenCalledWith('No organisation unit found on the current user');
         });
     });
 });

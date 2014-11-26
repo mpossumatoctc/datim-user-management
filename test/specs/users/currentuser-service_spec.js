@@ -93,6 +93,19 @@ describe('Current user', function () {
             });
         });
 
+        describe('isUserAdministrator', function () {
+            beforeEach(function () {
+                $httpBackend.flush();
+                spyOn(currentUser, 'hasUserRole');
+            });
+
+            it('should call hasUserRole with the user admin role', function () {
+                currentUser.isUserAdministrator();
+
+                expect(currentUser.hasUserRole).toHaveBeenCalledWith('User Administrator');
+            });
+        });
+
         describe('error handling', function () {
             var errorHandler;
 
