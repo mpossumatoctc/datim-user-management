@@ -12,7 +12,7 @@ function userActionsService(Restangular, errorHandler) {
     ];
     var actions = [
         {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
-        {name: 'Data Entry', userRole: '', typeDependent: true},
+        {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
         {name: 'Manage users', userRole: 'User Administrator'},

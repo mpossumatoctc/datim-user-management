@@ -22,15 +22,15 @@ function userService($q, Restangular) {
 
     return {
         getUserObject: getUserObject,
-        createUserInvite: createUserInvite,
         getUserInviteObject: getUserInviteObject,
         inviteUser: inviteUser,
         verifyInviteData: verifyInviteData,
-        saveUserLocale: saveUserLocale
+        saveUserLocale: saveUserLocale,
+        getSelectedDataGroups: getSelectedDataGroups
     };
 
     function getUserObject() {
-        return {
+        return angular.copy({
             userType: undefined,
             userEntity: undefined,
             email: undefined,
@@ -39,16 +39,12 @@ function userService($q, Restangular) {
             userGroups: [],
             userRoles: [],
             dataGroups: {}
-        };
-    }
-
-    function createUserInvite() {
-        return Restangular.all('users').post();
+        });
     }
 
     function getInviteObject() {
         var inviteObject = Object.create(getUserInviteProto());
-        return angular.extend(inviteObject, userInviteObjectStructure);
+        return angular.extend(inviteObject, angular.copy(userInviteObjectStructure));
     }
 
     function getUserInviteProto() {
@@ -159,11 +155,20 @@ function userService($q, Restangular) {
 
             return actions.concat(current);
         }, actions).filter(function (action) {
-            if ((selectedActions.indexOf(action.name) >= 0) || action.default === true) {
+            if (((selectedActions.indexOf(action.name) >= 0) || action.default === true) && isRequiredDataStreamSelected(action.dataStream, selectedDataGroups)) {
                 return true;
             }
             return false;
         });
+    }
+
+    function isRequiredDataStreamSelected(dataGroupNames, selectedDataGroups) {
+        if (Array.isArray(dataGroupNames) && dataGroupNames.length > 0) {
+            return selectedDataGroups.reduce(function (curr, dataGroup) {
+                return dataGroupNames.indexOf(dataGroup.name) >= 0 || curr;
+            }, false);
+        }
+        return true;
     }
 
     function inviteUser(inviteData) {

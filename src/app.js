@@ -68,6 +68,7 @@ angular.module('PEPFAR.usermanagement', [
     'pascalprecht.translate',
     'ui.select',
     'ui.bootstrap',
+    'ui.bootstrap.tooltip',
     'ui.validate',
     'ngMessages',
     'd2-headerbar'

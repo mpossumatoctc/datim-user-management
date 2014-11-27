@@ -512,6 +512,7 @@ describe('Add user controller', function () {
                             });
                         }
                     });
+                    spyOn(userService, 'getUserObject').and.callThrough();
                     controller.addUser();
                 });
 
@@ -608,6 +609,91 @@ describe('Add user controller', function () {
                     expect(controller.isProcessingAddUser).toBe(false);
                 });
             });
+        });
+    });
+
+    describe('isRequiredDataStreamSelected', function () {
+        var controller;
+        var scope;
+
+        beforeEach(inject(function ($controller, $rootScope) {
+            scope = $rootScope.$new();
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: undefined,
+                dataGroups: [
+                    {name: 'SI'},
+                    {name: 'EA'},
+                    {name: 'SIMS'}
+                ],
+                dimensionConstraint: {},
+                userActionsService: {
+                    getActionsFor: function () {
+                        return [];
+                    }
+                },
+                currentUser: currentUserMock()
+            });
+        }));
+
+        it('should be a function', function () {
+            expect(controller.isRequiredDataStreamSelected).toBeAFunction();
+        });
+
+        it('should return true if SI is selected', function () {
+            scope.user.dataGroups = {
+                SI: true
+            };
+
+            expect(controller.isRequiredDataStreamSelected(['SI'])).toBe(true);
+        });
+
+        it('should return false if SI is not selected', function () {
+            scope.user.dataGroups = {
+                SI: false
+            };
+
+            expect(controller.isRequiredDataStreamSelected(['SI'])).toBe(false);
+        });
+
+        it('should return true if the second group is selected', function () {
+            scope.user.dataGroups = {
+                SI: false,
+                EA: true
+            };
+
+            expect(controller.isRequiredDataStreamSelected(['EA'])).toBe(true);
+        });
+
+        it('should return true if both groups are selected', function () {
+            scope.user.dataGroups = {
+                SI: true,
+                EA: true
+            };
+
+            expect(controller.isRequiredDataStreamSelected(['SI', 'EA'])).toBe(true);
+        });
+
+        it('should return true if the first group is selected', function () {
+            scope.user.dataGroups = {
+                SI: true,
+                EA: false
+            };
+
+            expect(controller.isRequiredDataStreamSelected(['SI', 'EA'])).toBe(true);
+        });
+
+        it('should return true if no groups are required', function () {
+            scope.user.dataGroups = {
+                SI: true,
+                EA: false
+            };
+
+            expect(controller.isRequiredDataStreamSelected([])).toBe(true);
+        });
+
+        it('should return true if parameter is undefined', function () {
+            expect(controller.isRequiredDataStreamSelected(undefined)).toBe(true);
         });
     });
 });

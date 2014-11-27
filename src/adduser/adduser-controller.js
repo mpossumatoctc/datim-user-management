@@ -17,7 +17,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
     vm.allowUserAdd = false;
     vm.dimensionConstraint = dimensionConstraint;
-    vm.inviteObject = {};
+    vm.userInviteObject = {};
+    vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
 
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
@@ -25,7 +26,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     initialize();
 
     $scope.$watch('user.userType', function (newVal, oldVal) {
-        if (newVal !== oldVal && newVal.name) {
+        if (newVal !== oldVal && newVal && newVal.name) {
             $scope.user.userActions = {};
             vm.actions = userActionsService.getActionsFor(newVal.name);
 
@@ -90,6 +91,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                     userService.saveUserLocale(newUser.userCredentials.code, $scope.user.locale.name)
                         .then(function () {
                             notify.success('User added successfully');
+                            $scope.user = userService.getUserObject();
                             vm.isProcessingAddUser = false;
                             $state.go('add', {}, {reload: true});
                         }, function () {
@@ -122,9 +124,20 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }));
 
         groups.forEach(function (key) {
-            if (form[key].$dirty) { dataStreamInteractedWith = true; }
+            if (form[key] && form[key].$dirty) { dataStreamInteractedWith = true; }
         });
 
         return dataStreamInteractedWith;
+    }
+
+    function isRequiredDataStreamSelected(dataGroupNames) {
+        var selectedDataGroups = userService.getSelectedDataGroups($scope.user, vm.dataGroups);
+
+        if (Array.isArray(dataGroupNames) && dataGroupNames.length > 0) {
+            return selectedDataGroups.reduce(function (curr, dataGroup) {
+                return dataGroupNames.indexOf(dataGroup.name) >= 0 || curr;
+            }, false);
+        }
+        return true;
     }
 }
