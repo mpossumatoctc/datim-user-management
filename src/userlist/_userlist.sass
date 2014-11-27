@@ -1,0 +1,76 @@
+.user-list, .user-list-row
+  list-style: none
+  padding: 0
+  margin: 0
+
+.user-list-row
+  padding: 10px
+  padding-bottom: 10px
+  border-radius: 5px
+
+  &:hover
+    background-color: #276696
+    color: #FFF
+
+.user-list-row:nth-child(odd)
+  background-color: #CDF
+
+.user-list-row:nth-child(odd)
+  &:hover
+    background-color: #276696
+    color: #FFF
+
+
+.user-details-main
+  .user-name
+    font-size: 1.3em
+  .email, .user-username
+    font-size: 1em
+
+  .deactivate
+    button, & > span
+      position: absolute
+      right: 15px
+
+    button
+      display: none
+      width: 100px
+
+.user-list-row:hover
+  .deactivate
+
+    & > span
+      display: none
+
+    button
+      display: block
+
+
+.user-details-sub
+  transition: 150ms linear all
+  display: block
+  height: 0
+  overflow: hidden
+  font-size: .8em
+  border-top: 1px dotted #FFFFFF
+  margin-top: 5px
+  padding-top: 5px
+
+  ul
+    margin-left: 0
+    padding-left: 0
+
+  .user-item
+    display: inline-block
+    width: 50%
+    list-style: none
+    margin: 0
+
+  .user-list-row:hover &
+    display: block
+    height: 100px
+
+
+  .title
+    display: block
+    color: #DDDDDD

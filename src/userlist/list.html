@@ -31,27 +31,51 @@ List of searchable users here
 		'other': '{} Users found'
 
 		}"></p>
-		<ul ng-repeat="user in userList.users">
-		    <li user-id="{{user.id}}">
+		<ul class="user-list">
+		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled}">
 		    	<div class="result">
-		    		<div class="row">
-		    			<div class="col-sm-6">
-		    				<span class="title">Name: </span><span ng-bind="user.name"></span>
+		    		<div class="row user-details-main">
+		    			<div class="col-sm-8">
+		    				<span class="user-name" ng-bind="::user.name"></span>
+                            <div class="email">
+                                <span ng-bind="::user.email"></span> | <span ng-bind="::user.userCredentials.code"></span>
+                            </div>
 		    			</div>
-		    			<div class="col-sm-6">
-		    				<span class="title">Email: </span><span ng-bind="user.email"></span>
-		    			</div>
+                        <div class="col-sm-4">
+                            <div class="deactivate">
+                                <span class="user-status" ng-show="user.userCredentials.disabled">Disabled</span>
+                                <span class="user-status" ng-hide="user.userCredentials.disabled">Active</span>
+                                <button class="btn btn-danger" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user)">
+                                    <i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i>
+                                    <i class="fa fa-circle-o-notch fa-spin" ng-show="userList.isProcessing(user.id)"></i>
+                                    <span ng-hide="userList.isProcessing(user.id)">De-activate</span>
+                                </button>
+                                <button class="btn btn-success" ng-show="user.userCredentials.disabled" ng-click="userList.activateUser(user)">
+                                    <i class="fa fa-circle-o-notch fa-spin" ng-show="userList.isProcessing(user.id)"></i>
+                                    <span ng-hide="userList.isProcessing(user.id)">Activate</span>
+                                </button>
+                            </div>
+                        </div>
 		    		</div>
-		    		<div class="row">
-		    			<div class="col-sm-6">
-		    				<span class="title">Group:</span><span ng-bind="user.userGroups"></span>
+		    		<div class="row user-details-sub">
+		    			<div class="col-sm-8 user-details">
+		    				<span class="title">User groups:</span>
+                            <ul>
+                                <li class="user-item" ng-repeat="userGroup in ::user.userGroups" ng-bind="userGroup.name"></li>
+                            </ul>
 		    			</div>
-		    			<div class="col-sm-6">
-		    				<span class="title">User Credentials: </span><span ng-bind="user.userCredentials"></span>
-		    			</div>
-		    		</div>
+                        <div class="col-sm-4 user-details">
+                            <span class="title">User roles:</span>
+                            <ul>
+                                <li class="user-item" ng-repeat="userRole in ::user.userCredentials.userRoles" ng-bind="userRole.name"></li>
+                            </ul>
+                        </div>
+                    </div>
 		    	</div>
 		    </li>
 		</ul>	
-	</div>		
+	</div>
+    <div class="pagination">
+        <pagination total-items="userList.pagination.getTotalItemCount()" items-per-page="userList.pagination.getPageSize()" ng-model="userList.currentPage" ng-change="userList.pageChanged()"></pagination>
+    </div>
 </div>
