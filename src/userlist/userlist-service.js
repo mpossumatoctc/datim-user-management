@@ -2,10 +2,12 @@ angular.module('PEPFAR.usermanagement').factory('userListService', userListServi
 
 function userListService(Restangular, paginationService, errorHandler) {
     var fields = ['id', 'name', 'email', 'organisationUnits', 'userCredentials[code,disabled,userRoles]', 'userGroups'];
+    var filters = [];
 
     return {
         getList: getList,
-        pagination: paginationService
+        pagination: paginationService,
+        setFilter: setFilter
     };
 
     function getList() {
@@ -31,7 +33,12 @@ function userListService(Restangular, paginationService, errorHandler) {
         return {
             fields: fields.join(','),
             page: paginationService.getCurrentPage(),
-            pageSize: paginationService.getPageSize()
+            pageSize: paginationService.getPageSize(),
+            filter: filters
         };
+    }
+
+    function setFilter(filter) {
+        filters = [filter];
     }
 }

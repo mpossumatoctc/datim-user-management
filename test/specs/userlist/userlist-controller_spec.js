@@ -1,19 +1,13 @@
 describe('Userlist controller', function () {
     var controller;
-    var getListSpy;
     var userStatusServiceMockFactory;
     var userStatusService;
     var errorHandler;
     var $rootScope;
     var dataGroupsService;
+    var userListService;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
-        getListSpy = jasmine.createSpy().and.returnValue({
-            then: function (callback) {
-                callback(window.fixtures.get('usersPage1').users);
-            }
-        });
-
         userStatusServiceMockFactory = function ($q) {
             var success = $q.when(window.fixtures.get('userPutSuccess'));
             var failure = $q.reject('Failed');
@@ -35,7 +29,11 @@ describe('Userlist controller', function () {
             {name: 'Roles'},
             {name: 'User Groups'},
             {name: 'Organisation Unit'},
-            {name: 'Types'}
+            {name: 'Types', secondary: [
+                {name: 'Inter-Agency'},
+                {name: 'Agency'},
+                {name: 'Partner'}
+            ]}
         ]);
         $provide.value('userTypes', [
             {name: 'Inter-Agency'},
@@ -53,9 +51,10 @@ describe('Userlist controller', function () {
             };
 
         });
-        $provide.factory('userListService', function (paginationService) {
+        $provide.factory('userListService', function (paginationService, $q) {
+            var success = $q.when(window.fixtures.get('usersPage1').users);
             return {
-                getList: getListSpy,
+                getList: jasmine.createSpy().and.returnValue(success),
                 pagination: paginationService
             };
         });
@@ -73,6 +72,7 @@ describe('Userlist controller', function () {
 
         userStatusService = $injector.get('userStatusService');
         dataGroupsService = $injector.get('dataGroupsService');
+        userListService = $injector.get('userListService');
         errorHandler = $injector.get('errorHandler');
         $rootScope = $injector.get('$rootScope');
 
@@ -88,10 +88,11 @@ describe('Userlist controller', function () {
     });
 
     it('should call getlist on the userservice', function () {
-        expect(getListSpy).toHaveBeenCalled();
+        expect(userListService.getList).toHaveBeenCalled();
     });
 
     it('should set the initial userlist onto the controller', function () {
+        $rootScope.$apply();
         expect(controller.users).toBeAnArray();
         expect(controller.users.length).toBe(50);
     });
@@ -375,6 +376,32 @@ describe('Userlist controller', function () {
             var otherUserType = {userGroups: [{name: 'OU Rwanda Admin users'}]};
 
             expect(controller.getUserType(otherUserType)).toBe('Unknown type');
+        });
+    });
+
+    describe('search', function () {
+        it('should be defined', function () {
+            expect(controller.search).toBeDefined();
+        });
+
+        it('should have search options', function () {
+            expect(controller.search.options).toEqual([
+                {name: 'Name'},
+                {name: 'Username'},
+                {name: 'E-Mail'},
+                {name: 'Roles'},
+                {name: 'User Groups'},
+                {name: 'Organisation Unit'},
+                {name: 'Types', secondary: [
+                    {name: 'Inter-Agency'},
+                    {name: 'Agency'},
+                    {name: 'Partner'}
+                ]}
+            ]);
+        });
+
+        it('should have a search method', function () {
+            expect(controller.search.doSearch).toBeAFunction();
         });
     });
 });

@@ -2,21 +2,33 @@ List of searchable users here
 
 <div class="search-users">
 	<div class="row">
-		<div class="col-sm-6">
-			<select name="filter" id="filter" ng-model="filter" ng-options="nameOption.name for nameOption in userFilter" ng-change="setFilterRefine()"></select>
-		</div>
-		<div class="col-sm-6">
-			<select name="filter-secondary" id="filter-secondary" ng-model="filterSecond" ng-options="refineOption.name for refineOption in filterRefine" ng-show="filterRefine.length > 0"></select>
+		<div class="select-filters col-sm-12">
+            <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType.secondary}">
+                <ui-select ng-required="true" ng-model="userList.search.filterType">
+                    <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
+                        <div>{{item.name}}</div>
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div class="select-filtertype-secondary half" ng-show="userList.search.filterType.secondary">
+                <ui-select ng-model="userList.search.filterTypeSecondary">
+                    <ui-select-match>{{$select.selected.name}}</ui-select-match>
+                    <ui-select-choices repeat="item in userList.search.filterType.secondary | filter: $select.search">
+                        <div>{{item.name}}</div>
+                    </ui-select-choices>
+                </ui-select>
+            </div>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<input type="text" ng-model="textFilter" typeahead="usersList for usersList in getUserList($viewValue)" typeahead-loading="loadingLocations">
-			<i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>	
+			<input class="form-control" ng-change="userList.search.doSearch()" placeholder="Search for users" type="text" ng-model="userList.search.searchWord" ng-hide="!!userList.search.filterType.secondary" ng-disabled="!userList.search.filterType" typeahead-loading="loadingLocations">
+            <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
 		</div>
 	</div>
 
-    <p ng-pluralize count="userList.users.length"
+    <p ng-pluralize count="userList.pagination.getTotalItemCount()"
        when="{'0': 'No users have been found, please make your search less specific',
 		'1': '1 User found',
 		'other': '{} Users found'
@@ -24,6 +36,9 @@ List of searchable users here
 		}"></p>
 
 	<div class="search-result" ng-show="userList.users">
+        <div class="loading-mask" ng-show="userList.listIsLoading">
+            <div class="loading-mask-inner"><i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;Loading users...</div>
+        </div>
 		<ul class="user-list" ng-class="{'user-details-open': userList.detailsOpen}">
 		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)">
 		    	<div class="result">
