@@ -12,9 +12,12 @@
   padding-bottom: 10px
   border-radius: 5px
 
-  &:hover
+  &:hover, &.is-details-user:hover
     background-color: #276696
     color: #FFF
+
+  &.is-details-user
+    background-color: #FFFFCC
 
 .user-list-row:nth-child(odd)
   background-color: #EEEEEE
@@ -79,11 +82,34 @@
     display: block
     color: #DDDDDD
 
-.user-disabled
+.user-disabled, .user-no-access
   color: #d9534f
 
-.user-enabled
+.user-enabled, .user-access
   color: #5cb85c
+
+.user-details-view
+  h3
+    font-size: 1.5em
+    font-weight: 200
+    margin: 0
+
+  table
+    width: 100%
+
+    thead
+      th
+        text-align: center
+
+    tbody
+      tr:nth-child(odd)
+        background-color: #FFFFFF
+
+      th, td
+        padding: 5px 10px 10px 5px
+
+      td
+        text-align: center
 
 @media (min-width: 1000px)
   .user-list
@@ -102,6 +128,7 @@
     opacity: 1
     background-color: #EEEEEE
     border-radius: 5px
+    padding: 15px
 
     &.ng-hide
       opacity: 0

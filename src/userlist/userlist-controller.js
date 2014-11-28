@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypes, dataGroups, userListService, userStatusService, errorHandler) {
+function userListController(userFilter, userTypes, dataGroupsService, userListService, userStatusService, errorHandler) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -15,6 +15,8 @@ function userListController(userFilter, userTypes, dataGroups, userListService, 
     vm.showDetails = showDetails;
     vm.detailsUser = undefined;
     vm.isDetailsUser = isDetailsUser;
+    vm.getDataGroupsForUser = getDataGroupsForUser;
+    vm.detailsUserDataGroups = [];
 
     initialise();
 
@@ -75,6 +77,7 @@ function userListController(userFilter, userTypes, dataGroups, userListService, 
         if (user !== vm.detailsUser) {
             vm.detailsUser = user;
             vm.detailsOpen = true;
+            vm.getDataGroupsForUser(user);
         } else {
             vm.detailsUser = undefined;
             vm.detailsOpen = false;
@@ -83,6 +86,16 @@ function userListController(userFilter, userTypes, dataGroups, userListService, 
 
     function isDetailsUser(user) {
         return user === vm.detailsUser;
+    }
+
+    function getDataGroupsForUser(user) {
+        dataGroupsService.getDataGroupsForUser(user)
+            .then(function (dataGroups) {
+                vm.detailsUserDataGroups = dataGroups;
+            })
+            .catch(function () {
+                errorHandler.warning('Failed to load datagroups for user');
+            });
     }
 
 //    //$scope.userTypes = userTypes || [];

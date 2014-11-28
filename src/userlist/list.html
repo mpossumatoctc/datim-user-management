@@ -25,7 +25,7 @@ List of searchable users here
 
 	<div class="search-result" ng-show="userList.users">
 		<ul class="user-list" ng-class="{'user-details-open': userList.detailsOpen}">
-		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled}" ng-click="userList.showDetails(user)">
+		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)">
 		    	<div class="result">
 		    		<div class="row user-details-main">
 		    			<div class="col-sm-8">
@@ -55,6 +55,29 @@ List of searchable users here
 		</ul>
         <div class="user-details-view" ng-show="userList.detailsOpen">
             <div>
+                <div class="data-group">
+                    <h3>Data streams</h3>
+                    <table>
+                        <thead>
+                            <th></th>
+                            <th>Access</th>
+                            <th>Data entry</th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dataGroup in userList.detailsUserDataGroups">
+                                <th ng-bind="dataGroup.name"></th>
+                                <td>
+                                    <i class="user-access fa fa-check" ng-show="dataGroup.access"></i>
+                                    <i class="user-no-access fa fa-times" ng-hide="dataGroup.access"></i>
+                                </td>
+                                <td>
+                                    <i class="user-access fa fa-check" ng-show="dataGroup.entry"></i>
+                                    <i class="user-no-access fa fa-times" ng-hide="dataGroup.entry"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 	</div>

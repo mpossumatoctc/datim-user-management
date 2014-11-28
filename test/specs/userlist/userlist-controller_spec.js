@@ -5,6 +5,7 @@ describe('Userlist controller', function () {
     var userStatusService;
     var errorHandler;
     var $rootScope;
+    var dataGroupsService;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         getListSpy = jasmine.createSpy().and.returnValue({
@@ -39,7 +40,15 @@ describe('Userlist controller', function () {
         $provide.value('userTypes', {
 
         });
-        $provide.value('dataGroups', {
+        $provide.factory('dataGroupsService', function ($q) {
+            var success = $q.when(window.fixtures.get('dataStreamAccess'));
+            var failure = $q.reject('Failed');
+            return {
+                getDataGroupsForUser: jasmine.createSpy().and.returnValue(success),
+                SETTOFAIL: function () {
+                    this.getDataGroupsForUser = jasmine.createSpy().and.returnValue(failure);
+                }
+            };
 
         });
         $provide.factory('userListService', function (paginationService) {
@@ -51,7 +60,8 @@ describe('Userlist controller', function () {
         $provide.factory('userStatusService', userStatusServiceMockFactory);
         $provide.factory('errorHandler', function () {
             return {
-                error: jasmine.createSpy()
+                error: jasmine.createSpy(),
+                warning: jasmine.createSpy()
             };
         });
     }));
@@ -60,6 +70,7 @@ describe('Userlist controller', function () {
         var $controller = $injector.get('$controller');
 
         userStatusService = $injector.get('userStatusService');
+        dataGroupsService = $injector.get('dataGroupsService');
         errorHandler = $injector.get('errorHandler');
         $rootScope = $injector.get('$rootScope');
 
@@ -105,6 +116,10 @@ describe('Userlist controller', function () {
 
     it('should have a detailsOpen property', function () {
         expect(controller.detailsOpen).toBe(false);
+    });
+
+    it('should have a detailsUserDataGroups property', function () {
+        expect(controller.detailsUserDataGroups).toBeDefined();
     });
 
     describe('deactivateUser', function () {
@@ -255,6 +270,46 @@ describe('Userlist controller', function () {
             controller.showDetails(user);
 
             expect(controller.detailsUser).not.toBeDefined();
+        });
+
+        it('should call getDataStreamsForUser', function () {
+            spyOn(controller, 'getDataGroupsForUser');
+
+            controller.showDetails(user);
+
+            expect(controller.getDataGroupsForUser).toHaveBeenCalled();
+        });
+    });
+
+    describe('getDataGroupsForUser', function () {
+        var user;
+        var expectedDataStreams;
+
+        beforeEach(function () {
+            user = window.fixtures.get('usersPage1').users[0];
+            expectedDataStreams = window.fixtures.get('dataStreamAccess');
+        });
+
+        it('should call getDataGroupsForUser', function () {
+            controller.showDetails(user);
+
+            expect(dataGroupsService.getDataGroupsForUser).toHaveBeenCalled();
+        });
+
+        it('should set the detailsUserDataGroups', function () {
+            controller.showDetails(user);
+            $rootScope.$apply();
+
+            expect(controller.detailsUserDataGroups).toEqual(expectedDataStreams);
+        });
+
+        it('should call warning when fails', function () {
+            dataGroupsService.SETTOFAIL();
+
+            controller.showDetails(user);
+            $rootScope.$apply();
+
+            expect(errorHandler.warning).toHaveBeenCalled();
         });
     });
 

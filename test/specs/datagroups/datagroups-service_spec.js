@@ -215,4 +215,64 @@ describe('DataGroupService', function () {
             });
         });
     });
+
+    describe('getDataGroupsForUser', function () {
+        it('should be a function', function () {
+            expect(dataGroupsService.getDataGroupsForUser).toBeAFunction();
+        });
+
+        it('should return a promise like object', function () {
+            expect(dataGroupsService.getDataGroupsForUser()).toBeAPromiseLikeObject();
+        });
+
+        describe('responses', function () {
+            var $httpBackend;
+            var userGroupRequest;
+            var userRoleRequest;
+            var currentUserRequest;
+            var currentUserAuthoritiesRequest;
+            var expectedDataStreams = window.fixtures.get('dataStreamAccess');
+
+            beforeEach(inject(function ($injector) {
+                var currentUserResponse = fixtures.get('currentUser');
+                currentUserResponse.groups = [
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ];
+
+                $httpBackend = $injector.get('$httpBackend');
+
+                userGroupRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Data&paging=false')
+                    .respond(200, fixtures.get('userGroups'));
+                userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
+                        'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')
+                    .respond(200, fixtures.get('userRoles'));
+
+                currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
+                    .respond(200, currentUserResponse);
+                currentUserAuthoritiesRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
+                    .respond(200, fixtures.get('currentUserAuthorities'));
+            }));
+
+            it('should reject the promise if no user was given', function () {
+                var catchFunction = jasmine.createSpy();
+
+                dataGroupsService.getDataGroupsForUser().catch(catchFunction);
+                $rootScope.$apply();
+
+                expect(catchFunction).toHaveBeenCalled();
+            });
+
+            it('should return all usergroups with values', function () {
+                var dataGroups;
+                dataGroupsService.getDataGroupsForUser(window.fixtures.get('userGroupsRoles')).then(function (response) {
+                    dataGroups = response;
+                });
+                $httpBackend.flush();
+
+                expect(dataGroups).toEqual(expectedDataStreams);
+            });
+        });
+    });
 });
