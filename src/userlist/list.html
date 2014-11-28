@@ -55,6 +55,9 @@ List of searchable users here
 		</ul>
         <div class="user-details-view" ng-show="userList.detailsOpen">
             <div>
+                <div class="user-details-title">
+                    <span class="user-name" ng-bind="userList.detailsUser.name"></span>&nbsp;is&nbsp;a<span ng-show="userList.detailsUserUserType[0] === 'A' || userList.detailsUserUserType[0] === 'I'">n</span>&nbsp;<span class="details-user-type" ng-bind="userList.detailsUserUserType"></span>&nbsp;user
+                </div>
                 <div class="data-group">
                     <h3>Data streams</h3>
                     <table>

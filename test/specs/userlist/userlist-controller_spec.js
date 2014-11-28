@@ -37,9 +37,11 @@ describe('Userlist controller', function () {
             {name: 'Organisation Unit'},
             {name: 'Types'}
         ]);
-        $provide.value('userTypes', {
-
-        });
+        $provide.value('userTypes', [
+            {name: 'Inter-Agency'},
+            {name: 'Agency'},
+            {name: 'Partner'}
+        ]);
         $provide.factory('dataGroupsService', function ($q) {
             var success = $q.when(window.fixtures.get('dataStreamAccess'));
             var failure = $q.reject('Failed');
@@ -120,6 +122,10 @@ describe('Userlist controller', function () {
 
     it('should have a detailsUserDataGroups property', function () {
         expect(controller.detailsUserDataGroups).toBeDefined();
+    });
+
+    it('should have a property detailsUserUserType', function () {
+        expect(controller.detailsUserUserType).toBeDefined();
     });
 
     describe('deactivateUser', function () {
@@ -279,6 +285,12 @@ describe('Userlist controller', function () {
 
             expect(controller.getDataGroupsForUser).toHaveBeenCalled();
         });
+
+        it('should set the detailsUserUserType', function () {
+            controller.showDetails(window.fixtures.get('userGroupsRoles'));
+
+            expect(controller.detailsUserUserType).toBe('Partner');
+        });
     });
 
     describe('getDataGroupsForUser', function () {
@@ -315,6 +327,7 @@ describe('Userlist controller', function () {
 
     describe('isDetailsUser', function () {
         var user;
+
         beforeEach(function () {
             user = window.fixtures.get('usersPage1').users[0];
             controller.showDetails(user);
@@ -334,6 +347,34 @@ describe('Userlist controller', function () {
             controller.showDetails(user);
 
             expect(controller.isDetailsUser(user)).toBe(false);
+        });
+    });
+
+    describe('getUserType', function () {
+        it('should be a function', function () {
+            expect(controller.getUserType).toBeAFunction();
+        });
+
+        it('should return usertype partner', function () {
+            var user = window.fixtures.get('userGroupsRoles');
+
+            expect(controller.getUserType(user)).toBe('Partner');
+        });
+
+        it('should return usertype Inter-Agency instead of country', function () {
+            var user = window.fixtures.get('userObjectDisabled');
+
+            expect(controller.getUserType(user)).toBe('Inter-Agency');
+        });
+
+        it('should return Unknown type if the type cannot be determined', function () {
+            expect(controller.getUserType({})).toBe('Unknown type');
+        });
+
+        it('should return Unknown type if the type cannot be determined', function () {
+            var otherUserType = {userGroups: [{name: 'OU Rwanda Admin users'}]};
+
+            expect(controller.getUserType(otherUserType)).toBe('Unknown type');
         });
     });
 });

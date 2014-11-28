@@ -17,6 +17,8 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
     vm.isDetailsUser = isDetailsUser;
     vm.getDataGroupsForUser = getDataGroupsForUser;
     vm.detailsUserDataGroups = [];
+    vm.detailsUserUserType = '';
+    vm.getUserType = getUserType;
 
     initialise();
 
@@ -78,6 +80,7 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
             vm.detailsUser = user;
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
+            vm.detailsUserUserType = vm.getUserType(user);
         } else {
             vm.detailsUser = undefined;
             vm.detailsOpen = false;
@@ -96,6 +99,34 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
             .catch(function () {
                 errorHandler.warning('Failed to load datagroups for user');
             });
+    }
+
+    //TODO: Move this out and perhaps use the available usertype services
+    function getUserType(user) {
+        var userTypesForMatches = userTypes.map(fixCountryType).reverse();
+
+        return userTypesForMatches.reduce(function (currentType) {
+            var userGroupRegex = new RegExp('OU .+? (.+?) ', 'i');
+            (user && user.userGroups || []).forEach(function (userGroup) {
+                var matches = userGroupRegex.exec(userGroup.name);
+
+                if (matches && (userTypesForMatches.indexOf(matches[1]) >= 0)) {
+                    currentType = matches[1];
+
+                    if (currentType.toLowerCase() === 'country') {
+                        currentType = 'Inter-Agency';
+                    }
+                }
+            });
+            return currentType;
+        }, 'Unknown type');
+
+        function fixCountryType(userType) {
+            if (userType.name === 'Inter-Agency') {
+                return 'Country';
+            }
+            return userType.name;
+        }
     }
 
 //    //$scope.userTypes = userTypes || [];

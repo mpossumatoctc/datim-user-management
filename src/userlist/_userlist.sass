@@ -16,7 +16,7 @@
     background-color: #276696
     color: #FFF
 
-  &.is-details-user
+  &.is-details-user, &.is-details-user:nth-child(odd)
     background-color: #FFFFCC
 
 .user-list-row:nth-child(odd)
@@ -27,10 +27,17 @@
     background-color: #276696
     color: #FFF
 
+.user-name, .details-user-type
+  font-size: 1.3em
+
+  .user-details-title &
+    color: #276696
+    font-size: 1.5em
+
+.user-details-title
+  margin-bottom: 30px
 
 .user-details-main
-  .user-name
-    font-size: 1.3em
   .email, .user-username
     font-size: 1em
 
@@ -90,8 +97,7 @@
 
 .user-details-view
   h3
-    font-size: 1.5em
-    font-weight: 200
+    font-size: 1.3em
     margin: 0
 
   table
