@@ -1,7 +1,11 @@
+.search-result
+  position: relative
+
 .user-list, .user-list-row
   list-style: none
   padding: 0
   margin: 0
+  transition: 300ms all
 
 .user-list-row
   padding: 10px
@@ -13,7 +17,7 @@
     color: #FFF
 
 .user-list-row:nth-child(odd)
-  background-color: #CDF
+  background-color: #EEEEEE
 
 .user-list-row:nth-child(odd)
   &:hover
@@ -74,3 +78,32 @@
   .title
     display: block
     color: #DDDDDD
+
+.user-disabled
+  color: #d9534f
+
+.user-enabled
+  color: #5cb85c
+
+@media (min-width: 1000px)
+  .user-list
+    width: 100%
+
+    &.user-details-open
+      width: 60%
+
+  .user-details-view
+    position: absolute
+    right: 0
+    top: 0
+    transition: 300ms all
+    width: 35%
+    height: 400px
+    opacity: 1
+    background-color: #EEEEEE
+    border-radius: 5px
+
+    &.ng-hide
+      opacity: 0
+      width: 0
+      height: 0

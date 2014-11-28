@@ -1,8 +1,9 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypes, dataGroups, userListService) {
+function userListController(userFilter, userTypes, dataGroups, userListService, userStatusService, errorHandler) {
     var vm = this;
 
+    vm.detailsOpen = false;
     vm.users = [];
     vm.pagination = userListService.pagination;
     vm.processing = {};
@@ -11,6 +12,9 @@ function userListController(userFilter, userTypes, dataGroups, userListService) 
     vm.activateUser = activateUser;
     vm.deactivateUser = deactivateUser;
     vm.isProcessing = isProcessing;
+    vm.showDetails = showDetails;
+    vm.detailsUser = undefined;
+    vm.isDetailsUser = isDetailsUser;
 
     initialise();
 
@@ -32,22 +36,53 @@ function userListController(userFilter, userTypes, dataGroups, userListService) 
             .then(setUserList);
     }
 
-    function activateUser() {
-        //We need to request :all fields for the user to be able to disable him/her
-        console.log(userId); //jshint ignore:line
+    function activateUser(user) {
+        vm.processing[user.id] = true;
+
+        userStatusService.enable(user.id)
+            .then(function () {
+                vm.processing[user.id] = false;
+                user.userCredentials.disabled = false;
+            })
+            .catch(function () {
+                vm.processing[user.id] = false;
+                errorHandler.error('Unable to enable the user');
+            });
     }
 
     function deactivateUser(user) {
         vm.processing[user.id] = true;
-        console.log(user); //jshint ignore:line
+
+        userStatusService.disable(user.id)
+            .then(function () {
+                vm.processing[user.id] = false;
+                user.userCredentials.disabled = true;
+            })
+            .catch(function () {
+                vm.processing[user.id] = false;
+                errorHandler.error('Unable to disable the user');
+            });
     }
 
     function isProcessing(id) {
-        console.log(vm.processing[id]); //jshint ignore:line
         if (vm.processing[id] && vm.processing[id] === true) {
             return true;
         }
         return false;
+    }
+
+    function showDetails(user) {
+        if (user !== vm.detailsUser) {
+            vm.detailsUser = user;
+            vm.detailsOpen = true;
+        } else {
+            vm.detailsUser = undefined;
+            vm.detailsOpen = false;
+        }
+    }
+
+    function isDetailsUser(user) {
+        return user === vm.detailsUser;
     }
 
 //    //$scope.userTypes = userTypes || [];

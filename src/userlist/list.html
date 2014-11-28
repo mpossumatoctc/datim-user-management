@@ -16,23 +16,16 @@ List of searchable users here
 		</div>
 	</div>
 
-	<!--
-	<div class="search-result" ng-hide="">
-		<ul ng-repeat="user in userList.users">
-		    <li ng-bind="user.name"></li>
-		</ul>	
-	</div>
-	-->
-
-	<div class="search-result" ng-show="userList.users">
-		<p ng-pluralize count="userList.users.length"
-		when="{'0': 'No users have been found, please make your search less specific',
+    <p ng-pluralize count="userList.users.length"
+       when="{'0': 'No users have been found, please make your search less specific',
 		'1': '1 User found',
 		'other': '{} Users found'
 
 		}"></p>
-		<ul class="user-list">
-		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled}">
+
+	<div class="search-result" ng-show="userList.users">
+		<ul class="user-list" ng-class="{'user-details-open': userList.detailsOpen}">
+		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled}" ng-click="userList.showDetails(user)">
 		    	<div class="result">
 		    		<div class="row user-details-main">
 		    			<div class="col-sm-8">
@@ -43,37 +36,27 @@ List of searchable users here
 		    			</div>
                         <div class="col-sm-4">
                             <div class="deactivate">
-                                <span class="user-status" ng-show="user.userCredentials.disabled">Disabled</span>
-                                <span class="user-status" ng-hide="user.userCredentials.disabled">Active</span>
-                                <button class="btn btn-danger" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user)">
-                                    <i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i>
+                                <span class="user-status" ng-show="userList.isProcessing(user.id)"><i class="fa fa-circle-o-notch fa-spin"></i></span>
+                                <span class="user-status user-disabled" ng-show="user.userCredentials.disabled && !userList.isProcessing(user.id)">Disabled</span>
+                                <span class="user-status user-enabled" ng-hide="user.userCredentials.disabled || userList.isProcessing(user.id)">Active</span>
+                                <button class="btn btn-danger" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user); $event.stopPropagation();">
                                     <i class="fa fa-circle-o-notch fa-spin" ng-show="userList.isProcessing(user.id)"></i>
                                     <span ng-hide="userList.isProcessing(user.id)">De-activate</span>
                                 </button>
-                                <button class="btn btn-success" ng-show="user.userCredentials.disabled" ng-click="userList.activateUser(user)">
+                                <button class="btn btn-success" ng-show="user.userCredentials.disabled" ng-click="userList.activateUser(user); $event.stopPropagation();">
                                     <i class="fa fa-circle-o-notch fa-spin" ng-show="userList.isProcessing(user.id)"></i>
                                     <span ng-hide="userList.isProcessing(user.id)">Activate</span>
                                 </button>
                             </div>
                         </div>
 		    		</div>
-		    		<div class="row user-details-sub">
-		    			<div class="col-sm-8 user-details">
-		    				<span class="title">User groups:</span>
-                            <ul>
-                                <li class="user-item" ng-repeat="userGroup in ::user.userGroups" ng-bind="userGroup.name"></li>
-                            </ul>
-		    			</div>
-                        <div class="col-sm-4 user-details">
-                            <span class="title">User roles:</span>
-                            <ul>
-                                <li class="user-item" ng-repeat="userRole in ::user.userCredentials.userRoles" ng-bind="userRole.name"></li>
-                            </ul>
-                        </div>
-                    </div>
 		    	</div>
 		    </li>
-		</ul>	
+		</ul>
+        <div class="user-details-view" ng-show="userList.detailsOpen">
+            <div>
+            </div>
+        </div>
 	</div>
     <div class="pagination">
         <pagination total-items="userList.pagination.getTotalItemCount()" items-per-page="userList.pagination.getPageSize()" ng-model="userList.currentPage" ng-change="userList.pageChanged()"></pagination>

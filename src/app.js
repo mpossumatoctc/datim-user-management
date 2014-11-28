@@ -71,7 +71,8 @@ angular.module('PEPFAR.usermanagement', [
     'ui.bootstrap.tooltip',
     'ui.validate',
     'ngMessages',
-    'd2-headerbar'
+    'd2-headerbar',
+    'ngAnimate'
 ]);
 
 //==================================================================================

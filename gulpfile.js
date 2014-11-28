@@ -12,6 +12,7 @@ var files = [
     'vendor/jquery/dist/jquery.js',
     'vendor/toastr/toastr.js',
     'vendor/angular/angular.js',
+    'vendor/angular-animate/angular-animate.js',
     'vendor/ui-router/release/angular-ui-router.js',
     'vendor/lodash/dist/lodash.js',
     'vendor/restangular/dist/restangular.js',
