@@ -81,7 +81,10 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             .all(cogsId).withHttpConfig({cache: true})
             .get('items', {paging: 'false'})
             .then(function (response) {
-                errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access']));
+                errorHandler.debug(
+                    errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access']),
+                    response && response.items
+                );
 
                 return response.items;
             });
@@ -120,7 +123,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             .then(function (userGroups) {
 
                 errorHandler.debug(
-                    errorHandler.message(['Found ', userGroups.userGroups.length, 'usergroups whos name contains', '"', [organisationUnitName.trim(), 'Agency'].join(' '), '"']),
+                    errorHandler.message(['Found ', userGroups.userGroups.length, 'usergroups whos name contains', '"', [organisationUnitName.trim(), 'Partner'].join(' '), '"']),
                     userGroups.userGroups
                 );
 
