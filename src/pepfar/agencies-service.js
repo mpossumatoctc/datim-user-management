@@ -15,33 +15,51 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
             }
             organisationUnitName = user.organisationUnits[0].name;
 
-            return $q.all([getAgencyObjects(), getUserGroups(organisationUnitName)])
-                .then(function (responses) {
-                    var agencyDimensionResponse = Array.isArray(responses[0]) ? responses[0] : [];
-                    var userGroups = Array.isArray(responses[1]) ? responses[1] : [];
+            return matchUserGroupsWithAgencies(organisationUnitName).catch(errorHandler.debug);
+        });
+    }
 
-                    var agencies = matchAgenciesWithUserGroups(agencyDimensionResponse, userGroups, organisationUnitName);
-                    if (!agencies || agencies.length === 0) {
+    function matchUserGroupsWithAgencies(organisationUnitName) {
+        return $q.all([
+                getFundingAgencyCogs().then(getAgencyObjects),
+                getUserGroups(organisationUnitName)
+            ])
+            .then(function (responses) {
+                var agencyDimensionResponse = Array.isArray(responses[0]) ? responses[0] : [];
+                var userGroups = Array.isArray(responses[1]) ? responses[1] : [];
+                var agencies = matchAgenciesWithUserGroups(agencyDimensionResponse, userGroups, organisationUnitName);
 
-                        return $q.reject(['No agencies found in', organisationUnitName, 'that you can access all mechanisms for'].join(' '));
-                    }
-
+                if (agencies && agencies.length > 0) {
                     errorHandler.debug(
                         errorHandler.message(['Found', agencies.length, 'agencies for which you can also access the required user groups.']),
                         agencies
                     );
 
                     return agencies;
-                });
-        }).catch(errorHandler.debug);
+                }
+
+                return $q.reject(['No agencies found in', organisationUnitName, 'that you can access all mechanisms for'].join(' '));
+            });
     }
 
-    function getAgencyObjects() {
+    function getAgencyObjects(cogsId) {
         var queryParams = {
             paging: 'false'
         };
 
         //categoryOptionGroupSets.json?fields=id&filter=name:eq:Funding%20Agency&paging=false
+        return Restangular
+            .all('dimensions').withHttpConfig({cache: true})
+            .all(cogsId)
+            .get('items', queryParams)
+            .then(function (response) {
+                errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'agencies that you can access']));
+
+                return response.items;
+            });
+    }
+
+    function getFundingAgencyCogs() {
         return Restangular
             .one('categoryOptionGroupSets').withHttpConfig({cache: true})
             .get({
@@ -56,15 +74,7 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
                     return $q.reject('None or more than one categoryOptionGroupSets found that match "Funding Agency"');
                 }
 
-                return Restangular
-                    .all('dimensions').withHttpConfig({cache: true})
-                    .all(categoryOptionGroupSets[0].id)
-                    .get('items', queryParams)
-                    .then(function (response) {
-                        errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'agencies that you can access']));
-
-                        return response.items;
-                    });
+                return categoryOptionGroupSets[0].id;
             });
     }
 

@@ -19,7 +19,10 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
         }
         organisationUnitName = user.organisationUnits[0].name;
 
-        return $q.all([getPartnersFromApi(), getUserGroups(organisationUnitName)])
+        return $q.all([
+                getImplementingPartnerCogs().then(getPartnersFromApi),
+                getUserGroups(organisationUnitName)]
+            )
             .then(matchPartnersWithUserGroups)
             .catch(errorHandler.debugFn(['No partners found in', organisationUnitName, 'that you can access all mechanisms for'].join(' ')));
     }
@@ -32,7 +35,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             .map(addUserGroupsToPartners(userGroups))
             .filter(partnersWithUserGroupId);
 
-        if (partners.length > 0) {
+        if (partners && partners.length > 0) {
             errorHandler.debug(
                 errorHandler.message(['Found', partners.length, 'partners for which you can also access the required user groups.']),
                 partners
@@ -72,7 +75,19 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             partner.userUserGroup && partner.userUserGroup.id;
     }
 
-    function getPartnersFromApi() {
+    function getPartnersFromApi(cogsId) {
+        return Restangular
+            .all('dimensions').withHttpConfig({cache: true})
+            .all(cogsId).withHttpConfig({cache: true})
+            .get('items', {paging: 'false'})
+            .then(function (response) {
+                errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access']));
+
+                return response.items;
+            });
+    }
+
+    function getImplementingPartnerCogs() {
         return Restangular
             .one('categoryOptionGroupSets').withHttpConfig({cache: true})
             .get({
@@ -86,16 +101,7 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
                 if (categoryOptionGroupSets.length !== 1) {
                     return $q.reject('None or more than one categoryOptionGroupSets found that match "Implementing Partner"');
                 }
-
-                return Restangular
-                    .all('dimensions').withHttpConfig({cache: true})
-                    .all(categoryOptionGroupSets[0].id).withHttpConfig({cache: true})
-                    .get('items', {paging: 'false'})
-                    .then(function (response) {
-                        errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access']));
-
-                        return response.items;
-                    });
+                return categoryOptionGroupSets[0].id;
             });
     }
 
