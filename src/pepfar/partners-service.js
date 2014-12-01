@@ -33,6 +33,11 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             .filter(partnersWithUserGroupId);
 
         if (partners.length > 0) {
+            errorHandler.debug(
+                errorHandler.message(['Found', partners.length, 'partners for which you can also access the required user groups.']),
+                partners
+            );
+
             return partners;
         }
         return $q.reject('No partners found matching given userGroups and partners');
@@ -69,11 +74,28 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
     function getPartnersFromApi() {
         return Restangular
-            .all('dimensions').withHttpConfig({cache: true})
-            .all('BOyWrF33hiR').withHttpConfig({cache: true})
-            .get('items', {paging: 'false'})
+            .one('categoryOptionGroupSets').withHttpConfig({cache: true})
+            .get({
+                fields: 'id',
+                filter: 'name:eq:Implementing Partner',
+                paging: false
+            })
             .then(function (response) {
-                return response.items;
+                var categoryOptionGroupSets = response.categoryOptionGroupSets || [];
+
+                if (categoryOptionGroupSets.length !== 1) {
+                    return $q.reject('None or more than one categoryOptionGroupSets found that match "Implementing Partner"');
+                }
+
+                return Restangular
+                    .all('dimensions').withHttpConfig({cache: true})
+                    .all(categoryOptionGroupSets[0].id).withHttpConfig({cache: true})
+                    .get('items', {paging: 'false'})
+                    .then(function (response) {
+                        errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access']));
+
+                        return response.items;
+                    });
             });
     }
 
@@ -90,6 +112,12 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             .one('userGroups').withHttpConfig({cache: true})
             .get(queryParams)
             .then(function (userGroups) {
+
+                errorHandler.debug(
+                    errorHandler.message(['Found ', userGroups.userGroups.length, 'usergroups whos name contains', '"', [organisationUnitName.trim(), 'Agency'].join(' '), '"']),
+                    userGroups.userGroups
+                );
+
                 return userGroups.userGroups || [];
             });
     }

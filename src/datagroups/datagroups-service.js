@@ -23,13 +23,22 @@ function dataGroupsService($q, Restangular, currentUserService, errorHandler) {
             var currentUserGroupIds = currentUserGroups.map(function (userGroup) {
                 return userGroup.id;
             });
+            var resultingDataStreams;
 
-            return dataGroups.filter(function (dataGroup) {
+            resultingDataStreams = dataGroups.filter(function (dataGroup) {
                 var userGroups = dataGroup.userGroups || [];
                 return currentUser.hasAllAuthority() || userGroups.some(function (userGroup) {
                     return currentUserGroupIds.indexOf(userGroup.id) >= 0;
                 });
             });
+
+            errorHandler.debug(
+                'Based on the userGroups', responses[0],
+                'and user Roles', responses[1],
+                'you should have access to', resultingDataStreams
+            );
+
+            return resultingDataStreams;
         });
     }
 

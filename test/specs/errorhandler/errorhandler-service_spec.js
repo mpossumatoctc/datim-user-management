@@ -12,14 +12,11 @@ describe('Error handler service', function () {
         spyOn($log, 'error');
         spyOn(notify, 'error');
         spyOn(notify, 'warning');
+        spyOn($log, 'debug');
     }));
 
     it('should be an object', function () {
         expect(service).toBeAnObject();
-    });
-
-    it('should have a debug flag', function () {
-        expect(service.isDebugOn).toBeDefined();
     });
 
     describe('error', function () {
@@ -139,45 +136,21 @@ describe('Error handler service', function () {
     });
 
     describe('debug', function () {
-        beforeEach(function () {
-            service.isDebugOn = true;
-        });
+        var settings;
+        beforeEach(inject(function (SETTINGS) {
+            $log.debug.calls.reset();
+            settings = SETTINGS;
+            settings.debug = true;
+        }));
 
         it('should be a function', function () {
             expect(service.debug).toBeAFunction();
         });
 
-        it('should extract the message from the error object', function () {
-            service.debug({
-                status: 404
-            });
-            expect($log.error).toHaveBeenCalledWith('Requested resource was not found');
-        });
-
         it('should call with just the message if the message is a string', function () {
             service.debug('ErrorString');
 
-            expect($log.error).toHaveBeenCalledWith('ErrorString');
-        });
-
-        it('should extract the message from the error object an', function () {
-            service.debug({
-                status: 404
-            });
-            expect(notify.warning).toHaveBeenCalledWith('Requested resource was not found');
-        });
-
-        it('should call with just the message if the message is a string', function () {
-            service.debug('ErrorString');
-
-            expect(notify.warning).toHaveBeenCalledWith('ErrorString');
-        });
-
-        it('should not call the notify service if the debug flag is set to false', function () {
-            service.isDebugOn = false;
-            service.debug('ErrorString');
-
-            expect(notify.warning).not.toHaveBeenCalledWith('ErrorString');
+            expect($log.debug).toHaveBeenCalledWith('ErrorString');
         });
 
         it('should still reject the promise if the debug is off', function () {
@@ -187,12 +160,28 @@ describe('Error handler service', function () {
 
             expect(result).toBeAPromiseLikeObject();
         });
+
+        it('should log all the parameters given', function () {
+            service.debug('ErrorString', 'ErrorMessage', {}, [], 'Another message');
+
+            expect($log.debug.calls.count()).toBe(5);
+        });
+
+        it('should call the debug with the correct messages', function () {
+            service.debug('ErrorString', 'ErrorMessage', {}, [], 'Another message');
+
+            expect($log.debug).toHaveBeenCalledWith('ErrorString');
+            expect($log.debug).toHaveBeenCalledWith('ErrorMessage');
+            expect($log.debug).toHaveBeenCalledWith({});
+            expect($log.debug).toHaveBeenCalledWith([]);
+            expect($log.debug).toHaveBeenCalledWith('Another message');
+        });
     });
 
     describe('debugFn', function () {
-        beforeEach(function () {
-            service.isDebugOn = true;
-        });
+        beforeEach(inject(function (SETTINGS) {
+            SETTINGS.debug = true;
+        }));
 
         it('should be a function', function () {
             expect(service.debugFn).toBeAFunction();
@@ -216,6 +205,16 @@ describe('Error handler service', function () {
             service.debugFn('ErrorMessage')();
 
             expect(service.debug).toHaveBeenCalledWith('ErrorMessage');
+        });
+    });
+
+    describe('message', function () {
+        it('should return a build error message if the parameter is an array', function () {
+            expect(service.message(['my', 12, 'monkeys'])).toBe('my 12 monkeys');
+        });
+
+        it('should return the message if the parameter is a string', function () {
+            expect(service.message('monkeys')).toBe('monkeys');
         });
     });
 });

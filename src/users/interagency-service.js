@@ -21,6 +21,14 @@ function interAgencyService($q, Restangular, currentUserService, errorHandler) {
                     getAdminUserGroup(organisationUnitName),
                     getMechUserGroup(organisationUnitName)
                 ]).then(function (responses) {
+
+                    errorHandler.debug(
+                        'The following inter-agency user groups were found:',
+                        'for users:', responses[0],
+                        'for usermanagement:', responses[1],
+                        'for mechanisms:', responses[2]
+                    );
+
                     return {
                         userUserGroup: responses[0],
                         userAdminUserGroup: responses[1],

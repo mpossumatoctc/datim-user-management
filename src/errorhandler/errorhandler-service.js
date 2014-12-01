@@ -1,15 +1,16 @@
 angular.module('PEPFAR.usermanagement').service('errorHandler', errorHandlerService);
 
-function errorHandlerService($q, $log, notify, DEBUG) {
+function errorHandlerService($q, $log, notify, SETTINGS) {
     var errorMessages = {
         404: 'Requested resource was not found'
     };
     var sv = this;
 
-    this.isDebugOn = DEBUG;
     this.error = error;
     this.warning = warning;
     this.debug = debug;
+    this.message = message;
+
     this.errorFn = function (message) {
             return function () {
                 return sv.error(message);
@@ -51,15 +52,21 @@ function errorHandlerService($q, $log, notify, DEBUG) {
     }
 
     function debug(message) {
-        if (!sv.isDebugOn) { return $q.reject(message); }
+        if (!SETTINGS.debug) { return $q.reject(message); }
 
-        if (message.status) {
-            $log.error(errorMessages[message.status]);
-            notify.warning(errorMessages[message.status]);
-        } else {
-            $log.error(message);
-            notify.warning(message);
-        }
+        Array.prototype.forEach.call(arguments, function (message) {
+            $log.debug(message);
+        });
+
         return $q.reject(message);
+    }
+
+    function message(msg) {
+        var separator = ' ';
+
+        if (Array.isArray(msg)) {
+            return msg.join(separator);
+        }
+        return msg;
     }
 }

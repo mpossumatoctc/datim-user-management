@@ -25,6 +25,12 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
 
                         return $q.reject(['No agencies found in', organisationUnitName, 'that you can access all mechanisms for'].join(' '));
                     }
+
+                    errorHandler.debug(
+                        errorHandler.message(['Found', agencies.length, 'agencies for which you can also access the required user groups.']),
+                        agencies
+                    );
+
                     return agencies;
                 });
         }).catch(errorHandler.debug);
@@ -35,12 +41,30 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
             paging: 'false'
         };
 
-        return Restangular.all('dimensions').withHttpConfig({cache: true})
-            .all('bw8KHXzxd9i')
-            .get('items', queryParams)
+        //categoryOptionGroupSets.json?fields=id&filter=name:eq:Funding%20Agency&paging=false
+        return Restangular
+            .one('categoryOptionGroupSets').withHttpConfig({cache: true})
+            .get({
+                fields: 'id',
+                filter: 'name:eq:Funding Agency',
+                paging: false
+            })
             .then(function (response) {
-                //Extract the items from the response
-                return response.items;
+                var categoryOptionGroupSets = response.categoryOptionGroupSets || [];
+
+                if (categoryOptionGroupSets.length !== 1) {
+                    return $q.reject('None or more than one categoryOptionGroupSets found that match "Funding Agency"');
+                }
+
+                return Restangular
+                    .all('dimensions').withHttpConfig({cache: true})
+                    .all(categoryOptionGroupSets[0].id)
+                    .get('items', queryParams)
+                    .then(function (response) {
+                        errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'agencies that you can access']));
+
+                        return response.items;
+                    });
             });
     }
 
@@ -58,6 +82,12 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
         return Restangular.one('userGroups').withHttpConfig({cache: true})
             .get(queryParams)
             .then(function (userGroups) {
+
+                errorHandler.debug(
+                    errorHandler.message(['Found ', userGroups.userGroups.length, 'usergroups whos name contains', '"', [organisationUnitName.trim(), 'Agency'].join(' '), '"']),
+                    userGroups.userGroups
+                );
+
                 return userGroups.userGroups;
             });
     }

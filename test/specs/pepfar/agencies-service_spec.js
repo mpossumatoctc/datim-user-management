@@ -48,8 +48,16 @@ describe('Agencies service', function () {
                         }
                     ]
                 });
+
             $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
                 .respond(200, []);
+
+            $httpBackend.whenGET('http://localhost:8080/dhis/api/categoryOptionGroupSets?fields=id&filter=name:eq:Funding+Agency&paging=false')
+                .respond(200, {
+                    categoryOptionGroupSets: [
+                        {id: 'bw8KHXzxd9i'}
+                    ]
+                });
 
             agenciesRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/bw8KHXzxd9i/items?paging=false')
                 .respond(200, fixtures.get('agenciesList'));

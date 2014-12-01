@@ -47,6 +47,13 @@ describe('Partners service', function () {
             $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
                 .respond(200, []);
 
+            $httpBackend.whenGET('http://localhost:8080/dhis/api/categoryOptionGroupSets?fields=id&filter=name:eq:Implementing+Partner&paging=false')
+                .respond(200, {
+                    categoryOptionGroupSets: [
+                        {id: 'BOyWrF33hiR'}
+                    ]
+                });
+
             partnersRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/BOyWrF33hiR/items?paging=false')
                 .respond(200, fixtures.get('partnerList'));
             userGroupsRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&paging=false')
