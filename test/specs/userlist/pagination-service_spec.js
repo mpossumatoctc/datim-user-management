@@ -107,5 +107,15 @@ describe('Userlist service', function () {
 
             expect(service.getNextPageNumber()).toBe(19);
         });
+
+        it('should get the previous page', function () {
+            service.setPagination({
+                page: 8,
+                pageCount: 19,
+                total: 919
+            });
+
+            expect(service.getPreviousPageNumber()).toBe(7);
+        });
     });
 });

@@ -26,6 +26,7 @@ describe('Agencies service', function () {
         var agenciesRequest;
         var userRequest;
         var userGroupRequest;
+        var cogsRequest;
 
         function withFakeUserGroups(expectedAgencies) {
             return {
@@ -52,7 +53,7 @@ describe('Agencies service', function () {
             $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
                 .respond(200, []);
 
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/categoryOptionGroupSets?fields=id&filter=name:eq:Funding+Agency&paging=false')
+            cogsRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/categoryOptionGroupSets?fields=id&filter=name:eq:Funding+Agency&paging=false')
                 .respond(200, {
                     categoryOptionGroupSets: [
                         {id: 'bw8KHXzxd9i'}
@@ -195,5 +196,30 @@ describe('Agencies service', function () {
 
             expect(agenciesMessage).toEqual('No organisation unit found on the current user');
         });
+
+        it('should reject the promise when the cogs can not be found', function () {
+            var catchFunction = jasmine.createSpy();
+            $httpBackend.resetExpectations();
+
+            cogsRequest.respond(500);
+            agenciesService.getAgencies().catch(catchFunction);
+
+            $httpBackend.flush();
+
+            expect(catchFunction).toHaveBeenCalled();
+        });
+
+        it('should reject the promise when only one cogs is returned', inject(function ($q) {
+            var catchFunction = jasmine.createSpy();
+            spyOn($q, 'reject').and.callThrough();
+            $httpBackend.resetExpectations();
+
+            cogsRequest.respond(200, {categoryOptionGroupSets: []});
+            agenciesService.getAgencies().catch(catchFunction);
+
+            $httpBackend.flush();
+
+            expect($q.reject).toHaveBeenCalledWith('None or more than one categoryOptionGroupSets found that match "Funding Agency"');
+        }));
     });
 });

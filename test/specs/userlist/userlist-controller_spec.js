@@ -53,9 +53,14 @@ describe('Userlist controller', function () {
         });
         $provide.factory('userListService', function (paginationService, $q) {
             var success = $q.when(window.fixtures.get('usersPage1').users);
+            var failure = $q.reject('Failed to load userlist');
+
             return {
                 getList: jasmine.createSpy().and.returnValue(success),
-                pagination: paginationService
+                pagination: paginationService,
+                SETTOFAIL: function () {
+                    this.getList = jasmine.createSpy().and.returnValue(failure);
+                }
             };
         });
         $provide.factory('userStatusService', userStatusServiceMockFactory);
@@ -95,6 +100,13 @@ describe('Userlist controller', function () {
         $rootScope.$apply();
         expect(controller.users).toBeAnArray();
         expect(controller.users.length).toBe(50);
+    });
+
+    it('should set list loading to false when the userlist fails', function () {
+        userListService.SETTOFAIL();
+        $rootScope.$apply();
+
+        expect(controller.listIsLoading).toBe(false);
     });
 
     it('should have a pagination object', function () {
@@ -402,6 +414,53 @@ describe('Userlist controller', function () {
 
         it('should have a search method', function () {
             expect(controller.search.doSearch).toBeAFunction();
+        });
+    });
+
+    describe('pageChanged', function () {
+        it('should reload the list when the page has changed', function () {
+            controller.pageChanged();
+
+            expect(userListService.getList).toHaveBeenCalled();
+        });
+
+        it('should call setCurrentPage on the pagination service', function () {
+            spyOn(userListService.pagination, 'setCurrentPage');
+
+            controller.currentPage = 4;
+            controller.pageChanged();
+
+            expect(userListService.pagination.setCurrentPage).toHaveBeenCalledWith(4);
+        });
+    });
+
+    describe('isProcessing', function () {
+        it('should return false when an id is not processing', function () {
+            expect(controller.isProcessing('ab1234')).toBe(false);
+        });
+
+        it('should return true when an id is processing', function () {
+            controller.processing['ab1234'] = true;
+
+            expect(controller.isProcessing('ab1234')).toBe(true);
+        });
+
+        it('should return false when the id is present in the processing list but false', function () {
+            controller.processing['ab1234'] = false;
+
+            expect(controller.isProcessing('ab1234')).toBe(false);
+        });
+    });
+
+    describe('doSecondarySearch', function () {
+        beforeEach(function () {
+            spyOn(controller, 'doSearch');
+        });
+
+        it('should set the secondary filter type', function () {
+            controller.search.doSecondarySearch({name: 'Partner'});
+
+            expect(controller.search.filterTypeSecondary).toEqual({name: 'Partner'});
         });
     });
 });

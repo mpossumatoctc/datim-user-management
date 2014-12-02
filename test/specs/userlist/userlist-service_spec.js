@@ -81,5 +81,17 @@ describe('Userlist service', function () {
 
             expect(errorHandler.errorFn).toHaveBeenCalledWith('Unable to get the list of users from the server');
         });
+
+        it('should add a filter to the query', function () {
+            $httpBackend.resetExpectations();
+            userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
+                    'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups&filter=name:like:Mark&page=1&pageSize=50')
+                .respond(200, window.fixtures.get('usersPage1'));
+
+            service.setFilter('name:like:Mark');
+            service.getList();
+
+            $httpBackend.flush();
+        });
     });
 });
