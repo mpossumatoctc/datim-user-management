@@ -27,7 +27,8 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
         filterType: undefined,
         filterTypeSecondary: undefined,
         searchWord: '',
-        doSearch: _.debounce(vm.doSearch, 400)
+        doSearch: _.debounce(vm.doSearch, 400),
+        doSecondarySearch: doSecondarySearch
     };
 
     initialise();
@@ -164,10 +165,14 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
 
         filter.push(fieldNames[selectedFilterType]);
         filter.push('like');
-
         if (vm.search.filterType.secondary) {
             //secondary search
-            filter.push(vm.search.searchWord);
+            //TODO: Don't compare the string here but make it some option in the filter service
+            if (vm.search.filterTypeSecondary.name === 'Inter-Agency') {
+                filter.push('Country team');
+            } else {
+                filter.push(vm.search.filterTypeSecondary.name);
+            }
 
         } else {
             //text search
@@ -176,6 +181,11 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
         console.log(filter.join(':')); //jshint ignore:line
         userListService.setFilter(filter.join(':'));
         loadList();
+    }
+
+    function doSecondarySearch($item) {
+        vm.search.filterTypeSecondary = $item;
+        doSearch();
     }
 
 //    //$scope.userTypes = userTypes || [];
