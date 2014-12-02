@@ -103,10 +103,11 @@ describe('Partners service', function () {
         it('should add the usergroups to the partner objects', function () {
             var partners;
             var expectedPartner = {
+                id: 'pBimh5znu2H',
+                code: 'Partner_10001',
                 name: 'Banana',
                 created: '2014-05-28T19:50:31.398+0000',
                 lastUpdated: '2014-10-05T13:07:56.182+0000',
-                id: 'pBimh5znu2H',
                 mechUserGroup: {
                     id: 'tICoPGZAWNk',
                     name: 'OU Kenya Partner 10001 all mechanisms - Banana'

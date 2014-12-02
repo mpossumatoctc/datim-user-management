@@ -102,10 +102,11 @@ describe('Agencies service', function () {
         it('should add the usergroups to the agency objects', function () {
             var agencies;
             var expectedAgency = {
+                id: 'FPUgmtt8HRi',
+                code: 'Agency_HHS/CDC',
                 name: 'HHS/CDC',
                 created: '2014-05-09T23:23:06.953+0000',
                 lastUpdated: '2014-10-05T13:07:55.940+0000',
-                id: 'FPUgmtt8HRi',
                 mechUserGroup: {
                     id: 'Stc8jiohyTg',
                     name: 'OU Rwanda Agency HHS/CDC all mechanisms'
