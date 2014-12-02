@@ -19,7 +19,7 @@
     "unused": true,
     "strict": false,
     "maxdepth": 5,
-    "maxstatements": 30,
+    "maxstatements": 35,
     "maxcomplexity": 6,
     "latedef": "nofunc",
 

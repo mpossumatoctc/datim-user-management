@@ -4,7 +4,7 @@ describe('Userlist service', function () {
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.factory('userTypesService', function ($q) {
-            var success = $q.when([ { name : 'Inter-Agency' }, { name : 'Agency' }, { name : 'Partner' } ]);
+            var success = $q.when([{name: 'Inter-Agency'}, {name: 'Agency'}, {name: 'Partner'}]);
             return {
                 getUserTypes: jasmine.createSpy().and.returnValue(success)
             };
@@ -38,7 +38,7 @@ describe('Userlist service', function () {
                 {name: 'Roles'},
                 {name: 'User Groups'},
                 {name: 'Organisation Unit'},
-                {name: 'Types', secondary: [ { name : 'Inter-Agency' }, { name : 'Agency' }, { name : 'Partner' } ]}
+                {name: 'Types', secondary: [{name: 'Inter-Agency'}, {name: 'Agency'}, {name: 'Partner'}]}
             ];
         }));
 

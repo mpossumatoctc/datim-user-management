@@ -104,10 +104,12 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
 
     function matchAgenciesWithUserGroups(agencies, userGroups, organisationUnitName) {
         return agencies.map(addUserGroups(userGroups, organisationUnitName))
-            .filter(function (agency) {
-                return angular.isObject(agency.mechUserGroup) && agency.mechUserGroup !== null &&
-                    angular.isObject(agency.userUserGroup) && agency.userUserGroup;
-            });
+            .filter(agencyWithMechanismsAndUserUserGroups);
+    }
+
+    function agencyWithMechanismsAndUserUserGroups(agency) {
+        return angular.isObject(agency.mechUserGroup) && agency.mechUserGroup !== null &&
+            angular.isObject(agency.userUserGroup) && agency.userUserGroup;
     }
 
     function addUserGroups(userGroups, organisationUnitName) {
@@ -116,9 +118,9 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
         var userAdminUserGroupRegex;
 
         return function (agency) {
-            mechUserGroupRegex = new RegExp(['^OU', organisationUnitName, 'Agency', agency.name, 'all mechanisms$'].join(' '));
-            userUserGroupRegex = new RegExp(['^OU', organisationUnitName, 'Agency', agency.name, 'users$'].join(' '));
-            userAdminUserGroupRegex = new RegExp(['^OU', organisationUnitName, 'Agency', agency.name, 'user administrators$'].join(' '));
+            mechUserGroupRegex = userGroupRegExp(organisationUnitName, agency, 'all mechanisms');
+            userUserGroupRegex = userGroupRegExp(organisationUnitName, agency, 'users');
+            userAdminUserGroupRegex = userGroupRegExp(organisationUnitName, agency, 'user administrators');
 
             userGroups.reduce(function (current, userGroup) {
                 if (mechUserGroupRegex.test(userGroup.name)) {
@@ -138,5 +140,15 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
 
             return agency;
         };
+    }
+
+    function userGroupRegExp(organisationUnitName, agency, suffix) {
+        return new RegExp(['^OU', organisationUnitName, underscoreToSpace(agency.code), [suffix, '$'].join('')].join(' '));
+    }
+
+    function underscoreToSpace(code) {
+        var agencyCodeRegExp = new RegExp('^Agency_', '');
+
+        return (code || '').replace(agencyCodeRegExp, 'Agency ');
     }
 }

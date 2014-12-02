@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypes, dataGroupsService, userListService, userStatusService, errorHandler) { //jshint ignore:line
+function userListController(userFilter, userTypes, dataGroupsService, userListService, userStatusService, errorHandler) {
     var vm = this;
 
     vm.detailsOpen = false;

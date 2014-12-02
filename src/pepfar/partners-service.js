@@ -48,9 +48,9 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
     function addUserGroupsToPartners(userGroups) {
         return function (partner) {
-            var partnerMechRegExp = new RegExp('^OU .+? Partner .+? all mechanisms - ' + partner.name + '$', 'i');
-            var partnerUserRegExp = new RegExp('^OU .+? Partner .+? users - ' + partner.name + '$', 'i');
-            var userAdminUserGroup = new RegExp('^OU .+? Partner .+? user administrators - ' + partner.name + '$', 'i');
+            var partnerMechRegExp = userGroupRegExp(partner, 'all mechanisms');
+            var partnerUserRegExp = userGroupRegExp(partner, 'users');
+            var userAdminUserGroup = userGroupRegExp(partner, 'user administrators');
 
             userGroups.forEach(function (userGroup) {
                 if (partnerMechRegExp.test(userGroup.name)) {
@@ -68,6 +68,16 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
 
             return partner;
         };
+    }
+
+    function userGroupRegExp(partner, userGroupType) {
+        return new RegExp(['^OU .+?', underscoreToSpace(partner.code), userGroupType, '- .+$'].join(' '), 'i');
+    }
+
+    function underscoreToSpace(code) {
+        var partnerCodeRegExp = new RegExp('^Partner_', '');
+
+        return (code || '').replace(partnerCodeRegExp, 'Partner ');
     }
 
     function partnersWithUserGroupId(partner) {

@@ -440,13 +440,13 @@ describe('Userlist controller', function () {
         });
 
         it('should return true when an id is processing', function () {
-            controller.processing['ab1234'] = true;
+            controller.processing.ab1234 = true;
 
             expect(controller.isProcessing('ab1234')).toBe(true);
         });
 
         it('should return false when the id is present in the processing list but false', function () {
-            controller.processing['ab1234'] = false;
+            controller.processing.ab1234 = false;
 
             expect(controller.isProcessing('ab1234')).toBe(false);
         });
