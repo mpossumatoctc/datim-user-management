@@ -5,6 +5,7 @@ describe('Add user controller', function () {
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.value('interAgencyService', {getUserGroups: function () {}});
     }));
+
     beforeEach(function () {
         currentUserMock = function (options) {
             return {

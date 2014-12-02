@@ -127,23 +127,36 @@ function dataGroupsService($q, Restangular, currentUserService, errorHandler) {
         });
 
         return $q.all([loadUserGroups(), loadUserRoles()])
-            .then(function () {
-                return dataGroups.map(function (dataGroup) {
-                    if (hasAll(dataGroup.userGroups, userGroupIds)) {
-                        dataGroup.access = true;
-                    } else {
-                        dataGroup.access = false;
-                    }
-                    //FIXME: Currently checks all roles to determine data entry but this could change
-                    //if more streams specific roles are added.
-                    if (hasAll(dataGroup.userRoles, userRoleIds)) {
-                        dataGroup.entry = true;
-                    } else {
-                        dataGroup.entry = false;
-                    }
-                    return dataGroup;
-                });
+            .then(determineDataAccessByUserGroups(userGroupIds))
+            .then(determineDataEntryByUserRoles(userRoleIds));
+    }
+
+    function determineDataAccessByUserGroups(userGroupIds) {
+        return function () {
+            return dataGroups.map(function (dataGroup) {
+                if (hasAll(dataGroup.userGroups, userGroupIds)) {
+                    dataGroup.access = true;
+                } else {
+                    dataGroup.access = false;
+                }
+                return dataGroup;
             });
+        };
+    }
+
+    function determineDataEntryByUserRoles(userRoleIds) {
+        return function () {
+            return dataGroups.map(function (dataGroup) {
+                //FIXME: Currently checks all roles to determine data entry but this could change
+                //if more streams specific roles are added.
+                if (hasAll(dataGroup.userRoles, userRoleIds)) {
+                    dataGroup.entry = true;
+                } else {
+                    dataGroup.entry = false;
+                }
+                return dataGroup;
+            });
+        };
     }
 
     function hasAll(checkFor, against) {
