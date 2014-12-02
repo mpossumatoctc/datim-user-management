@@ -56,6 +56,15 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
                 errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'agencies that you can access']));
 
                 return response.items;
+            })
+            .then(function (agencies) {
+                var agenciesWithCodes = (agencies || []).filter(function (agency) {
+                    return (agency && angular.isString(agency.code) && agency.code !== '');
+                });
+
+                errorHandler.debug(errorHandler.message(['Of the accessible agencies', agenciesWithCodes.length, 'has/have a code']), agenciesWithCodes);
+
+                return agenciesWithCodes;
             });
     }
 

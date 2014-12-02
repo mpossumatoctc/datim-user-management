@@ -92,11 +92,19 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
             .get('items', {paging: 'false'})
             .then(function (response) {
                 errorHandler.debug(
-                    errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access']),
-                    response && response.items
+                    errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access'])
                 );
 
                 return response.items;
+            })
+            .then(function (partners) {
+                var partnersWithCode = (partners || []).filter(function (partner) {
+                    return (partner && angular.isString(partner.code) && partner.code !== '');
+                });
+
+                errorHandler.debug(errorHandler.message(['Of the accessible partners', partnersWithCode.length, 'has/have a code']), partnersWithCode);
+
+                return partnersWithCode;
             });
     }
 
