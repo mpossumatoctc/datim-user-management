@@ -40,7 +40,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function initialize() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
-            $state.go('noaccess');
+            $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
         }
 
         if (vm.dataGroups.length <= 0) {
