@@ -21,8 +21,6 @@ function currentUserService($q, Restangular, errorHandler) {
                 currentUser.hasUserRole = hasUserRole.bind(currentUser);
                 currentUser.isUserAdministrator = isUserAdministrator.bind(currentUser);
 
-                handleLegacyUserRoles(currentUser);
-
                 return currentUser;
             }, errorHandler.errorFn('Failed to load the current user data'));
     }
@@ -37,13 +35,6 @@ function currentUserService($q, Restangular, errorHandler) {
 
     function getCurrentUser() {
         return currentUserPromise;
-    }
-
-    //TODO: Write some tests for this
-    function handleLegacyUserRoles(currentUser) {
-        if (currentUser.userCredentials && !currentUser.userCredentials.userRoles && currentUser.userCredentials.userAuthorityGroups) {
-            currentUser.userCredentials.userRoles = currentUser.userCredentials.userAuthorityGroups;
-        }
     }
 
     //*************************************************************************
