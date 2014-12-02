@@ -35,7 +35,7 @@ describe('Add user controller', function () {
                 dataGroups: undefined,
                 dimensionConstraint: {},
                 userActionsService: {
-                    getActionsFor: function () {
+                    getActionsForUserType: function () {
                         return [];
                     }
                 },
@@ -168,7 +168,7 @@ describe('Add user controller', function () {
             ];
 
             userActionsServiceMock = {
-                getActionsFor: jasmine.createSpy().and.returnValue(expectedActions)
+                getActionsForUserType: jasmine.createSpy().and.returnValue(expectedActions)
             };
 
             scope = $rootScope.$new();
@@ -192,7 +192,7 @@ describe('Add user controller', function () {
             scope.user.userType = {name: 'Partner'};
             scope.$apply();
 
-            expect(userActionsServiceMock.getActionsFor).toHaveBeenCalledWith('Partner');
+            expect(userActionsServiceMock.getActionsForUserType).toHaveBeenCalledWith('Partner');
         });
 
         it('should store the available actions onto the controller', function () {
@@ -299,7 +299,7 @@ describe('Add user controller', function () {
                 dataGroups: dataGroupValues,
                 dimensionConstraint: {},
                 userActionsService: {
-                    getActionsFor: function () {
+                    getActionsForUserType: function () {
                         return [];
                     }
                 },
@@ -628,7 +628,7 @@ describe('Add user controller', function () {
                 ],
                 dimensionConstraint: {},
                 userActionsService: {
-                    getActionsFor: function () {
+                    getActionsForUserType: function () {
                         return [];
                     }
                 },

@@ -23,7 +23,7 @@ describe('User actions', function () {
         expect(userActionsService.actions).toEqual(fixtures.get('actionsList'));
     });
 
-    describe('getActionsFor', function () {
+    describe('getActionsForUserType', function () {
         it('should return the user actions available for agencies', function () {
             var expectedActions = [
                 {name: 'Accept data', userRole: 'Data Accepter'},
@@ -32,7 +32,7 @@ describe('User actions', function () {
                 {name: 'Read data', userRole: 'Read Only', default: true}
             ];
 
-            expect(userActionsService.getActionsFor('agency')).toEqual(expectedActions);
+            expect(userActionsService.getActionsForUserType('agency')).toEqual(expectedActions);
         });
 
         it('should return the user actions available for inter-agency', function () {
@@ -44,7 +44,7 @@ describe('User actions', function () {
                 {name: 'Read data', userRole: 'Read Only', default: true}
             ];
 
-            expect(userActionsService.getActionsFor('inter-agency')).toEqual(expectedActions);
+            expect(userActionsService.getActionsForUserType('inter-agency')).toEqual(expectedActions);
         });
 
         it('should return the user actions available for partners', function () {
@@ -55,7 +55,7 @@ describe('User actions', function () {
                 {name: 'Read data', userRole: 'Read Only', default: true}
             ];
 
-            expect(userActionsService.getActionsFor('partner')).toEqual(expectedActions);
+            expect(userActionsService.getActionsForUserType('partner')).toEqual(expectedActions);
         });
 
         it('should return the read action as a default', function () {
@@ -63,7 +63,7 @@ describe('User actions', function () {
                 {name: 'Read data', userRole: 'Read Only', default: true}
             ];
 
-            expect(userActionsService.getActionsFor()).toEqual(expectedActions);
+            expect(userActionsService.getActionsForUserType()).toEqual(expectedActions);
         });
 
         it('should also return the correct data when called with uppercase value', function () {
@@ -74,7 +74,7 @@ describe('User actions', function () {
                 {name: 'Read data', userRole: 'Read Only', default: true}
             ];
 
-            expect(userActionsService.getActionsFor('Partner')).toEqual(expectedActions);
+            expect(userActionsService.getActionsForUserType('Partner')).toEqual(expectedActions);
         });
     });
 

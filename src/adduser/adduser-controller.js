@@ -9,7 +9,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     vm.title = 'Add or delete user';
     vm.dataGroups = dataGroups || [];
-    vm.actions = userActionsService.getActionsFor();
+    vm.actions = userActionsService.getActionsForUserType();
     vm.languages = [];
     vm.isProcessingAddUser = false;
     vm.addUser = addUser;
@@ -28,7 +28,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     $scope.$watch('user.userType', function (newVal, oldVal) {
         if (newVal !== oldVal && newVal && newVal.name) {
             $scope.user.userActions = {};
-            vm.actions = userActionsService.getActionsFor(newVal.name);
+            vm.actions = userActionsService.getActionsForUserType(newVal.name);
 
             if (newVal.name === 'Inter-Agency') {
                 interAgencyService.getUserGroups().then(function (interAgencyUserGroups) {

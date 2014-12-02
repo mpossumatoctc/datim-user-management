@@ -22,7 +22,7 @@ function userActionsService(Restangular, errorHandler) {
     initialise();
     return {
         actions: actions,
-        getActionsFor: getActionsFor
+        getActionsForUserType: getActionsForUserType
     };
 
     function initialise() {
@@ -75,7 +75,7 @@ function userActionsService(Restangular, errorHandler) {
         return [];
     }
 
-    function getActionsFor(userType) {
+    function getActionsForUserType(userType) {
         var availableActions = getAvailableActionsForUserType(userType);
 
         return actions.filter(function (action) {
