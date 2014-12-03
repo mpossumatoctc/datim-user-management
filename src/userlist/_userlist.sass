@@ -61,22 +61,23 @@
   padding: 10px
   padding-bottom: 10px
   border-radius: 5px
-  min-height: 65px
+  min-height: 80px
+  max-height: 80px
+  border-bottom: 1px solid #ccc
 
-  &:hover, &.is-details-user:hover
+  &:hover, &.is-details-user:hover, &:nth-child(odd):hover, &.is-details-user:nth-child(odd):hover
     background-color: #276696
     color: #FFF
+
+    .email, .username
+      .fa
+        color: #FFF
 
   &.is-details-user, &.is-details-user:nth-child(odd)
     background-color: #FFFFCC
 
-.user-list-row:nth-child(odd)
-  background-color: #EEEEEE
-
-.user-list-row:nth-child(odd)
-  &:hover
-    background-color: #276696
-    color: #FFF
+  &:nth-child(odd)
+    background-color: #EEEEEE
 
 .user-name, .details-user-type
   font-size: 1.3em
@@ -89,11 +90,18 @@
   margin-bottom: 30px
 
 .user-details-main
-  .email, .user-username
+  .email, .username
+    min-width: 330px
     font-size: 1em
 
+    .fa
+      color: #276696
+
+  .result > &:first-child
+    min-height: 40px
+
   .deactivate
-    button, & > span
+    & > span
       position: absolute
       right: 15px
 
@@ -103,12 +111,10 @@
 
 .user-list-row:hover
   .deactivate
-
-    & > span
-      display: none
-
     button
       display: block
+      position: absolute
+      right: 55px
 
 
 .user-details-sub
@@ -141,11 +147,34 @@
     display: block
     color: #DDDDDD
 
-.user-disabled, .user-no-access
+.user-no-access
   color: #d9534f
 
-.user-enabled, .user-access
+.user-access
   color: #5cb85c
+
+.user-disabled, .user-enabled
+  color: #FFF
+
+.user-disabled
+  background-color: #d9534f
+
+.user-enabled
+  background-color: #5cb85c
+
+.user-status
+  transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+  -ms-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+  -webkit-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+  display: block
+  color: white
+  border-bottom-left-radius: 5px
+  border-bottom-right-radius: 5px
+  padding: 8px
+  width: 79px
+  text-align: center
+  box-shadow: 0px 8px 4px -6px #333 inset
+  border-top: 1px solid #222
 
 .user-details-view
   h3
