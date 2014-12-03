@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypes, dataGroupsService, userListService, userStatusService, errorHandler) {
+function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, errorHandler) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -19,7 +19,6 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
     vm.getDataGroupsForUser = getDataGroupsForUser;
     vm.detailsUserDataGroups = [];
     vm.detailsUserUserType = '';
-    vm.getUserType = getUserType;
     vm.doSearch = doSearch;
 
     vm.search = {
@@ -96,7 +95,7 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
             vm.detailsUser = user;
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
-            vm.detailsUserUserType = vm.getUserType(user);
+            vm.detailsUserUserType = userTypesService.getUserType(user);
         } else {
             vm.detailsUser = undefined;
             vm.detailsOpen = false;
@@ -115,34 +114,6 @@ function userListController(userFilter, userTypes, dataGroupsService, userListSe
             .catch(function () {
                 errorHandler.warning('Failed to load datagroups for user');
             });
-    }
-
-    //TODO: Move this out and perhaps use the available usertype services
-    function getUserType(user) {
-        var userTypesForMatches = userTypes.map(fixCountryType).reverse();
-
-        return userTypesForMatches.reduce(function (currentType) {
-            var userGroupRegex = new RegExp('OU .+? (.+?) ', 'i');
-            (user && user.userGroups || []).forEach(function (userGroup) {
-                var matches = userGroupRegex.exec(userGroup.name);
-
-                if (matches && (userTypesForMatches.indexOf(matches[1]) >= 0)) {
-                    currentType = matches[1];
-
-                    if (currentType.toLowerCase() === 'country') {
-                        currentType = 'Inter-Agency';
-                    }
-                }
-            });
-            return currentType;
-        }, 'Unknown type');
-
-        function fixCountryType(userType) {
-            if (userType.name === 'Inter-Agency') {
-                return 'Country';
-            }
-            return userType.name;
-        }
     }
 
     //TODO: Move the search stuff to the filter service

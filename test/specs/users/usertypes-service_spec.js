@@ -37,4 +37,32 @@ describe('userTypesService', function () {
             expect(userTypes).toEqual(expectedUserTypes);
         });
     });
+
+    describe('getUserType', function () {
+        it('should be a function', function () {
+            expect(userTypesService.getUserType).toBeAFunction();
+        });
+
+        it('should return usertype partner', function () {
+            var user = window.fixtures.get('userGroupsRoles');
+
+            expect(userTypesService.getUserType(user)).toBe('Partner');
+        });
+
+        it('should return usertype Inter-Agency instead of country', function () {
+            var user = window.fixtures.get('userObjectDisabled');
+
+            expect(userTypesService.getUserType(user)).toBe('Inter-Agency');
+        });
+
+        it('should return Unknown type if the type cannot be determined', function () {
+            expect(userTypesService.getUserType({})).toBe('Unknown type');
+        });
+
+        it('should return Unknown type if the type cannot be determined', function () {
+            var otherUserType = {userGroups: [{name: 'OU Rwanda Admin users'}]};
+
+            expect(userTypesService.getUserType(otherUserType)).toBe('Unknown type');
+        });
+    });
 });
