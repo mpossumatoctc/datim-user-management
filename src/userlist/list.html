@@ -56,13 +56,13 @@ List of searchable users here
                                     <span ng-hide="userList.isProcessing(user.id)">Active</span>
                                     <span ng-show="userList.isProcessing(user.id)"><i class="fa fa-circle-o-notch fa-spin"></i></span>
                                 </span>
-                                <div>
-                                    <button class="btn btn-primary" ng-click="userList.editUser(user)">Edit</button>
+                                <div class="button-group">
+                                    <button class="btn btn-default btn-edit-user" ng-click="userList.editUser(user)"><i class="fa fa-pencil-square-o"></i> Edit</button>
                                     <button class="btn btn-danger" ng-disabled="userList.isProcessing(user.id)" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user); $event.stopPropagation();">
-                                        <span>De-activate</span>
+                                        <i class="fa fa-times"></i>
                                     </button>
                                     <button class="btn btn-success" ng-disabled="userList.isProcessing(user.id)" ng-show="user.userCredentials.disabled" ng-click="userList.activateUser(user); $event.stopPropagation();">
-                                        <span>Activate</span>
+                                        <i class="fa fa-check"></i>
                                     </button>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@ List of searchable users here
 		    		</div>
                     <div class="row user-details-main">
                         <div class="email col-sm-6"><i class="fa fa-envelope"></i>&nbsp;<span ng-bind="::user.email"></span></div>
-                        <div class="username col-sm-6"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.code"></span></div>
+                        <div class="username col-sm-6" ng-hide="userList.detailsOpen"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.code"></span></div>
                     </div>
 		    	</div>
 		    </li>

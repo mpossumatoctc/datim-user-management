@@ -5,7 +5,7 @@
 .icon-rotate
   transform-style: preserve-3d
   transition: transform 0.5s
-  transform: rotateY( -180deg )
+  transform: rotateZ( 360deg ) rotateY( 360deg )
 
 *
   box-sizing: border-box
@@ -35,10 +35,7 @@ h2.sub-title
 .button-group
   float: right
 
-  a
-    i
-      margin-right: 5px
-
+  a, button
     &:hover i
       @extend .icon-rotate
 
