@@ -35,6 +35,7 @@ describe('Application states', function () {
         $state = $injector.get('$state');
         $rootScope = $injector.get('$rootScope');
         $templateCache.put('adduser/add.html', '');
+        $templateCache.put('edituser/edit.html', '');
         $templateCache.put('userlist/list.html', '');
         $templateCache.put('noaccess/noaccess.html', '');
     }));
@@ -102,6 +103,23 @@ describe('Application states', function () {
         };
 
         $state.go('noaccess');
+        $rootScope.$apply();
+
+        expect($state.current.name).toEqual(expectedState.name);
+        expect($state.current.url).toEqual(expectedState.url);
+        expect($state.current.templateUrl).toEqual(expectedState.templateUrl);
+        expect($state.current.controller).toEqual(expectedState.controller);
+    });
+
+    it('should change the state to edit', function () {
+        var expectedState = {
+            name: 'edit',
+            url: '/edit',
+            templateUrl: 'edituser/edit.html',
+            controller: 'editUserController as editUser'
+        };
+
+        $state.go('edit');
         $rootScope.$apply();
 
         expect($state.current.name).toEqual(expectedState.name);

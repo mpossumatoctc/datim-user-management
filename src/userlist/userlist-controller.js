@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, userActionsService, errorHandler) {
+function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, userActionsService, $state, errorHandler) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -21,6 +21,7 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     vm.detailsUserUserType = '';
     vm.detailsUserActions = [];
     vm.doSearch = doSearch;
+    vm.editUser = editUser;
 
     vm.search = {
         options: userFilter,
@@ -161,5 +162,9 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     function doSecondarySearch($item) {
         vm.search.filterTypeSecondary = $item;
         vm.doSearch();
+    }
+
+    function editUser(user) {
+        $state.go('edit', {user: user});
     }
 }

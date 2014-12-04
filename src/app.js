@@ -52,6 +52,25 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 }
             }
         })
+        .state('edit', {
+            url: '/edit',
+            templateUrl: 'edituser/edit.html',
+            controller: 'editUserController as editUser',
+            resolve: {
+                userTypes: function (userTypesService) {
+                    return userTypesService.getUserTypes();
+                },
+                dataGroups: function (dataGroupsService) {
+                    return dataGroupsService.getDataGroups();
+                },
+                currentUser: function (currentUserService) {
+                    return currentUserService.getCurrentUser();
+                },
+                dimensionConstraint: function (categoriesService) {
+                    return categoriesService.getDimensionConstraint();
+                }
+            }
+        })
         .state('noaccess', {
             url: '/noaccess',
             templateUrl: 'noaccess/noaccess.html',

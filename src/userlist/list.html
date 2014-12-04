@@ -40,7 +40,7 @@ List of searchable users here
             <div class="loading-mask-inner"><i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;Loading users...</div>
         </div>
 		<ul class="user-list" ng-class="{'user-details-open': userList.detailsOpen}">
-		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)">
+		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)" >
 		    	<div class="result">
 		    		<div class="row user-details-main">
 		    			<div class="col-sm-9">
@@ -56,12 +56,15 @@ List of searchable users here
                                     <span ng-hide="userList.isProcessing(user.id)">Active</span>
                                     <span ng-show="userList.isProcessing(user.id)"><i class="fa fa-circle-o-notch fa-spin"></i></span>
                                 </span>
-                                <button class="btn btn-danger" ng-disabled="userList.isProcessing(user.id)" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user); $event.stopPropagation();">
-                                    <span>De-activate</span>
-                                </button>
-                                <button class="btn btn-success" ng-disabled="userList.isProcessing(user.id)" ng-show="user.userCredentials.disabled" ng-click="userList.activateUser(user); $event.stopPropagation();">
-                                    <span>Activate</span>
-                                </button>
+                                <div>
+                                    <button class="btn btn-primary" ng-click="userList.editUser(user)">Edit</button>
+                                    <button class="btn btn-danger" ng-disabled="userList.isProcessing(user.id)" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user); $event.stopPropagation();">
+                                        <span>De-activate</span>
+                                    </button>
+                                    <button class="btn btn-success" ng-disabled="userList.isProcessing(user.id)" ng-show="user.userCredentials.disabled" ng-click="userList.activateUser(user); $event.stopPropagation();">
+                                        <span>Activate</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 		    		</div>

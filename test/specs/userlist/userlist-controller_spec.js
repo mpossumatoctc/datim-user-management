@@ -78,6 +78,12 @@ describe('Userlist controller', function () {
                 warning: jasmine.createSpy()
             };
         });
+
+        $provide.factory('$state', function () {
+            return {
+                go: jasmine.createSpy()
+            };
+        });
     }));
 
     beforeEach(inject(function ($injector) {
@@ -459,6 +465,24 @@ describe('Userlist controller', function () {
             controller.search.doSecondarySearch({name: 'Partner'});
 
             expect(controller.search.filterTypeSecondary).toEqual({name: 'Partner'});
+        });
+    });
+
+    describe('editUser', function () {
+        var $state;
+
+        beforeEach(inject(function ($injector) {
+            $state = $injector.get('$state');
+        }));
+
+        it('should be a function', function () {
+            expect(controller.editUser).toBeAFunction();
+        });
+
+        it('should call $state.go', function () {
+            controller.editUser();
+
+            expect($state.go).toHaveBeenCalled();
         });
     });
 });
