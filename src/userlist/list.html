@@ -43,10 +43,10 @@ List of searchable users here
 		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)" >
 		    	<div class="result">
 		    		<div class="row user-details-main">
-		    			<div class="col-sm-9">
+		    			<div class="col-sm-5">
 		    				<span class="user-name" ng-bind="::user.name"></span>
 		    			</div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-7">
                             <div class="deactivate">
                                 <span class="user-status user-disabled" ng-show="user.userCredentials.disabled">
                                     <span ng-hide="userList.isProcessing(user.id)">Disabled</span>
@@ -68,9 +68,11 @@ List of searchable users here
                             </div>
                         </div>
 		    		</div>
-                    <div class="row user-details-main">
-                        <div class="email col-sm-6"><i class="fa fa-envelope"></i>&nbsp;<span ng-bind="::user.email"></span></div>
-                        <div class="username col-sm-6" ng-hide="userList.detailsOpen"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.code"></span></div>
+                    <div class="row user-details-main user-details-additional" ng-class="{'user-details-open': userList.detailsOpen}">
+                        <div class="col-sm-6">
+                            <div class="email"><i class="fa fa-envelope"></i>&nbsp;<span ng-bind="::user.email"></span></div>
+                            <div class="username"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.code"></span></div>
+                        </div>
                     </div>
 		    	</div>
 		    </li>

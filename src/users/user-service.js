@@ -26,7 +26,9 @@ function userService($q, Restangular) {
         inviteUser: inviteUser,
         verifyInviteData: verifyInviteData,
         saveUserLocale: saveUserLocale,
-        getSelectedDataGroups: getSelectedDataGroups
+        getSelectedDataGroups: getSelectedDataGroups,
+        getUser: getUser,
+        getUserLocale: getUserLocale
     };
 
     function getUserObject() {
@@ -251,6 +253,33 @@ function userService($q, Restangular) {
             .post(undefined, locale, {user: username}, {'Content-Type': 'text/plain'})
             .then(function () {
                 return locale;
+            });
+    }
+
+    function getUserLocale(userName) {
+        var deferred = $q.defer();
+
+        Restangular
+            .all('userSettings')
+            .get('keyUiLocale', {user: userName})
+            .then(function (locale) {
+                deferred.resolve({
+                    name: locale,
+                    code: locale
+                });
+            })
+            .catch(function () {
+                deferred.resolve(undefined);
+            });
+
+        return deferred.promise;
+    }
+
+    function getUser(userId) {
+        return Restangular
+            .all('users')
+            .get(userId, {
+                fields: ['id', 'name', 'email', 'organisationUnits', 'userCredentials[code,disabled,userRoles]', 'userGroups'].join(',')
             });
     }
 }

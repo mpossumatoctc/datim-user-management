@@ -459,6 +459,53 @@ describe('User service', function () {
         });
     });
 
+    describe('getUserLocale', function () {
+        var $httpBackend;
+
+        beforeEach(inject(function ($injector) {
+            $httpBackend = $injector.get('$httpBackend');
+        }));
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should call the api for the userLocale', function () {
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=markpo')
+                .respond(200, 'en');
+
+            service.getUserLocale('markpo');
+            $httpBackend.flush();
+        });
+
+        it('should return the locale', function () {
+            var userLocale;
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=markpo')
+                .respond(200, 'en');
+
+            service.getUserLocale('markpo').then(function (locale) {
+                userLocale = locale;
+            });
+            $httpBackend.flush();
+
+            expect(userLocale).toEqual({name: 'en', code: 'en'});
+        });
+
+        it('should return undefined when locale can not be found', function () {
+            var userLocale = '';
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=larshe')
+                .respond(500);
+
+            service.getUserLocale('larshe').then(function (locale) {
+                userLocale = locale;
+            });
+            $httpBackend.flush();
+
+            expect(userLocale).toBeUndefined();
+        });
+    });
+
     describe('getSelectedDataGroups', function () {
         var dataGroups;
         var userDataGroups;
@@ -488,6 +535,27 @@ describe('User service', function () {
                 {name: 'SIMS'}
             ];
             expect(service.getSelectedDataGroups(userDataGroups, dataGroups)).toEqual(exectedDataGroups);
+        });
+    });
+
+    describe('getUser', function () {
+        var $httpBackend;
+
+        beforeEach(inject(function ($injector) {
+            $httpBackend = $injector.get('$httpBackend');
+        }));
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should request a user', function () {
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/dfersddd?fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups')
+                .respond(200, {});
+
+            service.getUser('dfersddd');
+            $httpBackend.flush();
         });
     });
 });

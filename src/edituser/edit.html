@@ -1,3 +1,20 @@
 <div>
-    Edit user here
+    <div class="user-edit-header">
+        <div class="row">
+            <h3 ng-bind="editUser.userToEdit.name"></h3>
+        </div>
+        <div class="row email" ng-show="editUser.userToEdit.email">
+            <i class="fa fa-envelope"></i> <span ng-bind="editUser.userToEdit.email"></span>
+        </div>
+        <div class="row username">
+            <i class="fa fa-user"></i> <span ng-bind="editUser.userToEdit.userCredentials.code"></span>
+        </div>
+    </div>
+    <div class="user-edit-form">
+        <form>
+            <div class="col-sm-12">
+                <locale-select user="editUser"></locale-select>
+            </div>
+        </form>
+    </div>
 </div>

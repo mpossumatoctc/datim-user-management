@@ -29,11 +29,20 @@ describe('Application states', function () {
                 return {};
             }
         });
+        $provide.value('userService', {
+            getUser: function () {
+                return {};
+            },
+            getUserLocale: function () {
+                return 'en';
+            }
+        });
     }));
     beforeEach(inject(function ($templateCache, $injector) {
         injector = $injector;
         $state = $injector.get('$state');
         $rootScope = $injector.get('$rootScope');
+
         $templateCache.put('adduser/add.html', '');
         $templateCache.put('edituser/edit.html', '');
         $templateCache.put('userlist/list.html', '');
@@ -114,12 +123,12 @@ describe('Application states', function () {
     it('should change the state to edit', function () {
         var expectedState = {
             name: 'edit',
-            url: '/edit',
+            url: '/edit/{userId}/{username}',
             templateUrl: 'edituser/edit.html',
             controller: 'editUserController as editUser'
         };
 
-        $state.go('edit');
+        $state.go('edit', {userId: 'd323ffsdf'});
         $rootScope.$apply();
 
         expect($state.current.name).toEqual(expectedState.name);

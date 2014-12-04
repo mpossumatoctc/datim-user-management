@@ -14,7 +14,8 @@ function appController($scope, Restangular, webappManifest, errorHandler) {
 
     vm.subTitles = {
         add: 'Invite user',
-        list: 'Manage users'
+        list: 'Manage users',
+        edit: 'Edit user'
     };
 
     initialise();

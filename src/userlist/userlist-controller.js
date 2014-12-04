@@ -165,6 +165,8 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     }
 
     function editUser(user) {
-        $state.go('edit', {user: user});
+        if (user && user.id && user.userCredentials && user.userCredentials.code) {
+            $state.go('edit', {userId: user.id, username: user.userCredentials.code});
+        }
     }
 }

@@ -53,7 +53,7 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             }
         })
         .state('edit', {
-            url: '/edit',
+            url: '/edit/{userId}/{username}',
             templateUrl: 'edituser/edit.html',
             controller: 'editUserController as editUser',
             resolve: {
@@ -68,7 +68,17 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 dimensionConstraint: function (categoriesService) {
                     return categoriesService.getDimensionConstraint();
+                },
+                userToEdit: function ($stateParams, userService) {
+                    return userService.getUser($stateParams.userId);
+                },
+                userLocale: function ($stateParams, userService) {
+                    return userService.getUserLocale($stateParams.username);
                 }
+            },
+            params: {
+                userId: '',
+                username: ''
             }
         })
         .state('noaccess', {

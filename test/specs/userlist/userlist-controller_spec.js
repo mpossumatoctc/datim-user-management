@@ -480,7 +480,7 @@ describe('Userlist controller', function () {
         });
 
         it('should call $state.go', function () {
-            controller.editUser();
+            controller.editUser({id: 'stuff', userCredentials: {code: 'markpo'}});
 
             expect($state.go).toHaveBeenCalled();
         });

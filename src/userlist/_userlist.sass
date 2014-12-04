@@ -92,13 +92,6 @@
 .user-details-main
   .email, .username
     min-width: 330px
-    font-size: 1em
-
-    .fa
-      color: #276696
-
-  .result > &:first-child
-    min-height: 40px
 
   .deactivate
     & > span
@@ -106,7 +99,7 @@
       right: 15px
 
     div
-      position: relative
+      position: absolute
       right: 55px
 
       button.btn-edit-user
@@ -236,3 +229,6 @@
       opacity: 0
       width: 0
       height: 0
+
+  .user-details-additional.user-details-open .username
+    display: none
