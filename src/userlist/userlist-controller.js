@@ -99,7 +99,7 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
             vm.detailsUserUserType = userTypesService.getUserType(user);
             userActionsService.getActionsForUser(user).then(function (actions) {
                 vm.detailsUserActions = actions;
-            })
+            });
         } else {
             vm.detailsUser = undefined;
             vm.detailsOpen = false;
