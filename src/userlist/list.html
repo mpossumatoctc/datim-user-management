@@ -100,6 +100,16 @@ List of searchable users here
                         </tbody>
                     </table>
                 </div>
+                <div class="data-group">
+                    <h3>Actions</h3>
+                    <ul>
+                        <li ng-repeat="action in userList.detailsUserActions">
+                            <i class="user-access fa fa-check" ng-show="action.hasAction"></i>
+                            <i class="user-no-access fa fa-times" ng-hide="action.hasAction"></i>
+                            <span ng-bind="action.name"></span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 	</div>

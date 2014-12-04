@@ -3,7 +3,16 @@ describe('User actions', function () {
     var userActionsService;
     var errorHandler;
 
-    beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.factory('dataGroupsService', function ($q) {
+            var success = $q.when(fixtures.get('dataStreamAccess'));
+            return {
+                getDataGroupsForUser: function () {
+                    return success;
+                }
+            };
+        });
+    }));
     beforeEach(inject(function ($injector) {
         errorHandler = $injector.get('errorHandler');
         spyOn(errorHandler, 'error');
@@ -113,6 +122,89 @@ describe('User actions', function () {
 
             expect(errorHandler.error).toHaveBeenCalledWith('Failed to load user roles for actions');
             expect(errorHandler.error.calls.count()).toBe(1);
+        });
+    });
+
+    describe('getActionsForUser', function () {
+        var $httpBackend;
+        var $rootScope;
+        var userRoleRequest;
+
+        beforeEach(inject(function ($injector) {
+            $httpBackend = $injector.get('$httpBackend');
+            $rootScope = $injector.get('$rootScope');
+
+            userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
+                    'fields=id,name&filter=name:eq:Data+Entry+SI+Country+Team&filter=name:eq:Data+Accepter' +
+                    '&filter=name:eq:Data+Submitter&filter=name:eq:User+Administrator&filter=name:eq:Read+Only&paging=false')
+                .respond(200, fixtures.get('userRolesForActions'));
+            $httpBackend.flush();
+        }));
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should be a function', function () {
+            expect(userActionsService.getActionsForUser).toBeAFunction();
+        });
+
+        it('should get the actions with a hasAction property', function () {
+            var user = window.fixtures.get('userGroupsRoles');
+            var userActions;
+            var expectedActions = [
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+                ];
+
+            userActionsService.getActionsForUser(user).then(function (actions) {
+                userActions = actions;
+            });
+            $rootScope.$apply();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should also give the user the submit action', function () {
+            var user = window.fixtures.get('userGroupsRoles');
+            var userActions;
+            var expectedActions = [
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+            ];
+            user.userCredentials.userRoles.push(
+                {id: 'n777lf1THwQ', name: 'Data Submitter', created: '2014-05-05T08:41:19.534+0000', lastUpdated: '2014-11-26T22:41:33.482+0000'}
+            );
+
+            userActionsService.getActionsForUser(user).then(function (actions) {
+                userActions = actions;
+            });
+            $rootScope.$apply();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should not give the user any actions', function () {
+            var user = window.fixtures.get('userGroupsRoles');
+            var userActions;
+            user.userGroups = [];
+            user.userCredentials.userRoles = [];
+
+            var expectedActions = [
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: false}
+            ];
+
+            userActionsService.getActionsForUser(user).then(function (actions) {
+                userActions = actions;
+            });
+            $rootScope.$apply();
+
+            expect(userActions).toEqual(expectedActions);
         });
     });
 });

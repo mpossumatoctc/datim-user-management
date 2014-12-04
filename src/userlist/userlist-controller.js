@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, errorHandler) {
+function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, userActionsService, errorHandler) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -19,6 +19,7 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     vm.getDataGroupsForUser = getDataGroupsForUser;
     vm.detailsUserDataGroups = [];
     vm.detailsUserUserType = '';
+    vm.detailsUserActions = [];
     vm.doSearch = doSearch;
 
     vm.search = {
@@ -96,6 +97,9 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
             vm.detailsUserUserType = userTypesService.getUserType(user);
+            userActionsService.getActionsForUser(user).then(function (actions) {
+                vm.detailsUserActions = actions;
+            })
         } else {
             vm.detailsUser = undefined;
             vm.detailsOpen = false;

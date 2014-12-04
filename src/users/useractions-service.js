@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, errorHandler) {
+function userActionsService(Restangular, $q, userTypesService, dataGroupsService, errorHandler) {
     var availableAgencyActions = [
         'Accept data', 'Submit data', 'Manage users'
     ];
@@ -22,7 +22,8 @@ function userActionsService(Restangular, errorHandler) {
     initialise();
     return {
         actions: actions,
-        getActionsForUserType: getActionsForUserType
+        getActionsForUserType: getActionsForUserType,
+        getActionsForUser: getActionsForUser
     };
 
     function initialise() {
@@ -81,5 +82,45 @@ function userActionsService(Restangular, errorHandler) {
         return actions.filter(function (action) {
             return (availableActions.indexOf(action.name) >= 0) || action.default;
         });
+    }
+
+    function getActionsForUser(user) {
+        var actions = getActionsForUserType(userTypesService.getUserType(user));
+        var userRoles = (user && user.userCredentials && user.userCredentials.userRoles) || [];
+        var userRoleIds = userRoles.map(pick('id'));
+        var promise;
+
+        actions.forEach(function (action) {
+            if (action.name === 'Capture data') {
+                promise = hasDataEntry(user).then(function (hasDataEntry) {
+                    action.hasAction = hasDataEntry;
+                });
+            } else {
+                action.hasAction = hasUserRoleFor(userRoleIds, action);
+            }
+        });
+
+        return $q.when(promise).then(function () {
+            return actions;
+        });
+    }
+
+    function hasDataEntry(user) {
+        return dataGroupsService.getDataGroupsForUser(user)
+            .then(function (dataGroups) {
+                return dataGroups.reduce(function (hasEntry, dataGroup) {
+                    return hasEntry || dataGroup.entry;
+                }, false);
+            });
+    }
+
+    function hasUserRoleFor(userRoleIds, action) {
+        return (userRoleIds.indexOf(action.userRoleId) >= 0);
+    }
+
+    function pick(property) {
+        return function (object) {
+            return object[property];
+        };
     }
 }

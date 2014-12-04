@@ -6,6 +6,7 @@ describe('Userlist controller', function () {
     var $rootScope;
     var dataGroupsService;
     var userListService;
+    var userActionsService;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         userStatusServiceMockFactory = function ($q) {
@@ -58,6 +59,18 @@ describe('Userlist controller', function () {
                 }
             };
         });
+        $provide.factory('userActionsService', function ($q) {
+            var success = $q.when([
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+            ]);
+
+            return {
+                getActionsForUser: jasmine.createSpy().and.returnValue(success)
+            };
+        });
         $provide.factory('userStatusService', userStatusServiceMockFactory);
         $provide.factory('errorHandler', function () {
             return {
@@ -73,6 +86,7 @@ describe('Userlist controller', function () {
         userStatusService = $injector.get('userStatusService');
         dataGroupsService = $injector.get('dataGroupsService');
         userListService = $injector.get('userListService');
+        userActionsService = $injector.get('userActionsService');
         errorHandler = $injector.get('errorHandler');
         $rootScope = $injector.get('$rootScope');
 
@@ -134,6 +148,10 @@ describe('Userlist controller', function () {
 
     it('should have a property detailsUserUserType', function () {
         expect(controller.detailsUserUserType).toBeDefined();
+    });
+
+    it('should have a property detailsUserAction', function () {
+        expect(controller.detailsUserActions).toBeDefined();
     });
 
     describe('deactivateUser', function () {
@@ -298,6 +316,19 @@ describe('Userlist controller', function () {
             controller.showDetails(window.fixtures.get('userGroupsRoles'));
 
             expect(controller.detailsUserUserType).toBe('Partner');
+        });
+
+        it('should call the service for the userActions', function () {
+            controller.showDetails(window.fixtures.get('userGroupsRoles'));
+
+            expect(userActionsService.getActionsForUser).toHaveBeenCalledWith(window.fixtures.get('userGroupsRoles'));
+        });
+
+        it('should set the detailsUserActions', function () {
+            controller.showDetails(window.fixtures.get('userGroupsRoles'));
+            $rootScope.$apply();
+
+            expect(controller.detailsUserActions.length).toBe(4);
         });
     });
 
