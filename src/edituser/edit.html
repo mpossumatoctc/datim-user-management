@@ -11,9 +11,52 @@
         </div>
     </div>
     <div class="user-edit-form">
-        <form>
-            <div class="col-sm-12">
-                <locale-select user="editUser"></locale-select>
+        <form name="editForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <locale-select user="editUser"></locale-select>
+                </div>
+            </div>
+
+            <div class="row form-controls-wrap">
+                <div class="col-sm-6">
+
+                    <fieldset name="Data streams">
+                        <legend>Data streams<i class="fa fa-check valid-icon" ng-show="editUser.validateDataGroups()"></i></legend>
+                        <ul class="checkbox-group">
+                            <li ng-repeat="(name, value) in user.dataGroups">
+                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name]" type="checkbox">
+                                <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
+                            </li>
+                        </ul>
+                    </fieldset>
+                    <div class="error-messages" ng-if="editUser.dataGroupsInteractedWith(editForm) && !editUser.validateDataGroups()">
+                        <div>Please select one or more data streams</div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+
+                    <fieldset name="User actions">
+                        <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
+                        <ul class="checkbox-group">
+                            <li ng-repeat="action in editUser.actions">
+                                <input ng-model="user.userActions[action.name]" ng-checked="action.hasAction" ng-disabled="(action.default && action.hasAction) || !editUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
+                                <label for="userActions[{{::action.name}}]">
+                                    <span ng-bind="action.name"></span>
+                                    <span  class="action-datastream" ng-if="action.dataStream" ng-bind="action.dataStream" translate></span>
+                                </label>
+                            </li>
+                        </ul>
+                    </fieldset>
+
+                </div>
+            </div>
+
+            <div class="row form-controls-wrap">
+                <button class="btn btn-primary add-user-button" ng-disabled="!editForm.$valid || editUser.isProcessingeditUser" ng-click="editUser.editUser()">
+                    <i class="fa fa-circle-o-notch fa-spin" ng-if="editUser.isProcessingeditUser"></i>
+                    <span ng-if="!editUser.isProcessingeditUser">Save changes</span>
+                </button>
             </div>
         </form>
     </div>

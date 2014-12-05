@@ -20,8 +20,8 @@
     </div>
     <div class="form-controls-wrap">
         <div class="half">
-            <fieldset name="Data groups">
-                <legend>Data groups<i class="fa fa-check valid-icon" ng-show="addUser.validateDataGroups()"></i></legend>
+            <fieldset name="Data streams">
+                <legend>Data streams<i class="fa fa-check valid-icon" ng-show="addUser.validateDataGroups()"></i></legend>
                 <ul class="checkbox-group">
                     <li ng-repeat="(name, value) in user.dataGroups">
                         <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name]" type="checkbox">

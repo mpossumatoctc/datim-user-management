@@ -1,11 +1,9 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
-                           userActionsService, userService, $state, notify, interAgencyService) {
+                           userActionsService, userService, $state, notify, interAgencyService, userFormService) {
     var vm = this;
-    var regex = /^dataStream.+$/g;
-    var dataStreamIds;
-    var dataStreamInteractedWith = false;
+    var validations = userFormService.getValidations();
 
     vm.title = 'Add or delete user';
     vm.dataGroups = dataGroups || [];
@@ -14,7 +12,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isProcessingAddUser = false;
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
-    vm.dataGroupsInteractedWith = dataGroupsInteractedWith;
+    vm.dataGroupsInteractedWith = validations.dataGroupsInteractedWith;
     vm.allowUserAdd = false;
     vm.dimensionConstraint = dimensionConstraint;
     vm.userInviteObject = {};
@@ -107,37 +105,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     }
 
     function validateDataGroups() {
-        var valid = false;
-
-        valid = Array.prototype.map.call(Object.keys($scope.user.dataGroups), function (value) {
-            return $scope.user.dataGroups[value];
-        }).reduce(function (valid, curr) {
-            return valid || curr;
-        }, valid);
-
-        return valid;
-    }
-
-    function dataGroupsInteractedWith(form) {
-        var groups = dataStreamIds || (dataStreamIds = Object.keys(form).filter(function (key) {
-            return regex.test(key);
-        }));
-
-        groups.forEach(function (key) {
-            if (form[key] && form[key].$dirty) { dataStreamInteractedWith = true; }
-        });
-
-        return dataStreamInteractedWith;
+        return validations.validateDataGroups($scope.user.dataGroups);
     }
 
     function isRequiredDataStreamSelected(dataGroupNames) {
-        var selectedDataGroups = userService.getSelectedDataGroups($scope.user, vm.dataGroups);
-
-        if (Array.isArray(dataGroupNames) && dataGroupNames.length > 0) {
-            return selectedDataGroups.reduce(function (curr, dataGroup) {
-                return dataGroupNames.indexOf(dataGroup.name) >= 0 || curr;
-            }, false);
-        }
-        return true;
+        return validations.isRequiredDataStreamSelected(dataGroupNames, $scope.user, vm.dataGroups);
     }
 }
