@@ -1,6 +1,16 @@
-List of searchable users here
+
 
 <div class="search-users">
+	<div class="row">
+		<div class="col-sm-12">
+			<p>This form will allow you to add system users to your group in DHIS2.</p>
+			<ul>
+				<li>Select your filter type to limit your search</li>
+				<li>Start typing your filter value</li>
+			</ul>
+			<p>Your results will autopopulate below.</p>
+		</div>
+	</div>
 	<div class="row">
 		<div class="select-filters col-sm-12">
             <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType.secondary}">
@@ -23,7 +33,7 @@ List of searchable users here
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<input class="form-control" ng-change="userList.search.doSearch()" placeholder="Search for users" type="text" ng-model="userList.search.searchWord" ng-hide="!!userList.search.filterType.secondary" ng-disabled="!userList.search.filterType" typeahead-loading="loadingLocations">
+			<input class="form-control" ng-change="userList.search.doSearch()" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord" ng-hide="!!userList.search.filterType.secondary" ng-disabled="!userList.search.filterType" typeahead-loading="loadingLocations">
             <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
 		</div>
 	</div>
@@ -117,6 +127,6 @@ List of searchable users here
         </div>
 	</div>
     <div class="pagination">
-        <pagination total-items="userList.pagination.getTotalItemCount()" items-per-page="userList.pagination.getPageSize()" ng-model="userList.currentPage" ng-change="userList.pageChanged()"></pagination>
+        <pagination ng-show="userList.pagination.getNumberOfPages() > 1" total-items="userList.pagination.getTotalItemCount()" items-per-page="userList.pagination.getPageSize()" ng-model="userList.currentPage" ng-change="userList.pageChanged()"></pagination>
     </div>
 </div>
