@@ -96,7 +96,9 @@ describe('Userlist controller', function () {
         errorHandler = $injector.get('errorHandler');
         $rootScope = $injector.get('$rootScope');
 
-        controller = $controller('userListController', {});
+        controller = $controller('userListController', {
+            $scope: $rootScope.$new()
+        });
     }));
 
     it('should be an object', function () {
