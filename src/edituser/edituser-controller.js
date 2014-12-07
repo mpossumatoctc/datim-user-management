@@ -32,7 +32,7 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit, u
                     return dataGroups;
                 }, $scope.user.dataGroups);
             });
-
+        console.log(userToEdit); //jshint ignore:line
         userActionsService.getActionsForUser(userToEdit)
             .then(function (actions) {
                 console.log(actions); //jshint ignore:line

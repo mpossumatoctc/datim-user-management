@@ -18,6 +18,7 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         {name: 'Manage users', userRole: 'User Administrator'},
         {name: 'Read data', userRole: 'Read Only', default: true}
     ];
+    var actionRolesLoaded;
 
     initialise();
     return {
@@ -27,7 +28,7 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
     };
 
     function initialise() {
-        Restangular.one('userRoles').withHttpConfig({cache: true}).get({
+        actionRolesLoaded = Restangular.one('userRoles').withHttpConfig({cache: true}).get({
             fields: 'id,name',
             filter: getRoleFilters(),
             paging: false
@@ -90,18 +91,21 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         var userRoleIds = userRoles.map(pick('id'));
         var promise;
 
-        actions.forEach(function (action) {
-            if (action.name === 'Capture data') {
-                promise = hasDataEntry(user).then(function (hasDataEntry) {
-                    action.hasAction = hasDataEntry;
-                });
-            } else {
-                action.hasAction = hasUserRoleFor(userRoleIds, action);
-            }
-        });
+        return actionRolesLoaded.then(function () {
+            actions.forEach(function (action) {
+                if (action.name === 'Capture data') {
+                    promise = hasDataEntry(user).then(function (hasDataEntry) {
+                        action.hasAction = hasDataEntry;
+                    });
+                } else {
+                    console.log(userRoleIds, action); //jshint ignore:line
+                    action.hasAction = hasUserRoleFor(userRoleIds, action);
+                }
+            });
 
-        return $q.when(promise).then(function () {
-            return actions;
+            return $q.when(promise).then(function () {
+                return actions;
+            });
         });
     }
 
