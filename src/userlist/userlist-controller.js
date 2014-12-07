@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, userActionsService, $state, errorHandler) {
+function userListController(userFilter, userTypesService, dataGroupsService, userListService, userStatusService, userActionsService, $state, $scope, errorHandler) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -22,6 +22,7 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     vm.detailsUserActions = [];
     vm.doSearch = doSearch;
     vm.editUser = editUser;
+    vm.placeHolder = 'Search for user';
 
     vm.search = {
         options: userFilter,
@@ -86,10 +87,7 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     }
 
     function isProcessing(id) {
-        if (vm.processing[id] && vm.processing[id] === true) {
-            return true;
-        }
-        return false;
+        return (vm.processing[id] && vm.processing[id] === true) ? true : false;
     }
 
     function showDetails(user) {
@@ -120,6 +118,23 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
                 errorHandler.warning('Failed to load datagroups for user');
             });
     }
+
+    $scope.$watch('userList.search.filterType', function (newVal) {
+        var phText = 'Search for ';
+        var outputStr = '';
+
+        if (newVal) {
+
+            if (newVal.name === 'E-Mail' || newVal.name === 'Roles') {
+                outputStr = phText + 'user ';
+            } else {
+                outputStr = phText;
+            }
+            //vm.placeHolder = phText + ' ' + newVal.name;
+
+            vm.placeHolder = outputStr + newVal.name;
+        }
+    });
 
     //TODO: Move the search stuff to the filter service
     function doSearch() {
@@ -169,4 +184,5 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
             $state.go('edit', {userId: user.id, username: user.userCredentials.code});
         }
     }
+
 }
