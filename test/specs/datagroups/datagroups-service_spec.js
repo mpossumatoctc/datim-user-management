@@ -274,5 +274,11 @@ describe('DataGroupService', function () {
                 expect(dataGroups).toEqual(expectedDataStreams);
             });
         });
+
+        describe('getUserGroups', function () {
+            it('should be a function', function () {
+                expect(dataGroupsService.getUserGroups).toBeAFunction();
+            });
+        });
     });
 });

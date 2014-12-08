@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('editUserController', editUse
 
 function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
                             userLocale, userFormService, userActionsService,
-                            notify, errorHandler, _) {
+                            notify, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -58,16 +58,7 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
 
     function editUser() {
         userToEdit.userCredentials.userRoles = userActionsService.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
-        var userGroupIds = _.values(_.pluck(_.flatten(_.pluck(vm.dataGroups, 'userGroups')), 'id'));
-        var baseGroups = _.filter(userToEdit.userGroups, function (userGroup) {
-            return userGroupIds.indexOf(userGroup.id) === -1;
-        });
-        var dataUserGroups = _.flatten(_.pluck(_.filter(vm.dataGroups, function (dataGroup) {
-            console.log(dataGroup); //jshint ignore:line
-            return dataGroup.access === true;
-        }), 'userGroups'));
-
-        [].concat(baseGroups).concat(dataUserGroups);
+        var dataUserGroups = dataGroupsService.getUserGroups();
 
         console.log(dataUserGroups); //jshint ignore:line
 

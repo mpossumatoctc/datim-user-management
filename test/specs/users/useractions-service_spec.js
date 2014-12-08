@@ -12,7 +12,7 @@ describe('User actions', function () {
                 },
                 getDataGroups: jasmine.createSpy('getDataGroups').and.returnValue($q.when([
                     {
-                        name: 'SI',
+                       name: 'SI',
                         userGroups: [
                             {name: 'Data SI access', id: 'c6hGi8GEZot'}
                         ],
@@ -20,7 +20,7 @@ describe('User actions', function () {
                             {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
                         ]
                     }, {
-                        name: 'EA',
+                       name: 'EA',
                         userGroups: [
                             {name: 'Data EA access', id: 'YbkldVOJMUl'}
                         ],
@@ -28,7 +28,7 @@ describe('User actions', function () {
                             {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
                         ]
                     }, {
-                        name: 'SIMS',
+                       name: 'SIMS',
                         userGroups: [
                             {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
                         ],
@@ -291,7 +291,7 @@ describe('User actions', function () {
                 userActions: {'Capture data': true}
             };
             var expectedRoles = [
-                { name: 'Data Entry SI', id: 'k7BWFXkG6zt' },
+                {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
             ];
 
             expect(userActionsService.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
@@ -303,8 +303,20 @@ describe('User actions', function () {
                 userActions: {'Capture data': true, 'Submit data': true}
             };
             var expectedRoles = [
-                { name: 'Data Submitter', id: 'n777lf1THwQ' },
-                { name: 'Data Entry SI', id: 'k7BWFXkG6zt' }
+                {name: 'Data Submitter', id: 'n777lf1THwQ'},
+                {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+            ];
+
+            expect(userActionsService.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
+        });
+
+        it('should not give set data entry to true', function () {
+            var user = {
+                dataGroups: {SI: true, EA: true},
+                userActions: {'Submit data': true}
+            };
+            var expectedRoles = [
+                {name: 'Data Submitter', id: 'n777lf1THwQ'}
             ];
 
             expect(userActionsService.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);

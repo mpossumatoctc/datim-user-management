@@ -3,7 +3,9 @@ describe('Add user controller', function () {
     var currentUserMock;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
-        $provide.value('interAgencyService', {getUserGroups: function () {}});
+        $provide.factory('interAgencyService', function ($q) {
+            return {getUserGroups: jasmine.createSpy().and.returnValue($q.when({userGroup: 'interagency'}))};
+        });
     }));
 
     beforeEach(function () {
@@ -211,6 +213,14 @@ describe('Add user controller', function () {
 
             expect(scope.user.userActions).toEqual({});
         });
+
+        it('should call the interagency service', inject(function (interAgencyService) {
+            scope.user.userType = {name: 'Inter-Agency'};
+            scope.$apply();
+
+            expect(interAgencyService.getUserGroups).toHaveBeenCalled();
+            expect(scope.user.userEntity).toEqual({userGroup: 'interagency'});
+        }));
     });
 
     describe('validation for', function () {
