@@ -14,7 +14,7 @@
         <form name="editForm">
             <div class="row">
                 <div class="col-sm-12">
-                    <locale-select user="editUser"></locale-select>
+                    <locale-select user="editUser" required="false"></locale-select>
                 </div>
             </div>
 
@@ -42,7 +42,7 @@
                             <li ng-repeat="action in editUser.actions">
                                 <input ng-model="user.userActions[action.name]" ng-checked="action.hasAction" ng-disabled="(action.default && action.hasAction) || !editUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
                                 <label for="userActions[{{::action.name}}]">
-                                    <span ng-bind="action.name"></span>
+                                    <span ng-bind="action.name" translate></span>
                                     <span  class="action-datastream" ng-if="action.dataStream" ng-bind="action.dataStream" translate></span>
                                 </label>
                             </li>

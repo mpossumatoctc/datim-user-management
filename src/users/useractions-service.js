@@ -1,8 +1,9 @@
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, $q, userTypesService, dataGroupsService, errorHandler) {
+function userActionsService(Restangular, $q, userTypesService, dataGroupsService, userService,
+                            errorHandler) {
     var availableAgencyActions = [
-        'Accept data', 'Submit data', 'Manage users'
+        'Capture data', 'Accept data', 'Submit data', 'Manage users'
     ];
     var availableInterAgencyActions = [
         'Data Entry', 'Accept data', 'Submit data', 'Manage users'
@@ -24,7 +25,9 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
     return {
         actions: actions,
         getActionsForUserType: getActionsForUserType,
-        getActionsForUser: getActionsForUser
+        getActionsForUser: getActionsForUser,
+        getUserRolesForUser: getUserRolesForUser,
+        combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting
     };
 
     function initialise() {
@@ -98,7 +101,6 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                         action.hasAction = hasDataEntry;
                     });
                 } else {
-                    console.log(userRoleIds, action); //jshint ignore:line
                     action.hasAction = hasUserRoleFor(userRoleIds, action);
                 }
             });
@@ -122,9 +124,125 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         return (userRoleIds.indexOf(action.userRoleId) >= 0);
     }
 
-    function pick(property) {
-        return function (object) {
-            return object[property];
+    function getUserActionsForNames(selectedActions, actions) {
+        var userActions;
+        var selectedActionNames = Object.keys(selectedActions)
+            .map(function (key) {
+                if (selectedActions[key] === true) {
+                    return key;
+                }
+                return undefined;
+            }).filter(function (action) {
+                return action && action !== '';
+            });
+
+        userActions = actions.filter(function (action) {
+            return selectedActionNames.indexOf(action.name) >= 0;
+        });
+
+        return userActions;
+    }
+
+    function getUserRolesForUser(user, dataGroups, actions) {
+        var dataGroupsWithEntry;
+        var userRoles;
+        var dataEntryRoles;
+
+        dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups, actions)
+            .map(function (dataGroup) {
+                if (user.userActions['Capture data'] === true || user.userActions['Data Entry'] === true) {
+                    dataGroup.entry = true;
+                } else {
+                    dataGroup.entry = false;
+                }
+                return dataGroup;
+            });
+
+        userRoles = getUserActionsForNames(user.userActions, actions)
+            .map(pick('userRoleId', 'userRole'))
+            .filter(has('userRoleId'))
+            .map(function (item) {
+                return {
+                    name: item.userRole,
+                    id: item.userRoleId
+                };
+            });
+
+        dataEntryRoles = dataGroupsWithEntry
+            .filter(has('entry'))
+            .map(pick('userRoles'))
+            .reduce(flatten(), []);
+
+        return userRoles.concat(dataEntryRoles);
+    }
+
+    function getAvailableUserRoles(dataGroups, actions) {
+        var dataGroupRoles = (dataGroups || [])
+            .map(pick('userRoles'))
+            .reduce(flatten(), []);
+
+        var actionRoles = (actions || [])
+            .filter(has('userRoleId'))
+            .map(pick('userRole', 'userRoleId'))
+            .map(function (item) {
+                return {
+                    name: item.userRole,
+                    id: item.userRoleId
+                };
+            });
+
+        return [].concat(dataGroupRoles).concat(actionRoles);
+    }
+
+    function combineSelectedUserRolesWithExisting(userToEdit, user, dataGroups, actions) {
+        var selectedUserRoles = getUserRolesForUser(user, dataGroups, actions);
+        var availableUserRoleIds = getAvailableUserRoles(dataGroups, actions).map(pick('id'));
+        var currentUserRoles = (userToEdit.userCredentials && userToEdit.userCredentials.userRoles) || [];
+
+        var userRoleBasis = currentUserRoles.filter(function (userRole) {
+            return availableUserRoleIds.indexOf(userRole.id) === -1;
+        });
+
+        return [].concat(userRoleBasis).concat(selectedUserRoles);
+    }
+
+    /**********
+     * Array functions
+     */
+    //TODO: Move this out to utils
+    function has(property) {
+        return function (item) {
+            if (item && item[property]) {
+                return true;
+            }
+            return false;
         };
     }
+
+    function pick(property) {
+        var properties = Array.prototype.filter.apply(arguments, [angular.isString]);
+
+        if (properties.length === 1 && angular.isString(property)) {
+            return function (item) {
+                return item[property];
+            };
+        }
+
+        return function (item) {
+            var result = {};
+            Object.keys(item).map(function (key) {
+                if (properties.indexOf(key) >= 0) {
+                    result[key] = item[key];
+                }
+            });
+            return result;
+        };
+    }
+
+    function flatten() {
+        return function (current, items) {
+            return (current || []).concat(items);
+        };
+    }
+
 }

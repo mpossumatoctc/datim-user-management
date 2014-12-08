@@ -551,11 +551,45 @@ describe('User service', function () {
         });
 
         it('should request a user', function () {
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/dfersddd?fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups')
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/dfersddd?fields=:all,userCredentials%5Bid,code,disabled,userRoles%5D')
                 .respond(200, {});
 
             service.getUser('dfersddd');
             $httpBackend.flush();
         });
     });
+
+//    describe('combineSelectedUserRolesWithExisting', function () {
+//        var selectedRoles;
+//        var expectedRoles;
+//        var userRoles;
+//
+//        beforeEach(function () {
+//            selectedRoles = [
+//                {name:'Data Submitter', id:'n777lf1THwQ'},
+//                {name:'User Administrator', id:'KagqnetfxMr'},
+//                {name:'Read Only', id:'b2uHwX9YLhu'}
+//            ];
+//            expectedRoles = [
+//                {name:'Data Submitter', id:'n777lf1THwQ'},
+//                {name:'User Administrator', id:'KagqnetfxMr'},
+//                {name:'Read Only', id:'b2uHwX9YLhu'},
+//                {name:'Data Tracker', id:'somefakeId'}
+//            ];
+//            userRoles = [
+//                {name:'User Administrator', id:'KagqnetfxMr'},
+//                {name:'Data Tracker', id:'somefakeId'}
+//            ];
+//        });
+//
+//        it('should be a function', function () {
+//            expect(service.combineSelectedUserRolesWithExisting).toBeAFunction();
+//        });
+//
+//        it('should combine the two role sets', function () {
+//            var newUserRoles = service.combineSelectedUserRolesWithExisting(selectedRoles, userRoles);
+//
+//            expect(newUserRoles).toEqual(expectedRoles);
+//        });
+//    });
 });

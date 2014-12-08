@@ -9,7 +9,34 @@ describe('User actions', function () {
             return {
                 getDataGroupsForUser: function () {
                     return success;
-                }
+                },
+                getDataGroups: jasmine.createSpy('getDataGroups').and.returnValue($q.when([
+                    {
+                        name: 'SI',
+                        userGroups: [
+                            {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                        ]
+                    }, {
+                        name: 'EA',
+                        userGroups: [
+                            {name: 'Data EA access', id: 'YbkldVOJMUl'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
+                        ]
+                    }, {
+                        name: 'SIMS',
+                        userGroups: [
+                            {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
+                        ]
+                    }
+                ]))
             };
         });
     }));
@@ -35,6 +62,7 @@ describe('User actions', function () {
     describe('getActionsForUserType', function () {
         it('should return the user actions available for agencies', function () {
             var expectedActions = [
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
                 {name: 'Accept data', userRole: 'Data Accepter'},
                 {name: 'Submit data', userRole: 'Data Submitter'},
                 {name: 'Manage users', userRole: 'User Administrator'},
@@ -207,4 +235,22 @@ describe('User actions', function () {
             expect(userActions).toEqual(expectedActions);
         });
     });
+
+//    describe('getAvailableUserRolesForUser', function () {
+//        it('should be a function', function () {
+//            expect(userActionsService.getAvailableUserRoles).toBeAFunction();
+//        });
+//
+//        it('should return a list of actions', function () {
+//            //var user = window.fixtures.get('userGroupsRoles');
+//            var expectedActions = [
+//                {name: 'Data Entry EA', id: 'EAID'},
+//                {name: 'Data Submitter', id: 'n777lf1THwQ'},
+//                {name: 'User Administrator', id: 'KagqnetfxMr'},
+//                {name: 'Read Only', id: 'b2uHwX9YLhu'}
+//            ];
+//
+//            expect(userActionsService.getAvailableUserRoles([],[])).toEqual(expectedActions);
+//        });
+//    });
 });

@@ -279,7 +279,7 @@ function userService($q, Restangular) {
         return Restangular
             .all('users')
             .get(userId, {
-                fields: ['id', 'name', 'email', 'organisationUnits', 'userCredentials[code,disabled,userRoles]', 'userGroups'].join(',')
+                fields: [':all', 'userCredentials[id,code,disabled,userRoles]'].join(',')
             });
     }
 }
