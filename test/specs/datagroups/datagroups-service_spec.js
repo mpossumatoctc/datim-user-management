@@ -278,6 +278,7 @@ describe('DataGroupService', function () {
         describe('getUserGroups', function () {
             var userToEdit;
             var dataGroups;
+            var expectedUserGroups;
 
             beforeEach(function () {
                 userToEdit = window.fixtures.get('userGroupsRoles');
@@ -314,14 +315,8 @@ describe('DataGroupService', function () {
                         ]
                     }
                 ];
-            });
 
-            it('should be a function', function () {
-                expect(dataGroupsService.getUserGroups).toBeAFunction();
-            });
-
-            it('should return the selected groups', function () {
-                var expectedUserGroups = [
+                expectedUserGroups = [
                     {
                         id: 'iSC0IMnwa4n',
                         name: 'OU Rwanda Mechanism 10193 - TRAC Cooperative Agreement',
@@ -339,7 +334,110 @@ describe('DataGroupService', function () {
                         id: 'c6hGi8GEZot'
                     }
                 ];
+            });
+
+            it('should be a function', function () {
+                expect(dataGroupsService.getUserGroups).toBeAFunction();
+            });
+
+            it('should return the selected groups', function () {
+                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, {SI: true});
+
+                expect(returnedUserGroups).toEqual(expectedUserGroups);
+            });
+
+            it('should only return the selected streamgroups', function () {
+                var userStreams = {
+                    SI: true,
+                    EA: false,
+                    SIMS: false
+                };
+                dataGroups[1].access = true; //EA
+                dataGroups[2].access = true; //SIMS
+
+                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, userStreams);
+
+                expect(returnedUserGroups).toEqual(expectedUserGroups);
+            });
+
+            it('should not return any data groups when no streams are selected', function () {
+                expectedUserGroups = [
+                    {
+                        id: 'iSC0IMnwa4n',
+                        name: 'OU Rwanda Mechanism 10193 - TRAC Cooperative Agreement',
+                        created: '2014-09-29T12:56:50.366+0000',
+                        lastUpdated: '2014-11-20T11:22:00.781+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/iSC0IMnwa4n'
+                    }, {
+                        id: 'Xxel2E26U9j',
+                        name: 'OU Rwanda Partner 618 users - Treatment and Research AIDS Center',
+                        created: '2014-09-29T12:56:50.674+0000',
+                        lastUpdated: '2014-11-17T20:07:12.583+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/Xxel2E26U9j'
+                    }
+                ];
+
+                var userStreams = {
+                    SI: false,
+                    EA: false,
+                    SIMS: false
+                };
+
+                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, userStreams);
+
+                expect(returnedUserGroups).toEqual(expectedUserGroups);
+            });
+
+            it('should return the default groups when no stream object is provided', function () {
+                expectedUserGroups = [
+                    {
+                        id: 'iSC0IMnwa4n',
+                        name: 'OU Rwanda Mechanism 10193 - TRAC Cooperative Agreement',
+                        created: '2014-09-29T12:56:50.366+0000',
+                        lastUpdated: '2014-11-20T11:22:00.781+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/iSC0IMnwa4n'
+                    }, {
+                        id: 'Xxel2E26U9j',
+                        name: 'OU Rwanda Partner 618 users - Treatment and Research AIDS Center',
+                        created: '2014-09-29T12:56:50.674+0000',
+                        lastUpdated: '2014-11-17T20:07:12.583+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/Xxel2E26U9j'
+                    }
+                ];
+
+                dataGroups[1].access = true; //EA
+                dataGroups[2].access = true; //SIMS
+
                 var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups);
+
+                expect(returnedUserGroups).toEqual(expectedUserGroups);
+            });
+
+            it('should set stream access to true on the dataGroups', function () {
+                expectedUserGroups = [
+                    {
+                        id: 'iSC0IMnwa4n',
+                        name: 'OU Rwanda Mechanism 10193 - TRAC Cooperative Agreement',
+                        created: '2014-09-29T12:56:50.366+0000',
+                        lastUpdated: '2014-11-20T11:22:00.781+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/iSC0IMnwa4n'
+                    }, {
+                        id: 'Xxel2E26U9j',
+                        name: 'OU Rwanda Partner 618 users - Treatment and Research AIDS Center',
+                        created: '2014-09-29T12:56:50.674+0000',
+                        lastUpdated: '2014-11-17T20:07:12.583+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/Xxel2E26U9j'
+                    },
+                    {id: 'YbkldVOJMUl', name: 'Data EA access'}
+                ];
+
+                var userStreams = {
+                    SI: false,
+                    EA: true,
+                    SIMS: false
+                };
+
+                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, userStreams);
 
                 expect(returnedUserGroups).toEqual(expectedUserGroups);
             });

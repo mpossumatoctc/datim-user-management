@@ -58,9 +58,10 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
 
     function editUser() {
         userToEdit.userCredentials.userRoles = userActionsService.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
-        var dataUserGroups = dataGroupsService.getUserGroups();
 
-        console.log(dataUserGroups); //jshint ignore:line
+        //TODO: These need to be done separate according to
+        //https://www.dhis2.org/doc/snapshot/en/developer/html/dhis2_developer_manual_full.html#d4719e1000
+        userToEdit.userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
 
         userToEdit.save()
             .then(function () {

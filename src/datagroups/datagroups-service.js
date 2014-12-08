@@ -171,11 +171,23 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
         return checkFor.length === remaining.length;
     }
 
-    function getUserGroups(userToEdit, dataGroups) {
+    function getUserGroups(userToEdit, dataGroups, userStreams) {
         var userGroupIds = _.values(_.pluck(_.flatten(_.pluck(dataGroups, 'userGroups')), 'id'));
         var baseGroups = _.filter(userToEdit.userGroups, function (userGroup) {
             return userGroupIds.indexOf(userGroup.id) === -1;
         });
+
+        dataGroups = dataGroups.map(function (dataGroup) {
+            if (userStreams && userStreams[dataGroup.name]) {
+                dataGroup.access = true;
+            }
+            return dataGroup;
+        });
+
+        dataGroups = _.filter(dataGroups, function (dataGroup) {
+            return (userStreams && dataGroup && userStreams[dataGroup.name] === true);
+        });
+
         var dataUserGroups = _.flatten(_.pluck(_.filter(dataGroups, function (dataGroup) {
             return dataGroup.access === true;
         }), 'userGroups'));
