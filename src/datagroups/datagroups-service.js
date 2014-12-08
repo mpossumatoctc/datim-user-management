@@ -177,7 +177,6 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
             return userGroupIds.indexOf(userGroup.id) === -1;
         });
         var dataUserGroups = _.flatten(_.pluck(_.filter(dataGroups, function (dataGroup) {
-            console.log(dataGroup); //jshint ignore:line
             return dataGroup.access === true;
         }), 'userGroups'));
 

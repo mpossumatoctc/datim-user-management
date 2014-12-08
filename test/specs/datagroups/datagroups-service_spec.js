@@ -276,8 +276,72 @@ describe('DataGroupService', function () {
         });
 
         describe('getUserGroups', function () {
+            var userToEdit;
+            var dataGroups;
+
+            beforeEach(function () {
+                userToEdit = window.fixtures.get('userGroupsRoles');
+                dataGroups = [
+                    {
+                        name: 'SI',
+                        access: true,
+                        entry: true,
+                        userGroups: [
+                            {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                        ]
+                    }, {
+                        name: 'EA',
+                        access: false,
+                        entry: true,
+                        userGroups: [
+                            {name: 'Data EA access', id: 'YbkldVOJMUl'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
+                        ]
+                    }, {
+                        name: 'SIMS',
+                        access: false,
+                        entry: true,
+                        userGroups: [
+                            {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
+                        ]
+                    }
+                ];
+            });
+
             it('should be a function', function () {
                 expect(dataGroupsService.getUserGroups).toBeAFunction();
+            });
+
+            it('should return the selected groups', function () {
+                var expectedUserGroups = [
+                    {
+                        id: 'iSC0IMnwa4n',
+                        name: 'OU Rwanda Mechanism 10193 - TRAC Cooperative Agreement',
+                        created: '2014-09-29T12:56:50.366+0000',
+                        lastUpdated: '2014-11-20T11:22:00.781+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/iSC0IMnwa4n'
+                    }, {
+                        id: 'Xxel2E26U9j',
+                        name: 'OU Rwanda Partner 618 users - Treatment and Research AIDS Center',
+                        created: '2014-09-29T12:56:50.674+0000',
+                        lastUpdated: '2014-11-17T20:07:12.583+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/Xxel2E26U9j'
+                    }, {
+                        name: 'Data SI access',
+                        id: 'c6hGi8GEZot'
+                    }
+                ];
+                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups);
+
+                expect(returnedUserGroups).toEqual(expectedUserGroups);
             });
         });
     });
