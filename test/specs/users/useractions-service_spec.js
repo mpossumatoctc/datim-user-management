@@ -236,21 +236,183 @@ describe('User actions', function () {
         });
     });
 
-//    describe('getAvailableUserRolesForUser', function () {
-//        it('should be a function', function () {
-//            expect(userActionsService.getAvailableUserRoles).toBeAFunction();
-//        });
-//
-//        it('should return a list of actions', function () {
-//            //var user = window.fixtures.get('userGroupsRoles');
-//            var expectedActions = [
-//                {name: 'Data Entry EA', id: 'EAID'},
-//                {name: 'Data Submitter', id: 'n777lf1THwQ'},
-//                {name: 'User Administrator', id: 'KagqnetfxMr'},
-//                {name: 'Read Only', id: 'b2uHwX9YLhu'}
-//            ];
-//
-//            expect(userActionsService.getAvailableUserRoles([],[])).toEqual(expectedActions);
-//        });
-//    });
+    describe('getUserRolesForUser', function () {
+        var dataGroups = [
+            {
+                name: 'SI',
+                access: true,
+                entry: true,
+                userGroups: [
+                    {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                ],
+                userRoles: [
+                    {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                ]
+            }, {
+                name: 'EA',
+                access: false,
+                entry: true,
+                userGroups: [
+                    {name: 'Data EA access', id: 'YbkldVOJMUl'}
+                ],
+                userRoles: [
+                    {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
+                ]
+            }, {
+                name: 'SIMS',
+                access: false,
+                entry: true,
+                userGroups: [
+                    {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
+                ],
+                userRoles: [
+                    {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
+                ]
+            }
+        ];
+        var actions = [
+            {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+            {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
+            {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+            {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+        ];
+
+        it('should be a function', function () {
+            expect(userActionsService.getUserRolesForUser).toBeAFunction();
+        });
+
+        it('should return an empty array', function () {
+            expect(userActionsService.getUserRolesForUser()).toEqual([]);
+        });
+
+        it('should return the selected datagroup roles', function () {
+            var user = {
+                dataGroups: {SI: true},
+                userActions: {'Capture data': true}
+            };
+            var expectedRoles = [
+                { name: 'Data Entry SI', id: 'k7BWFXkG6zt' },
+            ];
+
+            expect(userActionsService.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
+        });
+
+        it('should return the general user roles', function () {
+            var user = {
+                dataGroups: {SI: true},
+                userActions: {'Capture data': true, 'Submit data': true}
+            };
+            var expectedRoles = [
+                { name: 'Data Submitter', id: 'n777lf1THwQ' },
+                { name: 'Data Entry SI', id: 'k7BWFXkG6zt' }
+            ];
+
+            expect(userActionsService.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
+        });
+    });
+
+    describe('combineSelectedUserRolesWithExisting', function () {
+        var dataGroups;
+        var user;
+        var actions;
+
+        beforeEach(function () {
+            dataGroups = [
+                {
+                    name: 'SI',
+                    access: true,
+                    entry: true,
+                    userGroups: [
+                        {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                    ],
+                    userRoles: [
+                        {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                    ]
+                }, {
+                    name: 'EA',
+                    access: false,
+                    entry: true,
+                    userGroups: [
+                        {name: 'Data EA access', id: 'YbkldVOJMUl'}
+                    ],
+                    userRoles: [
+                        {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
+                    ]
+                }, {
+                    name: 'SIMS',
+                    access: false,
+                    entry: true,
+                    userGroups: [
+                        {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
+                    ],
+                    userRoles: [
+                        {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
+                    ]
+                }
+            ];
+            user = {
+                dataGroups: {SI: true},
+                userActions: {'Capture data': true, 'Submit data': true}
+            };
+            actions = [
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+            ];
+        });
+
+        it('should be a function', function () {
+            expect(userActionsService.combineSelectedUserRolesWithExisting).toBeAFunction();
+        });
+
+        it('should return a list of actions', function () {
+            var existingUserObject = {
+                userCredentials: {
+                    userRoles: [
+                        {name: 'Some role this user has', id: 'ndnf3ddss'}
+                    ]
+                }
+            };
+            var userGroupsAndActions = {
+                dataGroups: {SI: true},
+                userActions: {'Capture data': true, 'Submit data': true}
+            };
+            var expectedActions = [
+                {name: 'Some role this user has', id: 'ndnf3ddss'},
+                {name: 'Data Submitter', id: 'n777lf1THwQ'},
+                {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+            ];
+
+            var returnedUserRoles = userActionsService.combineSelectedUserRolesWithExisting(
+                existingUserObject,
+                userGroupsAndActions,
+                dataGroups,
+                actions
+            );
+
+            expect(returnedUserRoles).toEqual(expectedActions);
+        });
+
+        it('should remove roles that are no longer selected', function () {
+            var existingUserObject = fixtures.get('userGroupsRoles');
+            var userGroupsAndActions = {
+                dataGroups: {SI: false},
+                userActions: {'Capture data': false, 'Submit data': true}
+            };
+
+            var returnedUserRoles = userActionsService.combineSelectedUserRolesWithExisting(
+                existingUserObject,
+                userGroupsAndActions,
+                dataGroups,
+                actions
+            );
+
+            var expectedActions = [
+                {name: 'Data Submitter', id: 'n777lf1THwQ'}
+            ];
+
+            expect(returnedUserRoles).toEqual(expectedActions);
+        });
+    });
 });

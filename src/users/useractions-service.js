@@ -136,7 +136,7 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                 return action && action !== '';
             });
 
-        userActions = actions.filter(function (action) {
+        userActions = (actions || []).filter(function (action) {
             return selectedActionNames.indexOf(action.name) >= 0;
         });
 
@@ -147,10 +147,11 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         var dataGroupsWithEntry;
         var userRoles;
         var dataEntryRoles;
+        var userActions = (user && user.userActions) || [];
 
         dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups, actions)
             .map(function (dataGroup) {
-                if (user.userActions['Capture data'] === true || user.userActions['Data Entry'] === true) {
+                if (userActions['Capture data'] === true || userActions['Data Entry'] === true) {
                     dataGroup.entry = true;
                 } else {
                     dataGroup.entry = false;
@@ -158,7 +159,7 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                 return dataGroup;
             });
 
-        userRoles = getUserActionsForNames(user.userActions, actions)
+        userRoles = getUserActionsForNames(userActions, actions)
             .map(pick('userRoleId', 'userRole'))
             .filter(has('userRoleId'))
             .map(function (item) {
@@ -198,7 +199,6 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         var selectedUserRoles = getUserRolesForUser(user, dataGroups, actions);
         var availableUserRoleIds = getAvailableUserRoles(dataGroups, actions).map(pick('id'));
         var currentUserRoles = (userToEdit.userCredentials && userToEdit.userCredentials.userRoles) || [];
-
         var userRoleBasis = currentUserRoles.filter(function (userRole) {
             return availableUserRoleIds.indexOf(userRole.id) === -1;
         });

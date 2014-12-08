@@ -115,21 +115,24 @@ function userService($q, Restangular) {
     }
 
     function getSelectedActions(user) {
-        return Object.keys(user.userActions).filter(function (key) {
+        var userActions = (user && user.userActions) || [];
+
+        return Object.keys(userActions).filter(function (key) {
             return this[key];
-        }, user.userActions);
+        }, userActions);
     }
 
     function getSelectedDataGroupNames(user) {
-        return Object.keys(user.dataGroups).filter(function (key) {
+        var dataGroups = (user && user.dataGroups) || {};
+        return Object.keys(dataGroups).filter(function (key) {
             return this[key];
-        }, user.dataGroups);
+        }, dataGroups);
     }
 
     function getSelectedDataGroups(user, dataGroups) {
         var selectedDataGroupNames = getSelectedDataGroupNames(user);
 
-        return dataGroups.filter(function (dataGroup) {
+        return (dataGroups || []).filter(function (dataGroup) {
             return selectedDataGroupNames.indexOf(dataGroup.name) >= 0;
         });
     }
