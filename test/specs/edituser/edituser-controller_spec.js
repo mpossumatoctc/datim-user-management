@@ -46,12 +46,16 @@ describe('Edit user controller', function () {
                 }
             };
         });
-        $provide.factory('userToEdit', function ($q) {
+        $provide.factory('userToEdit', function () {
             return {
-                userCredentials: {},
-                save: jasmine.createSpy('Restangular save').and.returnValue($q.when(true)),
+                userCredentials: {}
+            };
+        });
+        $provide.factory('userService', function ($q) {
+            return {
+                updateUser: jasmine.createSpy('updateUser').and.returnValue($q.when(true)),
                 SETTOFAIL: function () {
-                    this.save = jasmine.createSpy('Restangular save').and.returnValue($q.reject(true));
+                    this.updateUser = jasmine.createSpy('updateUser').and.returnValue($q.reject(true));
                 }
             };
         });
@@ -154,11 +158,13 @@ describe('Edit user controller', function () {
         var userActionsService;
         var notify;
         var errorHandler;
+        var userService;
 
         beforeEach(inject(function ($injector) {
             userActionsService = $injector.get('userActionsService');
             notify = $injector.get('notify');
             errorHandler = $injector.get('errorHandler');
+            userService = $injector.get('userService');
 
             controller.user = {
                 userActions: {}
@@ -189,14 +195,14 @@ describe('Edit user controller', function () {
             expect(errorHandler.errorFn()).not.toHaveBeenCalled();
         });
 
-        it('should call errorFunction on failure', inject(function (userToEdit) {
-            userToEdit.SETTOFAIL();
+        it('should call errorFunction on failure', function () {
+            userService.SETTOFAIL();
 
             controller.editUser();
             $rootScope.$apply();
 
             expect(errorHandler.errorFn()).toHaveBeenCalled();
             expect(notify.success).not.toHaveBeenCalled();
-        }));
+        });
     });
 });

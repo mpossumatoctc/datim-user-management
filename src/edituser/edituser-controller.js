@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('editUserController', editUse
 
 function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
                             userLocale, userFormService, userActionsService,
-                            notify, errorHandler) {
+                            notify, userService, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -59,11 +59,9 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
     function editUser() {
         userToEdit.userCredentials.userRoles = userActionsService.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
 
-        //TODO: These need to be done separate according to
-        //https://www.dhis2.org/doc/snapshot/en/developer/html/dhis2_developer_manual_full.html#d4719e1000
-        userToEdit.userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
+        var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
 
-        userToEdit.save()
+        userService.updateUser(userToEdit, userGroups)
             .then(function () {
                 notify.success('User updated');
             })

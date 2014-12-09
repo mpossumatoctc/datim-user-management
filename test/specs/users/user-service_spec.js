@@ -559,37 +559,80 @@ describe('User service', function () {
         });
     });
 
-//    describe('combineSelectedUserRolesWithExisting', function () {
-//        var selectedRoles;
-//        var expectedRoles;
-//        var userRoles;
-//
-//        beforeEach(function () {
-//            selectedRoles = [
-//                {name:'Data Submitter', id:'n777lf1THwQ'},
-//                {name:'User Administrator', id:'KagqnetfxMr'},
-//                {name:'Read Only', id:'b2uHwX9YLhu'}
-//            ];
-//            expectedRoles = [
-//                {name:'Data Submitter', id:'n777lf1THwQ'},
-//                {name:'User Administrator', id:'KagqnetfxMr'},
-//                {name:'Read Only', id:'b2uHwX9YLhu'},
-//                {name:'Data Tracker', id:'somefakeId'}
-//            ];
-//            userRoles = [
-//                {name:'User Administrator', id:'KagqnetfxMr'},
-//                {name:'Data Tracker', id:'somefakeId'}
-//            ];
-//        });
-//
-//        it('should be a function', function () {
-//            expect(service.combineSelectedUserRolesWithExisting).toBeAFunction();
-//        });
-//
-//        it('should combine the two role sets', function () {
-//            var newUserRoles = service.combineSelectedUserRolesWithExisting(selectedRoles, userRoles);
-//
-//            expect(newUserRoles).toEqual(expectedRoles);
-//        });
-//    });
+    describe('updateUser', function () {
+        var userToUpdate;
+        var userGroups;
+        var $q;
+        var $httpBackend;
+
+        beforeEach(inject(function ($injector) {
+            $q = $injector.get('$q');
+            $httpBackend = $injector.get('$httpBackend');
+
+            userToUpdate = {
+                id: 'myUserId',
+                userGroups: [
+                    {id: 'ckBmsHSkJ9I', name: 'OU Rwanda Partner 3781 users - Partnership for Supply Chain Management',
+                        created: '2014-09-29T12:56:42.101+0000',
+                        lastUpdated: '2014-10-23T00:46:28.036+0000',
+                        href: 'http://localhost:8080/dhis/api/userGroups/ckBmsHSkJ9I'},
+                    {id: 'YbkldVOJMUl', name: 'Data EA access'},
+                    {id: 'iuD8wUFz95X', name: 'Data SIMS access'}
+                ],
+                save: jasmine.createSpy('save').and.returnValue($q.when(true))
+            };
+
+            userGroups = [
+                {id: 'U0lbV8pGhgB', name: 'OU Rwanda Mechanism 7158 - SCMS',
+                    created: '2014-09-29T12:56:40.983+0000',
+                    lastUpdated: '2014-11-07T10:05:16.094+0000',
+                    href: 'http://localhost:8080/dhis/api/userGroups/U0lbV8pGhgB'},
+                {id: 'ckBmsHSkJ9I', name: 'OU Rwanda Partner 3781 users - Partnership for Supply Chain Management',
+                    created: '2014-09-29T12:56:42.101+0000',
+                    lastUpdated: '2014-10-23T00:46:28.036+0000',
+                    href: 'http://localhost:8080/dhis/api/userGroups/ckBmsHSkJ9I'},
+                {id: 'YbkldVOJMUl', name: 'Data EA access'},
+                {id: 'iuD8wUFz95X', name: 'Data SIMS access'}
+            ];
+        }));
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should be a function', function () {
+            expect(service.updateUser).toBeAFunction();
+        });
+
+        it('should return a promise like object', function () {
+            expect(service.updateUser(userToUpdate, userToUpdate.userGroups)).toBeAPromiseLikeObject();
+        });
+
+        it('should call the save method on the userToEdit', function () {
+            service.updateUser(userToUpdate, userToUpdate.userGroups);
+
+            expect(userToUpdate.save).toHaveBeenCalled();
+        });
+
+        it('should do a request for each userGroup that needs to be added', function () {
+            $httpBackend.expectPOST('http://localhost:8080/dhis/api/userGroups/U0lbV8pGhgB/users/myUserId')
+                .respond(200);
+
+            service.updateUser(userToUpdate, userGroups);
+            $httpBackend.flush();
+        });
+
+        it('should do a request for each userGroup that needs to be deleted', function () {
+            userGroups = [
+                {id: 'YbkldVOJMUl', name: 'Data EA access'},
+                {id: 'iuD8wUFz95X', name: 'Data SIMS access'}
+            ];
+            $httpBackend.expectDELETE('http://localhost:8080/dhis/api/userGroups/ckBmsHSkJ9I/users/myUserId')
+                .respond(200);
+
+            service.updateUser(userToUpdate, userGroups);
+            $httpBackend.flush();
+        });
+    });
 });

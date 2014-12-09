@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular) {
+function userService($q, Restangular, _) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -28,7 +28,8 @@ function userService($q, Restangular) {
         saveUserLocale: saveUserLocale,
         getSelectedDataGroups: getSelectedDataGroups,
         getUser: getUser,
-        getUserLocale: getUserLocale
+        getUserLocale: getUserLocale,
+        updateUser: updateUser
     };
 
     function getUserObject() {
@@ -284,5 +285,44 @@ function userService($q, Restangular) {
             .get(userId, {
                 fields: [':all', 'userCredentials[id,code,disabled,userRoles]'].join(',')
             });
+    }
+
+    function updateUser(userToUpdate, userGroups) {
+        getUserGroupsToAdd(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
+            return addUserGroup(userGroup.id, userToUpdate.id);
+        });
+        getUserGroupsToRemove(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
+            return removeUserGroup(userGroup.id, userToUpdate.id);
+        });
+
+        return userToUpdate.save();
+    }
+
+    function getUserGroupsToAdd(oldUserGroups, newUserGroups) {
+        var oldUserGroupIds = _.pluck(oldUserGroups, 'id');
+
+        return (newUserGroups || []).filter(function (userGroup) {
+            return oldUserGroupIds.indexOf(userGroup.id) === -1;
+        });
+    }
+
+    function getUserGroupsToRemove(oldUserGroups, newUserGroups) {
+        var newUserGroupIds = _.pluck(newUserGroups, 'id');
+
+        return (oldUserGroups || []).filter(function (userGroup) {
+            return newUserGroupIds.indexOf(userGroup.id) === -1;
+        });
+    }
+
+    function addUserGroup(userGroupId, userId) {
+        return Restangular
+            .one(['userGroups', userGroupId, 'users'].join('/'))
+            .post(userId);
+    }
+
+    function removeUserGroup(userGroupId, userId) {
+        return Restangular
+            .one(['userGroups', userGroupId, 'users', userId].join('/'))
+            .remove();
     }
 }
