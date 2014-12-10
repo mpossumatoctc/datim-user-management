@@ -1,0 +1,6 @@
+<span class="user-status" ng-class="{ 'user-disabled': user.disabled, 'user-enabled': !user.disabled }">
+    <span class="user-status-text" ng-bind="user.disabled ? 'Disabled' : 'Enabled'"></span>
+    <span ng-show="userList.isProcessing(user.id)">
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+    </span>
+</span>

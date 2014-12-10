@@ -20,6 +20,7 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
     vm.editUser = editUser;
     vm.isProcessingEditUser = false;
     vm.getUserType = getUserType;
+    vm.changeUserStatus = changeUserStatus;
 
     $scope.user = vm.user;
 
@@ -101,6 +102,12 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
 
     function getUserType() {
         return userTypesService.getUserType(userToEdit);
+    }
+
+    function changeUserStatus() {
+        if (vm.userToEdit && vm.userToEdit.userCredentials) {
+            vm.userToEdit.userCredentials.disabled = vm.userToEdit.userCredentials.disabled ? false : true;
+        }
     }
 
     function debugWatch() {

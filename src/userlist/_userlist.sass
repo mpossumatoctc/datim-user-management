@@ -102,9 +102,6 @@
       position: absolute
       right: 55px
 
-      button.btn-edit-user
-        width: 100px
-
 .user-details-sub
   -webkit-transition: 150ms linear all
   transition: 150ms linear all
@@ -151,18 +148,31 @@
   background-color: #5cb85c
 
 .user-status
-  transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
-  -ms-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
-  -webkit-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
-  display: block
+  display: inline-block
   color: white
-  border-bottom-left-radius: 5px
-  border-bottom-right-radius: 5px
   padding: 8px
   width: 79px
   text-align: center
-  box-shadow: 0px 7px 4px -6px #555 inset
-  border-top: 1px solid #666
+
+  .user-edit-header &
+    border-radius: 5px
+    position: absolute
+    right: 0
+    top: 20px
+
+  .user-list-row &
+    display: block
+    transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+    -ms-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+    -webkit-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+    box-shadow: 0px 7px 4px -6px #555 inset
+    border-top: 1px solid #666
+    border-bottom-left-radius: 5px
+    border-bottom-right-radius: 5px
+
+    @media (max-width: 768px)
+      &
+        display: none
 
 .user-details-view
   h3

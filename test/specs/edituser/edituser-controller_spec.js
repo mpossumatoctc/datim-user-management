@@ -48,7 +48,9 @@ describe('Edit user controller', function () {
         });
         $provide.factory('userToEdit', function () {
             return {
-                userCredentials: {},
+                userCredentials: {
+                    disabled: false
+                },
                 userGroups: window.fixtures.get('userGroupsRoles').userGroups
             };
         });
@@ -339,6 +341,26 @@ describe('Edit user controller', function () {
             $rootScope.$apply();
 
             expect(errorHandler.debug).toHaveBeenCalledWith('Manage user removed.');
+        });
+    });
+
+    describe('changeUserStatus', function () {
+        it('should be a function', function () {
+            expect(controller.changeUserStatus).toBeAFunction();
+        });
+
+        it('should change the status to disabled', function () {
+            controller.changeUserStatus();
+
+            expect(controller.userToEdit.userCredentials.disabled).toBe(true);
+        });
+
+        it('should change the status to enabled', function () {
+            controller.userToEdit.userCredentials.disabled = true;
+
+            controller.changeUserStatus();
+
+            expect(controller.userToEdit.userCredentials.disabled).toBe(false);
         });
     });
 });

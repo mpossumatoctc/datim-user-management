@@ -9,6 +9,7 @@
         <div class="row username">
             <i class="fa fa-user"></i> <span ng-bind="::editUser.userToEdit.userCredentials.code"></span>
         </div>
+        <user-status user="editUser.userToEdit.userCredentials" ng-click="editUser.changeUserStatus()"></user-status>
     </div>
     <div class="user-edit-form">
         <form name="editForm">
