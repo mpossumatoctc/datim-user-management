@@ -62,7 +62,10 @@ describe('User actions', function () {
     describe('getActionsForUserType', function () {
         it('should return the user actions available for agencies', function () {
             var expectedActions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
+                    Partner: ['SI', 'EA'],
+                    Agency: ['SI', 'SIMS']
+                }},
                 {name: 'Accept data', userRole: 'Data Accepter'},
                 {name: 'Submit data', userRole: 'Data Submitter'},
                 {name: 'Manage users', userRole: 'User Administrator'},
@@ -86,7 +89,10 @@ describe('User actions', function () {
 
         it('should return the user actions available for partners', function () {
             var expectedActions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
+                    Partner: ['SI', 'EA'],
+                    Agency: ['SI', 'SIMS']
+                }},
                 {name: 'Submit data', userRole: 'Data Submitter'},
                 {name: 'Manage users', userRole: 'User Administrator'},
                 {name: 'Read data', userRole: 'Read Only', default: true}
@@ -105,7 +111,10 @@ describe('User actions', function () {
 
         it('should also return the correct data when called with uppercase value', function () {
             var expectedActions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
+                    Partner: ['SI', 'EA'],
+                    Agency: ['SI', 'SIMS']
+                }},
                 {name: 'Submit data', userRole: 'Data Submitter'},
                 {name: 'Manage users', userRole: 'User Administrator'},
                 {name: 'Read data', userRole: 'Read Only', default: true}
@@ -182,7 +191,10 @@ describe('User actions', function () {
             var user = window.fixtures.get('userGroupsRoles');
             var userActions;
             var expectedActions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true, dataEntryRestrictions: {
+                    Partner: ['SI', 'EA'],
+                    Agency: ['SI', 'SIMS']
+                }},
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
                 {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
@@ -200,7 +212,10 @@ describe('User actions', function () {
             var user = window.fixtures.get('userGroupsRoles');
             var userActions;
             var expectedActions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true, dataEntryRestrictions: {
+                    Partner: ['SI', 'EA'],
+                    Agency: ['SI', 'SIMS']
+                }},
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
                 {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
@@ -271,7 +286,10 @@ describe('User actions', function () {
             }
         ];
         var actions = [
-            {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
+            {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true, dataEntryRestrictions: {
+                Partner: ['SI', 'EA'],
+                Agency: ['SI', 'SIMS']
+            }},
             {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
             {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
             {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}

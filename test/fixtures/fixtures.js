@@ -57,7 +57,10 @@
     ]};
 
     fixtures.actionsList = [
-        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
+            'Partner': ['SI', 'EA'],
+            'Agency': ['SI', 'SIMS']
+        }},
         {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
@@ -66,7 +69,10 @@
     ];
 
     fixtures.actionsListWithRoles = [
-        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
+            'Partner': ['SI', 'EA'],
+            'Agency': ['SI', 'SIMS']
+        }},
         {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'},
         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},

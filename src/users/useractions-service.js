@@ -12,7 +12,10 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         'Capture data', 'Submit data', 'Manage users'
     ];
     var actions = [
-        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true},
+        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
+            Partner: ['SI', 'EA'],
+            Agency: ['SI', 'SIMS']
+        }},
         {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},

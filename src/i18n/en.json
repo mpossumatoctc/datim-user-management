@@ -8,6 +8,8 @@
     "SI": "MER",
     "SIMS": "SIMS",
     "Capture data": "Data Entry",
+    "SI,SIMS": "MER, SIMS",
+    "SI,EA": "MER, EA",
 
     "ar": "Arabic",
     "ar_IQ": "Arabic (Iraq)",

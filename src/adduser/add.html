@@ -40,8 +40,9 @@
                     <li ng-repeat="action in addUser.actions">
                         <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default || !addUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
                         <label for="userActions[{{::action.name}}]">
-                            <span ng-bind="action.name"></span>
+                            <span ng-bind="action.name" translate></span>
                             <span  class="action-datastream" ng-if="action.dataStream" ng-bind="action.dataStream" translate></span>
+                            <span class="action-datastream" ng-if="::action.dataEntryRestrictions[user.userType.name]" ng-bind="::action.dataEntryRestrictions[user.userType.name]" translate></span>
                         </label>
                     </li>
                 </ul>
@@ -49,9 +50,9 @@
         </div>
     </div>
     <div class="form-controls-wrap">
-        <button class="btn btn-primary add-user-button" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">
-            <i class="fa fa-circle-o-notch fa-spin" ng-if="addUser.isProcessingAddUser"></i>
-            <span ng-if="!addUser.isProcessingAddUser">Invite user</span>
+        <button class="btn btn-primary add-user-button" ng-class="{ 'processing': addUser.isProcessingAddUser }" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+            <span>Invite user</span>
         </button>
     </div>
 </form>
