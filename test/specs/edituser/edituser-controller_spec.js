@@ -89,6 +89,17 @@ describe('Edit user controller', function () {
                 debug: jasmine.createSpy('debug')
             };
         });
+        $provide.factory('currentUser', function () {
+            return {
+                hasAllAuthority: jasmine.createSpy('hasAllAuthority').and.returnValue(false),
+                isUserAdministrator: jasmine.createSpy('isUserAdministrator').and.returnValue(true)
+            };
+        });
+        $provide.factory('$state', function () {
+            return {
+                go: jasmine.createSpy('go')
+            };
+        });
     }));
 
     beforeEach(inject(function ($injector) {
@@ -127,6 +138,16 @@ describe('Edit user controller', function () {
     it('should return userType when calling getUserType', function () {
         expect(controller.getUserType()).toBe('Partner');
     });
+
+    it('should redirect on no access', inject(function ($controller, currentUser, $state) {
+        currentUser.isUserAdministrator.and.returnValue(false);
+
+        $controller('editUserController', {
+            $scope: scope
+        });
+
+        expect($state.go).toHaveBeenCalled();
+    }));
 
     describe('validations', function () {
         var userFormService;

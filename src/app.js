@@ -25,6 +25,9 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 userFilter: function (userFilterService) {
                     return userFilterService.getUserFilter();
                 },
+                currentUser: function (currentUserService) {
+                    return currentUserService.getCurrentUser();
+                },
                 userTypes: function (userTypesService) {
                     return userTypesService.getUserTypes();
                 },

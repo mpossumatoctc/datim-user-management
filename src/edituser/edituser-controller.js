@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit,
                             userLocale, userFormService, userActionsService,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
@@ -28,6 +28,10 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
     debugWatch();
 
     function initialise() {
+        if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
+            $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+        }
+
         vm.userToEdit = userToEdit;
         vm.user.locale = userLocale;
 
