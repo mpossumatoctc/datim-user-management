@@ -1,20 +1,20 @@
 <div>
     <div class="user-edit-header">
-        <div class="row">
-            <h3 ng-bind="editUser.userToEdit.name"></h3>
+        <div class="row user-name">
+            <h3 ng-bind="::editUser.userToEdit.name"></h3><span class="user-type" ng-bind="::editUser.getUserType()"></span>
         </div>
         <div class="row email" ng-show="editUser.userToEdit.email">
-            <i class="fa fa-envelope"></i> <span ng-bind="editUser.userToEdit.email"></span>
+            <i class="fa fa-envelope"></i> <span ng-bind="::editUser.userToEdit.email"></span>
         </div>
         <div class="row username">
-            <i class="fa fa-user"></i> <span ng-bind="editUser.userToEdit.userCredentials.code"></span>
+            <i class="fa fa-user"></i> <span ng-bind="::editUser.userToEdit.userCredentials.code"></span>
         </div>
     </div>
     <div class="user-edit-form">
         <form name="editForm">
-            <div class="row">
+            <div class="row form-controls-wrap">
                 <div class="col-sm-12">
-                    <locale-select user="editUser" required="false"></locale-select>
+                    <locale-select user="editUser.user" required="false"></locale-select>
                 </div>
             </div>
 
@@ -33,6 +33,7 @@
                     <div class="error-messages" ng-if="editUser.dataGroupsInteractedWith(editForm) && !editUser.validateDataGroups()">
                         <div>Please select one or more data streams</div>
                     </div>
+
                 </div>
                 <div class="col-sm-6">
 
@@ -53,9 +54,9 @@
             </div>
 
             <div class="row form-controls-wrap">
-                <button class="btn btn-primary add-user-button" ng-disabled="!editForm.$valid || editUser.isProcessingeditUser" ng-click="editUser.editUser()">
-                    <i class="fa fa-circle-o-notch fa-spin" ng-if="editUser.isProcessingeditUser"></i>
-                    <span ng-if="!editUser.isProcessingeditUser">Save changes</span>
+                <button class="btn btn-primary add-user-button" ng-class="{ 'processing': editUser.isProcessingEditUser }" ng-disabled="!editForm.$valid || editUser.isProcessingEditUser" ng-click="editUser.editUser()">
+                    <i class="fa fa-circle-o-notch fa-spin"></i>
+                    <span>Save changes</span>
                 </button>
             </div>
         </form>

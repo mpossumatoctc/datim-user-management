@@ -11,12 +11,6 @@
 *
   box-sizing: border-box
 
-.form-controls-wrap
-  margin-bottom: 15px
-
-  &.select-user-type > div
-    margin-bottom: 15px
-
 h1, h2
   font-weight: 100
   margin-bottom: 30px
@@ -31,7 +25,7 @@ h1
 
 h2.sub-title
   font-size: 1.2em
-  color: #DDD
+  color: #AAA
 
 .button-group
   float: right
@@ -54,6 +48,20 @@ form
   .form-control-wrap
     position: relative
     display: block
+
+  .form-controls-wrap
+    margin-bottom: 15px
+
+    &.select-user-type > div
+      margin-bottom: 15px
+
+    fieldset
+      width: 95%
+
+      legend
+        i.valid-icon
+          color: green
+          margin-left: 15px
 
   .form-control-wrap.ng-valid,
   .ui-select-bootstrap.ng-valid
@@ -82,15 +90,6 @@ form
   display: inline-block
   vertical-align: top
   width: 50%
-
-  fieldset
-    width: 95%
-
-    legend
-      i.valid-icon
-        color: green
-        margin-left: 15px
-
 
 ul.checkbox-group
   list-style: none

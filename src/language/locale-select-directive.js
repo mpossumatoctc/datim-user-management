@@ -5,7 +5,8 @@ function localeSelectDirective(localeService, $translate, _) {
         restrict: 'E',
         replace: true,
         scope: {
-            required: '@'
+            required: '@',
+            user: '='
         },
         templateUrl: 'language/locale-select.html',
         link: linkFn

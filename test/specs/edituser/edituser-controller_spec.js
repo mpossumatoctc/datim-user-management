@@ -48,20 +48,34 @@ describe('Edit user controller', function () {
         });
         $provide.factory('userToEdit', function () {
             return {
-                userCredentials: {}
+                userCredentials: {},
+                userGroups: window.fixtures.get('userGroupsRoles').userGroups
             };
         });
         $provide.factory('userService', function ($q) {
             return {
                 updateUser: jasmine.createSpy('updateUser').and.returnValue($q.when(true)),
+                saveUserLocale: jasmine.createSpy('saveUserLocale').and.returnValue($q.when(true)),
                 SETTOFAIL: function () {
-                    this.updateUser = jasmine.createSpy('updateUser').and.returnValue($q.reject(true));
+                    if (Array.prototype.indexOf.call(arguments, 'updateUser') >= 0) {
+                        this.updateUser = jasmine.createSpy('updateUser').and.returnValue($q.reject(true));
+                    }
+
+                    if (Array.prototype.indexOf.call(arguments, 'saveUserLocale') >= 0) {
+                        this.saveUserLocale = jasmine.createSpy('saveUserLocale').and.returnValue($q.reject(true));
+                    }
                 }
+            };
+        });
+        $provide.factory('userTypeService', function () {
+            return {
+                getUserType: jasmine.createSpy('getUserType').and.returnValue('Partner')
             };
         });
         $provide.factory('notify', function () {
             return {
-                success: jasmine.createSpy('success')
+                success: jasmine.createSpy('success'),
+                warning: jasmine.createSpy('warning')
             };
         });
         $provide.factory('errorHandler', function () {
@@ -69,7 +83,8 @@ describe('Edit user controller', function () {
             return {
                 errorFn: function () {
                     return errorFunction;
-                }
+                },
+                debug: jasmine.createSpy('debug')
             };
         });
     }));
@@ -101,6 +116,14 @@ describe('Edit user controller', function () {
 
     it('should ask for the datagroups for a user', function () {
         expect(dataGroupsService.getDataGroupsForUser).toHaveBeenCalled();
+    });
+
+    it('should have a isProcessingEditUser property', function () {
+        expect(controller.isProcessingEditUser).toBe(false);
+    });
+
+    it('should return userType when calling getUserType', function () {
+        expect(controller.getUserType()).toBe('Partner');
     });
 
     describe('validations', function () {
@@ -196,13 +219,126 @@ describe('Edit user controller', function () {
         });
 
         it('should call errorFunction on failure', function () {
-            userService.SETTOFAIL();
+            userService.SETTOFAIL('updateUser');
 
             controller.editUser();
             $rootScope.$apply();
 
             expect(errorHandler.errorFn()).toHaveBeenCalled();
             expect(notify.success).not.toHaveBeenCalled();
+        });
+
+        it('should call  saveUserLocale on the userService', function () {
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(userService.saveUserLocale).toHaveBeenCalled();
+        });
+
+        it('should call notify with success when the user is updated successfully', function () {
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(notify.success).toHaveBeenCalledWith('User updated');
+        });
+
+        it('should call notify warning when the user is updated but failed to save locale', function () {
+            userService.SETTOFAIL('saveUserLocale');
+
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(notify.warning).toHaveBeenCalledWith('Updated user but failed to save the ui locale');
+            expect(errorHandler.errorFn()).not.toHaveBeenCalled();
+        });
+
+        it('should give success message when no locale was saved but user save was successful', function () {
+            scope.user.locale = undefined;
+
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(notify.success).toHaveBeenCalledWith('User updated');
+            expect(userService.saveUserLocale).not.toHaveBeenCalled();
+        });
+
+        it('should set isProcessingEditUser to true', function () {
+            controller.editUser();
+
+            expect(controller.isProcessingEditUser).toBe(true);
+        });
+
+        it('should set isProcessingEditUser to false after processing is complete', function () {
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(controller.isProcessingEditUser).toBe(false);
+        });
+
+        it('should set isProcessingEditUser to false after processing failed', function () {
+            userService.SETTOFAIL('saveUserLocale');
+
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(controller.isProcessingEditUser).toBe(false);
+        });
+
+        it('should set isProcessingEditUser to false after processing failed', function () {
+            userService.SETTOFAIL('updateUser');
+
+            controller.editUser();
+            $rootScope.$apply();
+
+            expect(controller.isProcessingEditUser).toBe(false);
+        });
+    });
+
+    describe('debugLog', function () {
+        var errorHandler;
+
+        beforeEach(inject(function ($injector) {
+            errorHandler = $injector.get('errorHandler');
+            $rootScope.$apply();
+        }));
+
+        it('should log the locale', function () {
+            scope.user.locale = {
+                name: 'en',
+                code: 'en'
+            };
+            $rootScope.$apply();
+
+            expect(errorHandler.debug).toHaveBeenCalledWith(
+                'Changed locale from:', {name: 'fr', code: 'fr'}, ' to ', {name: 'en', code: 'en'});
+        });
+
+        it('should log when a datagroup is added', function () {
+            scope.user.dataGroups.LAR = true;
+            $rootScope.$apply();
+
+            expect(errorHandler.debug).toHaveBeenCalledWith('LAR added.');
+        });
+
+        it('should log when a datagroup is removed', function () {
+            scope.user.dataGroups.EA = false;
+            $rootScope.$apply();
+
+            expect(errorHandler.debug).toHaveBeenCalledWith('EA removed.');
+        });
+
+        it('should log when a action is added', function () {
+            scope.user.userActions['Manage user'] = true;
+            $rootScope.$apply();
+
+            expect(errorHandler.debug).toHaveBeenCalledWith('Manage user added.');
+        });
+
+        it('should log when a action is removed', function () {
+            scope.user.userActions['Manage user'] = false;
+            $rootScope.$apply();
+
+            expect(errorHandler.debug).toHaveBeenCalledWith('Manage user removed.');
         });
     });
 });

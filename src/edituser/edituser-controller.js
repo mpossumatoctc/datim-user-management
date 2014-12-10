@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('editUserController', editUse
 
 function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
                             userLocale, userFormService, userActionsService,
-                            notify, userService, errorHandler) {
+                            notify, userService, userTypesService, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -18,6 +18,8 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
     vm.dataGroupsInteractedWith = validations.dataGroupsInteractedWith;
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.editUser = editUser;
+    vm.isProcessingEditUser = false;
+    vm.getUserType = getUserType;
 
     $scope.user = vm.user;
 
@@ -57,32 +59,61 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
     }
 
     function editUser() {
+        var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
+
         userToEdit.userCredentials.userRoles = userActionsService.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
 
-        var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
+        setProcessingTo(true);
 
         userService.updateUser(userToEdit, userGroups)
             .then(function () {
-                notify.success('User updated');
+                if ($scope.user.locale && $scope.user.locale.name) {
+                    saveUserLocale()
+                        .then(notifyUserOfSuccessfullSave)
+                        .catch(notifyUserOfFailedLocaleSave);
+                } else {
+                    notifyUserOfSuccessfullSave();
+                }
             })
-            .catch(errorHandler.errorFn('Failed to save user'));
+            .catch(errorHandler.errorFn('Failed to save user'))
+            .finally(setProcessingToFalse);
+    }
+
+    function notifyUserOfSuccessfullSave() {
+        return notify.success('User updated');
+    }
+
+    function notifyUserOfFailedLocaleSave() {
+        return notify.warning('Updated user but failed to save the ui locale');
+    }
+
+    function setProcessingTo(isProcessing) {
+        vm.isProcessingEditUser = isProcessing;
+    }
+
+    function setProcessingToFalse() {
+        return setProcessingTo(false);
+    }
+
+    function saveUserLocale() {
+        return userService.saveUserLocale(userToEdit.userCredentials.code, $scope.user.locale.name);
+    }
+
+    function getUserType() {
+        return userTypesService.getUserType(userToEdit);
     }
 
     function debugWatch() {
-        $scope.$watch('user.locale', function (newVal, oldVal) {
-            if (newVal !== oldVal)  {
-                console.log('Changed locale from:', oldVal, ' to ', newVal); //jshint ignore:line
-            }
-        });
+        $scope.$watch('user.locale', logUserLocaleChange);
 
         $scope.$watch('user.dataGroups', function (newVal, oldVal) {
             if (newVal !== oldVal)  {
                 Object.keys(newVal || {}).map(function (key) {
                     if (!(oldVal[key] && oldVal[key] === newVal[key])) {
                         if (newVal[key] === true) {
-                            console.log(key, 'added.'); //jshint ignore:line
+                            errorHandler.debug([key, 'added.'].join(' '));
                         } else {
-                            console.log(key, 'removed.'); //jshint ignore:line
+                            errorHandler.debug([key, 'removed.'].join(' '));
                         }
                     }
                 });
@@ -94,19 +125,19 @@ function editUserController($scope, dataGroups, dataGroupsService, userToEdit,
                 Object.keys(newVal || {}).map(function (key) {
                     if (!(oldVal[key] && oldVal[key] === newVal[key])) {
                         if (newVal[key] === true) {
-                            console.log(key, 'added.'); //jshint ignore:line
+                            errorHandler.debug([key, 'added.'].join(' '));
                         } else {
-                            console.log(key, 'removed.'); //jshint ignore:line
+                            errorHandler.debug([key, 'removed.'].join(' '));
                         }
                     }
                 });
             }
         }, true);
 
-        $scope.$watch('userToEdit', function (newVal, oldVal) {
+        function logUserLocaleChange(newVal, oldVal) {
             if (newVal !== oldVal)  {
-                console.log(userToEdit); //jshint ignore:line
+                errorHandler.debug('Changed locale from:', oldVal, ' to ', newVal); //jshint ignore:line
             }
-        }, true);
+        }
     }
 }
