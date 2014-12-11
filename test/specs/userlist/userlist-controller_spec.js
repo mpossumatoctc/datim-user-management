@@ -84,6 +84,17 @@ describe('Userlist controller', function () {
                 go: jasmine.createSpy()
             };
         });
+
+        $provide.factory('currentUser', function () {
+            return {
+                hasAllAuthority: jasmine.createSpy('hasAllAuthority').and.returnValue(false),
+                isUserAdministrator: jasmine.createSpy('isUserAdministrator').and.returnValue(true)
+            };
+        });
+
+        $provide.value('dataGroups', {});
+        $provide.value('userToEdit', {});
+        $provide.value('userLocale', {});
     }));
 
     beforeEach(inject(function ($injector) {
@@ -161,6 +172,16 @@ describe('Userlist controller', function () {
     it('should have a property detailsUserAction', function () {
         expect(controller.detailsUserActions).toBeDefined();
     });
+
+    it('should redirect on no access', inject(function ($rootScope, $controller, currentUser, $state) {
+        currentUser.isUserAdministrator.and.returnValue(false);
+
+        $controller('editUserController', {
+            $scope: $rootScope.$new()
+        });
+
+        expect($state.go).toHaveBeenCalledWith('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+    }));
 
     describe('deactivateUser', function () {
         it('should be a method', function () {

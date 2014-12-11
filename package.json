@@ -28,9 +28,9 @@
     "gulp-zip": "^2.0.2",
     "jscs": "^1.7.3",
     "jshint-stylish": "^1.0.0",
-    "karma": "^0.12.24",
+    "karma": "0.12.x",
     "karma-coverage": "^0.2.6",
-    "karma-jasmine": "^0.2.3",
+    "karma-jasmine": "0.2.x",
     "karma-ng-html2js-preprocessor": "^0.1.2",
     "karma-phantomjs-launcher": "^0.1.4",
     "run-sequence": "^1.0.1"

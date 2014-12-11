@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
+function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
                             userStatusService, userActionsService, $state, $scope, errorHandler) {
     var vm = this;
 
@@ -37,6 +37,10 @@ function userListController(userFilter, userTypesService, dataGroupsService, use
     initialise();
 
     function initialise() {
+        if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
+            return $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+        }
+
         loadList();
     }
 
