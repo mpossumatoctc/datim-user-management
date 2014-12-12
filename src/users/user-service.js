@@ -80,16 +80,26 @@ function userService($q, Restangular, _) {
         }
     }
 
-    function getUserInviteObject(user, dataGroups, allActions, currentUser) {
+    function getUserInviteObject(user, dataGroups, allActions, currentUser, dataEntryRestrictions) {
         var inviteObject = getInviteObject();
         var selectedDataGroups = getSelectedDataGroups(user, dataGroups);
         var actions = getActionsForGroups(user, selectedDataGroups, allActions);
-
         //Add the usergroups to the invite object
         selectedDataGroups.forEach(function (dataGroup) {
+
             inviteObject.groups = inviteObject.groups.concat(dataGroup.userGroups.map(function (userGroup) {
                 return {id: userGroup.id};
             }));
+        });
+        Object.keys(user.dataGroups).forEach(function (dataGroup) {
+            var userRoleId;
+
+            if (user.userType.name && dataEntryRestrictions && user.dataGroups[dataGroup].access === true && user.dataGroups[dataGroup].entry === true) {
+                userRoleId = dataEntryRestrictions[user.userType.name][dataGroup] && dataEntryRestrictions[user.userType.name][dataGroup].userRoleId;
+                if (userRoleId) {
+                    inviteObject.userCredentials.userRoles.push({id: userRoleId});
+                }
+            }
         });
 
         //Add the user actions to the invite object
@@ -126,7 +136,7 @@ function userService($q, Restangular, _) {
     function getSelectedDataGroupNames(user) {
         var dataGroups = (user && user.dataGroups) || {};
         return Object.keys(dataGroups).filter(function (key) {
-            return this[key];
+            return this[key] && this[key].access === true;
         }, dataGroups);
     }
 
@@ -156,11 +166,13 @@ function userService($q, Restangular, _) {
 
                 return action;
             });
-        }).reduce(function (actions, current) {
+        })
+        .reduce(function (actions, current) {
             if (angular.isArray(actions)) { actions = []; }
 
             return actions.concat(current);
-        }, actions).filter(function (action) {
+        }, actions)
+        .filter(function (action) {
             if (((selectedActions.indexOf(action.name) >= 0) || action.default === true) && isRequiredDataStreamSelected(action.dataStream, selectedDataGroups)) {
                 return true;
             }

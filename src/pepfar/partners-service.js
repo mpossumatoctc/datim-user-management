@@ -86,16 +86,20 @@ function partnersService($q, currentUserService, Restangular, errorHandler) {
     }
 
     function getPartnersFromApi(cogsId) {
+        var queryParams = {
+            fields: 'categoryOptionGroups',
+            paging: 'false'
+        };
+
         return Restangular
-            .all('dimensions').withHttpConfig({cache: true})
-            .all(cogsId).withHttpConfig({cache: true})
-            .get('items', {paging: 'false'})
+            .all('categoryOptionGroupSets').withHttpConfig({cache: true})
+            .get(cogsId, queryParams)
             .then(function (response) {
                 errorHandler.debug(
-                    errorHandler.message(['Found', (response.items && response.items.length) || 0, 'partners that you can access'])
+                    errorHandler.message(['Found', (response.categoryOptionGroups && response.categoryOptionGroups.length) || 0, 'partners that you can access'])
                 );
 
-                return response.items;
+                return response.categoryOptionGroups;
             })
             .then(function (partners) {
                 var partnersWithCode = (partners || []).filter(function (partner) {

@@ -37,6 +37,11 @@ describe('Application states', function () {
                 return 'en';
             }
         });
+        $provide.value('userActionsService', {
+            getActions: function () {
+                return {};
+            }
+        });
     }));
     beforeEach(inject(function ($templateCache, $injector) {
         injector = $injector;
@@ -166,6 +171,11 @@ describe('Application state error handling', function () {
         });
         $provide.value('userFilterService', {
             getUserFilter: function () {
+                return {};
+            }
+        });
+        $provide.value('userActionsService', {
+            getActions: function () {
                 return {};
             }
         });

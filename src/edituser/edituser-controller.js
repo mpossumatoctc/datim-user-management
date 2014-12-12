@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
 function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit,
-                            userLocale, userFormService, userActionsService,
+                            userLocale, userFormService, userActions,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
@@ -21,6 +21,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.isProcessingEditUser = false;
     vm.getUserType = getUserType;
     vm.changeUserStatus = changeUserStatus;
+    vm.updateDataEntry = updateDataEntry;
 
     $scope.user = vm.user;
 
@@ -36,23 +37,56 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         vm.user.locale = userLocale;
 
         dataGroupsService.getDataGroupsForUser(userToEdit)
-            .then(function (dataGroups) {
-                dataGroups.reduce(function (dataGroups, dataGroup) {
-                    if (dataGroup && dataGroup.name) {
-                        dataGroups[dataGroup.name] = dataGroup.access;
-                    }
-                    return dataGroups;
-                }, $scope.user.dataGroups);
-            });
-        userActionsService.getActionsForUser(userToEdit)
-            .then(function (actions) {
-                vm.actions = actions;
-                vm.actions.map(function (action) {
-                    if (action.hasAction === true) {
-                        vm.user.userActions[action.name] = true;
-                    }
+            .then(createDataGroupsObject)
+            .then(setDataEntryModelValue);
+
+        userActions.getActionsForUser(userToEdit)
+            .then(setUserActionsForThisUser);
+    }
+
+    function createDataGroupsObject(dataGroups) {
+        dataGroups.reduce(function (dataGroups, dataGroup) {
+            if (dataGroup && dataGroup.name) {
+                dataGroups[dataGroup.name] = {
+                    access: dataGroup.access,
+                    entry: dataGroup.entry
+                };
+            }
+            return dataGroups;
+        }, $scope.user.dataGroups);
+    }
+
+    function setUserActionsForThisUser(actions) {
+        vm.actions = actions;
+
+        vm.actions.map(function (action) {
+            if (action.hasAction === true) {
+                vm.user.userActions[action.name] = true;
+            }
+        });
+    }
+
+    function setDataEntryModelValue() {
+        vm.dataEntryAction = Object.keys($scope.user.dataGroups).reduce(function (dataEntryStatus, dataGroup) {
+            return dataEntryStatus || $scope.user.dataGroups[dataGroup].entry;
+        }, false);
+    }
+
+    function updateDataEntry() {
+        var userType = $scope.user && $scope.user.userType && $scope.user.userType.name;
+        var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
+
+        if (vm.dataEntryAction === true) {
+            Object.keys($scope.user.dataGroups)
+                .forEach(function (dataGroup) {
+                    $scope.user.dataGroups[dataGroup].entry = userGroupsThatApplyForDataEntryForUserType.indexOf(dataGroup) >= 0;
                 });
-            });
+        } else {
+            Object.keys($scope.user.dataGroups)
+                .forEach(function (dataGroup) {
+                    $scope.user.dataGroups[dataGroup].entry = false;
+                });
+        }
     }
 
     function validateDataGroups() {
@@ -66,7 +100,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     function editUser() {
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
 
-        userToEdit.userCredentials.userRoles = userActionsService.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
+        userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
 
         setProcessingTo(true);
 
@@ -120,8 +154,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         $scope.$watch('user.dataGroups', function (newVal, oldVal) {
             if (newVal !== oldVal)  {
                 Object.keys(newVal || {}).map(function (key) {
-                    if (!(oldVal[key] && oldVal[key] === newVal[key])) {
-                        if (newVal[key] === true) {
+                    if (!(oldVal[key] && oldVal[key].access === newVal[key].access)) {
+                        if (newVal[key].access === true) {
                             errorHandler.debug([key, 'added.'].join(' '));
                         } else {
                             errorHandler.debug([key, 'removed.'].join(' '));

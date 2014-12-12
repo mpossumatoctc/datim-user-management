@@ -1,7 +1,7 @@
 (function () {
     var fixtures = {};
 
-    fixtures.agenciesList = {"items": [
+    fixtures.agenciesList = {"categoryOptionGroups": [
         {
             id: "FPUgmtt8HRi",
             code: "Agency_HHS/CDC",
@@ -25,7 +25,7 @@
         }
     ]};
 
-    fixtures.partnerList = {"items": [
+    fixtures.partnerList = {"categoryOptionGroups": [
         {
             id: "Cs2c30KKxg6",
             code: "Partner_10000",
@@ -56,24 +56,7 @@
         }
     ]};
 
-    fixtures.actionsList = [
-        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
-            'Partner': ['SI', 'EA'],
-            'Agency': ['SI', 'SIMS']
-        }},
-        {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
-        {name: 'Accept data', userRole: 'Data Accepter'},
-        {name: 'Submit data', userRole: 'Data Submitter'},
-        {name: 'Manage users', userRole: 'User Administrator'},
-        {name: 'Read data', userRole: 'Read Only', default: true}
-    ];
-
     fixtures.actionsListWithRoles = [
-        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
-            'Partner': ['SI', 'EA'],
-            'Agency': ['SI', 'SIMS']
-        }},
-        {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'},
         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
         {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
@@ -109,7 +92,10 @@
         {"id": "n777lf1THwQ", "name": "Data Submitter"},
         {"id": "b2uHwX9YLhu", "name": "Read Only"},
         {"id": "KagqnetfxMr", "name": "User Administrator"},
-        {"id": "yYOqiMTxAOF", "name": "Data Entry SI Country Team"}
+        {"id": "yYOqiMTxAOF", "name": "Data Entry SI Country Team"},
+        {"id": "OKKx4bf4ueV", "name": "Data Entry EA"},
+        {"id": "k7BWFXkG6zt", "name": "Data Entry SI"},
+        {"id": "iXkZzRKD0i4", "name": "Data Entry SIMS"}
     ]};
 
     fixtures.currentUser = {"name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:06:25.617+0000", "surname": "Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "firstName": "kp1001ea", "userCredentials": {"code": "kp1001ea", "name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:26:48.495+0000", "username": "kp1001ea", "passwordLastUpdated": "2014-11-20T11:06:25.617+0000", "userRoles": [

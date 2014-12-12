@@ -28,6 +28,9 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 currentUser: function (currentUserService) {
                     return currentUserService.getCurrentUser();
                 },
+                userActions: function (userActionsService) {
+                    return userActionsService.getActions();
+                },
                 userTypes: function (userTypesService) {
                     return userTypesService.getUserTypes();
                 },
@@ -43,6 +46,9 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             resolve: {
                 userTypes: function (userTypesService) {
                     return userTypesService.getUserTypes();
+                },
+                userActions: function (userActionsService) {
+                    return userActionsService.getActions();
                 },
                 dataGroups: function (dataGroupsService) {
                     return dataGroupsService.getDataGroups();
@@ -65,6 +71,9 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 dataGroups: function (dataGroupsService) {
                     return dataGroupsService.getDataGroups();
+                },
+                userActions: function (userActionsService) {
+                    return userActionsService.getActions();
                 },
                 currentUser: function (currentUserService) {
                     return currentUserService.getCurrentUser();

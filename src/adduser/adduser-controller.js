@@ -1,13 +1,13 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
-                           userActionsService, userService, $state, notify, interAgencyService, userFormService) {
+                           userActions, userService, $state, notify, interAgencyService, userFormService) {
     var vm = this;
     var validations = userFormService.getValidations();
 
     vm.title = 'Add or delete user';
     vm.dataGroups = dataGroups || [];
-    vm.actions = userActionsService.getActionsForUserType();
+    vm.actions = [];
     vm.languages = [];
     vm.isProcessingAddUser = false;
     vm.addUser = addUser;
@@ -17,6 +17,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.dimensionConstraint = dimensionConstraint;
     vm.userInviteObject = {};
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
+    vm.updateDataEntry = updateDataEntry;
+    vm.dataEntryAction = false;
 
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
@@ -26,7 +28,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     $scope.$watch('user.userType', function (newVal, oldVal) {
         if (newVal !== oldVal && newVal && newVal.name) {
             $scope.user.userActions = {};
-            vm.actions = userActionsService.getActionsForUserType(newVal.name);
+            vm.actions = userActions.getActionsForUserType(newVal.name);
 
             if (newVal.name === 'Inter-Agency') {
                 interAgencyService.getUserGroups().then(function (interAgencyUserGroups) {
@@ -35,6 +37,16 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             }
         }
     });
+
+    function updateDataEntry() {
+        var userType = $scope.user && $scope.user.userType && $scope.user.userType.name;
+        var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
+
+        Object.keys($scope.user.dataGroups)
+            .forEach(function (dataGroup) {
+                $scope.user.dataGroups[dataGroup].entry = vm.dataEntryAction && (userGroupsThatApplyForDataEntryForUserType.indexOf(dataGroup) >= 0);
+            });
+    }
 
     function initialize() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
@@ -47,10 +59,15 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         vm.dataGroups.reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
-                dataGroups[dataGroup.name] = false;
+                dataGroups[dataGroup.name] = {
+                    access: false,
+                    entry: false
+                };
             }
             return dataGroups;
         }, $scope.user.dataGroups);
+
+        vm.actions = userActions.getActionsForUserType();
     }
 
     function addUser() {
@@ -58,9 +75,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser);
+        vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser, userActions.dataEntryRestrictions);
         vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
-
         if (!userService.verifyInviteData(vm.userInviteObject)) {
             notify.error('Invite did not pass basic validation');
             return;
@@ -83,6 +99,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
         }
 
+        //TODO: Clean this up
         userService.inviteUser(vm.userInviteObject)
             .then(function (newUser) {
                 if (newUser.userCredentials && angular.isString(newUser.userCredentials.code) && $scope.user.locale && $scope.user.locale.name) {

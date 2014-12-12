@@ -25,17 +25,27 @@ describe('Edit user controller', function () {
                 getUserGroups: jasmine.createSpy('getUserGroups')
             };
         });
-        $provide.factory('userActionsService', function ($q) {
-            var success = $q.when([
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
-                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
-                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
-            ]);
-
+        $provide.factory('userActions', function ($q) {
             return {
-                getActionsForUser: jasmine.createSpy('getActionsForUser').and.returnValue(success),
-                combineSelectedUserRolesWithExisting: jasmine.createSpy('combineSelectedUserRolesWithExisting')
+                actions: [
+                    {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                    {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                    {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                    {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                ],
+                getActionsForUserType: jasmine.createSpy('getActionsForUserType').and.returnValue(
+                    [{name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}]
+                ),
+                getActionsForUser: jasmine.createSpy('getActionsForUser')
+                    .and.returnValue($q.when([
+                        {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
+                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+                    ])),
+                getUserRolesForUser: jasmine.createSpy('getUserRolesForUser'),
+                combineSelectedUserRolesWithExisting: jasmine.createSpy('combineSelectedUserRolesWithExisting'),
+                getDataEntryRestrictionDataGroups: jasmine.createSpy('getDataEntryRestrictionDataGroups')
+                    .and.returnValue(['SI', 'EA'])
             };
         });
         $provide.factory('userFormService', function () {
@@ -174,7 +184,6 @@ describe('Edit user controller', function () {
 
         beforeEach(function () {
             expectedActions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
                 {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
@@ -188,26 +197,25 @@ describe('Edit user controller', function () {
 
             $rootScope.$apply();
 
-            expect(scope.user.dataGroups.EA).toBe(true);
+            expect(scope.user.dataGroups.EA.access).toBe(true);
         });
 
         it('should resolve the userActions promise', function () {
             $rootScope.$apply();
 
             expect(controller.actions).toEqual(expectedActions);
-            expect(controller.user.userActions['Capture data']).toBe(true);
             expect(controller.user.userActions['Read data']).toBe(true);
         });
     });
 
     describe('editUser', function () {
-        var userActionsService;
+        var userActions;
         var notify;
         var errorHandler;
         var userService;
 
         beforeEach(inject(function ($injector) {
-            userActionsService = $injector.get('userActionsService');
+            userActions = $injector.get('userActions');
             notify = $injector.get('notify');
             errorHandler = $injector.get('errorHandler');
             userService = $injector.get('userService');
@@ -224,7 +232,7 @@ describe('Edit user controller', function () {
         it('should call combineSelectedUserRolesWithExisting', function () {
             controller.editUser();
 
-            expect(userActionsService.combineSelectedUserRolesWithExisting).toHaveBeenCalled();
+            expect(userActions.combineSelectedUserRolesWithExisting).toHaveBeenCalled();
         });
 
         it('should call getUserGroups on dataGroupsService', function () {
@@ -337,14 +345,16 @@ describe('Edit user controller', function () {
         });
 
         it('should log when a datagroup is added', function () {
-            scope.user.dataGroups.LAR = true;
+            scope.user.dataGroups.LAR = {
+                access: true
+            };
             $rootScope.$apply();
 
             expect(errorHandler.debug).toHaveBeenCalledWith('LAR added.');
         });
 
         it('should log when a datagroup is removed', function () {
-            scope.user.dataGroups.EA = false;
+            scope.user.dataGroups.EA.access = false;
             $rootScope.$apply();
 
             expect(errorHandler.debug).toHaveBeenCalledWith('EA removed.');
@@ -383,5 +393,42 @@ describe('Edit user controller', function () {
 
             expect(controller.userToEdit.userCredentials.disabled).toBe(false);
         });
+    });
+
+    describe('dataEntrySetting', function () {
+        var $controller;
+
+        beforeEach(inject(function ($injector) {
+            $controller = $injector.get('$controller');
+            var dataGroupsService = $injector.get('dataGroupsService');
+
+            $rootScope = $injector.get('$rootScope');
+            scope = $rootScope.$new();
+
+            dataGroupsService = $injector.get('dataGroupsService');
+        }));
+
+        afterEach(function () {
+        });
+
+        it('should set the data entry flag based on the given dataGroups', function () {
+            controller = $controller('editUserController', {
+                $scope: scope
+            });
+            $rootScope.$apply();
+
+            expect(controller.dataEntryAction).toBe(true);
+        });
+
+        it('should not set the data entry flag if no data entry is available', inject(function ($q) {
+            dataGroupsService.getDataGroupsForUser.and.returnValue($q.when([]));
+
+            controller = $controller('editUserController', {
+                $scope: scope
+            });
+            $rootScope.$apply();
+
+            expect(controller.dataEntryAction).toBe(false);
+        }));
     });
 });

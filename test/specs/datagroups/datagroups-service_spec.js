@@ -341,17 +341,27 @@ describe('DataGroupService', function () {
             });
 
             it('should return the selected groups', function () {
-                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, {SI: true});
+                var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, {SI: {access: true}});
 
                 expect(returnedUserGroups).toEqual(expectedUserGroups);
             });
 
             it('should only return the selected streamgroups', function () {
                 var userStreams = {
-                    SI: true,
-                    EA: false,
-                    SIMS: false
+                    SI: {
+                        access: true,
+                        entry: false
+                    },
+                    EA: {
+                        access: false,
+                        entry: false
+                    },
+                    SIMS: {
+                        access: false,
+                        entry: false
+                    }
                 };
+
                 dataGroups[1].access = true; //EA
                 dataGroups[2].access = true; //SIMS
 
@@ -378,9 +388,18 @@ describe('DataGroupService', function () {
                 ];
 
                 var userStreams = {
-                    SI: false,
-                    EA: false,
-                    SIMS: false
+                    SI: {
+                        access: false,
+                        entry: false
+                    },
+                    EA: {
+                        access: false,
+                        entry: false
+                    },
+                    SIMS: {
+                        access: false,
+                        entry: false
+                    }
                 };
 
                 var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, userStreams);
@@ -432,9 +451,18 @@ describe('DataGroupService', function () {
                 ];
 
                 var userStreams = {
-                    SI: false,
-                    EA: true,
-                    SIMS: false
+                    SI: {
+                        access: false,
+                        entry: false
+                    },
+                    EA: {
+                        access: true,
+                        entry: false
+                    },
+                    SIMS: {
+                        access: false,
+                        entry: false
+                    }
                 };
 
                 var returnedUserGroups = dataGroupsService.getUserGroups(userToEdit, dataGroups, userStreams);

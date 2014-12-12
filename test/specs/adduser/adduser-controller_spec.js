@@ -1,14 +1,33 @@
 describe('Add user controller', function () {
     var scope;
     var currentUserMock;
+    var userActions;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.factory('interAgencyService', function ($q) {
             return {getUserGroups: jasmine.createSpy().and.returnValue($q.when({userGroup: 'interagency'}))};
         });
+        $provide.factory('userActions', function () {
+            return {
+                actions: [
+                    {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                    {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                    {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                    {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                ],
+                getActionsForUserType: jasmine.createSpy('getActionsForUserType').and.returnValue(
+                    [{name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}]
+                ),
+                getActionsForUser: jasmine.createSpy('getActionsForUser'),
+                getUserRolesForUser: jasmine.createSpy('getUserRolesForUser'),
+                combineSelectedUserRolesWithExisting: jasmine.createSpy('combineSelectedUserRolesWithExisting'),
+                getDataEntryRestrictionDataGroups: jasmine.createSpy('getDataEntryRestrictionDataGroups')
+                    .and.returnValue(['SI', 'EA'])
+            };
+        });
     }));
 
-    beforeEach(function () {
+    beforeEach(inject(function ($injector) {
         currentUserMock = function (options) {
             return {
                 hasAllAuthority: function () {
@@ -25,7 +44,9 @@ describe('Add user controller', function () {
                 }
             };
         };
-    });
+
+        userActions = $injector.get('userActions');
+    }));
 
     describe('basic structure', function () {
         var controller;
@@ -63,7 +84,7 @@ describe('Add user controller', function () {
         });
 
         it('should have an array for actions', function () {
-            expect(controller.actions).toEqual([]);
+            expect(controller.actions).toEqual([{name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}]);
         });
 
         it('should have an array for languages', function () {
@@ -124,9 +145,9 @@ describe('Add user controller', function () {
 
         it('should set the user dataGroups', function () {
             var expectedUserDataGroups = {
-                MER: false,
-                EA: false,
-                SIMS: false
+                MER: {access: false, entry: false},
+                EA: {access: false, entry: false},
+                SIMS: {access: false, entry: false}
             };
             expect(scope.user.dataGroups).toEqual(expectedUserDataGroups);
         });
@@ -160,19 +181,14 @@ describe('Add user controller', function () {
 
     describe('userType watch', function () {
         var controller;
-        var userActionsServiceMock;
         var expectedActions;
 
         beforeEach(inject(function ($controller, $rootScope) {
             expectedActions = [
-                {name: 'Submit data', userGroup: 'Data submitter'},
-                {name: 'Manage users', userGroup: 'User administrator'},
-                {name: 'Read data', userGroup: 'Data reader', default: true}
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
             ];
-
-            userActionsServiceMock = {
-                getActionsForUserType: jasmine.createSpy().and.returnValue(expectedActions)
-            };
 
             scope = $rootScope.$new();
             scope.user = {
@@ -184,7 +200,6 @@ describe('Add user controller', function () {
                 userTypes: undefined,
                 dataGroups: [{name: 'EA'}],
                 dimensionConstraint: {},
-                userActionsService: userActionsServiceMock,
                 currentUser: currentUserMock(),
                 $state: {} //Fake the state to not load the default
             });
@@ -195,10 +210,16 @@ describe('Add user controller', function () {
             scope.user.userType = {name: 'Partner'};
             scope.$apply();
 
-            expect(userActionsServiceMock.getActionsForUserType).toHaveBeenCalledWith('Partner');
+            expect(userActions.getActionsForUserType).toHaveBeenCalledWith('Partner');
         });
 
         it('should store the available actions onto the controller', function () {
+            userActions.getActionsForUserType.and.returnValue([
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+            ]);
+
             scope.user.userType = {name: 'Partner'};
             scope.$apply();
 
@@ -257,7 +278,10 @@ describe('Add user controller', function () {
             });
 
             it('should return true when a datagroup is selected', function () {
-                scope.user.dataGroups.MER = true;
+                scope.user.dataGroups.MER = {
+                    access: true,
+                    entry: false
+                };
 
                 expect(controller.validateDataGroups()).toBe(true);
             });
@@ -653,7 +677,10 @@ describe('Add user controller', function () {
 
         it('should return true if SI is selected', function () {
             scope.user.dataGroups = {
-                SI: true
+                SI: {
+                    access: true,
+                    entry: true
+                }
             };
 
             expect(controller.isRequiredDataStreamSelected(['SI'])).toBe(true);
@@ -661,7 +688,10 @@ describe('Add user controller', function () {
 
         it('should return false if SI is not selected', function () {
             scope.user.dataGroups = {
-                SI: false
+                SI: {
+                    access: false,
+                    entry: true
+                }
             };
 
             expect(controller.isRequiredDataStreamSelected(['SI'])).toBe(false);
@@ -669,8 +699,14 @@ describe('Add user controller', function () {
 
         it('should return true if the second group is selected', function () {
             scope.user.dataGroups = {
-                SI: false,
-                EA: true
+                SI: {
+                    access: false,
+                    entry: true
+                },
+                EA: {
+                    access: true,
+                    entry: true
+                }
             };
 
             expect(controller.isRequiredDataStreamSelected(['EA'])).toBe(true);
@@ -678,8 +714,14 @@ describe('Add user controller', function () {
 
         it('should return true if both groups are selected', function () {
             scope.user.dataGroups = {
-                SI: true,
-                EA: true
+                SI: {
+                    access: true,
+                    entry: true
+                },
+                EA: {
+                    access: true,
+                    entry: true
+                }
             };
 
             expect(controller.isRequiredDataStreamSelected(['SI', 'EA'])).toBe(true);
@@ -687,8 +729,14 @@ describe('Add user controller', function () {
 
         it('should return true if the first group is selected', function () {
             scope.user.dataGroups = {
-                SI: true,
-                EA: false
+                SI: {
+                    access: true,
+                    entry: true
+                },
+                EA: {
+                    access: false,
+                    entry: true
+                }
             };
 
             expect(controller.isRequiredDataStreamSelected(['SI', 'EA'])).toBe(true);
@@ -696,8 +744,14 @@ describe('Add user controller', function () {
 
         it('should return true if no groups are required', function () {
             scope.user.dataGroups = {
-                SI: true,
-                EA: false
+                SI: {
+                    access: true,
+                    entry: true
+                },
+                EA: {
+                    access: false,
+                    entry: true
+                }
             };
 
             expect(controller.isRequiredDataStreamSelected([])).toBe(true);
@@ -705,6 +759,72 @@ describe('Add user controller', function () {
 
         it('should return true if parameter is undefined', function () {
             expect(controller.isRequiredDataStreamSelected(undefined)).toBe(true);
+        });
+    });
+
+    describe('updateDataEntry', function () {
+        var controller;
+
+        beforeEach(inject(function ($controller, $rootScope, $httpBackend) {
+            scope = $rootScope.$new();
+            $httpBackend.whenGET()
+                .respond(200, {});
+
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: [],
+                dataGroups: [
+                    {name: 'SI'},
+                    {name: 'EA'},
+                    {name: 'SIMS'}
+                ],
+                dimensionConstraint: {id: 'SomeID'},
+                currentUser: currentUserMock()
+            });
+
+            scope.user.dataGroups.SI.access = true;
+            scope.user.userType = {
+                name: 'Partner'
+            };
+            controller.dataEntryAction = true;
+        }));
+
+        it('should be a function', function () {
+            expect(controller.updateDataEntry).toBeAFunction();
+        });
+
+        it('should set data entry on SI to true', function () {
+            controller.updateDataEntry();
+            scope.$apply();
+
+            expect(scope.user.dataGroups.SI.entry).toBe(true);
+        });
+
+        it('should only add dataEntry to the streams that belong to that type', function () {
+            controller.updateDataEntry();
+            scope.$apply();
+
+            expect(scope.user.dataGroups.SI.entry).toBe(true);
+            expect(scope.user.dataGroups.SIMS.entry).toBe(false);
+            expect(scope.user.dataGroups.EA.entry).toBe(true);
+        });
+
+        it('should call the actions with the correct parameter', function () {
+            controller.updateDataEntry();
+            scope.$apply();
+
+            expect(userActions.getDataEntryRestrictionDataGroups).toHaveBeenCalledWith('Partner');
+        });
+
+        it('should set all the dataStreams entry to false when entry is de-selected', function () {
+            controller.updateDataEntry();
+
+            controller.dataEntryAction = false;
+            controller.updateDataEntry();
+
+            expect(scope.user.dataGroups.SI.entry).toBe(false);
+            expect(scope.user.dataGroups.SIMS.entry).toBe(false);
+            expect(scope.user.dataGroups.EA.entry).toBe(false);
         });
     });
 });

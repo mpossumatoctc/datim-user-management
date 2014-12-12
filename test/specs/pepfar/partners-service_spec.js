@@ -26,7 +26,7 @@ describe('Partners service', function () {
 
         function withFakeUserGroups(expectedAgencies) {
             return {
-                items: expectedAgencies.items.map(function (partner) {
+                items: expectedAgencies.categoryOptionGroups.map(function (partner) {
                     partner.mechUserGroup = {id: 'fakeId'};
                     partner.userUserGroup = {id: 'fakeUserId'};
                     return partner;
@@ -55,7 +55,7 @@ describe('Partners service', function () {
                     ]
                 });
 
-            partnersRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/BOyWrF33hiR/items?paging=false')
+            partnersRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/categoryOptionGroupSets/BOyWrF33hiR?fields=categoryOptionGroups&paging=false')
                 .respond(200, fixtures.get('partnerList'));
             userGroupsRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Kenya+partner&paging=false')
                 .respond(200, {
@@ -82,7 +82,7 @@ describe('Partners service', function () {
 
         it('promise should return the correct partners', function () {
             var partnerList;
-            var expectedPartnerList = withFakeUserGroups(fixtures.get('partnerList')).items;
+            var expectedPartnerList = withFakeUserGroups(fixtures.get('partnerList')).categoryOptionGroups;
             partnersRequest.respond(200, withFakeUserGroups(fixtures.get('partnerList')));
 
             partnersService.getPartners().then(function (data) {

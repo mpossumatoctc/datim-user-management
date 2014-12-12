@@ -35,7 +35,7 @@ function userFormService(userService) {
         var valid = false;
 
         valid = Array.prototype.map.call(Object.keys(dataGroups), function (value) {
-            return dataGroups[value];
+            return dataGroups[value] && dataGroups[value].access === true;
         }).reduce(function (valid, curr) {
                 return valid || curr;
             }, valid);

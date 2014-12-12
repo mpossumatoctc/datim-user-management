@@ -178,14 +178,14 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
         });
 
         dataGroups = dataGroups.map(function (dataGroup) {
-            if (userStreams && userStreams[dataGroup.name]) {
+            if (userStreams && userStreams[dataGroup.name] && userStreams[dataGroup.name].access) {
                 dataGroup.access = true;
             }
             return dataGroup;
         });
 
         dataGroups = _.filter(dataGroups, function (dataGroup) {
-            return (userStreams && dataGroup && userStreams[dataGroup.name] === true);
+            return (userStreams && dataGroup && userStreams[dataGroup.name] && userStreams[dataGroup.name].access === true);
         });
 
         var dataUserGroups = _.flatten(_.pluck(_.filter(dataGroups, function (dataGroup) {

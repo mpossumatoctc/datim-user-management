@@ -30,7 +30,7 @@ describe('Agencies service', function () {
 
         function withFakeUserGroups(expectedAgencies) {
             return {
-                items: expectedAgencies.items.map(function (agency) {
+                categoryOptionGroups: expectedAgencies.categoryOptionGroups.map(function (agency) {
                     agency.mechUserGroup = {};
                     agency.userUserGroup = {};
                     return agency;
@@ -60,7 +60,7 @@ describe('Agencies service', function () {
                     ]
                 });
 
-            agenciesRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/dimensions/bw8KHXzxd9i/items?paging=false')
+            agenciesRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/categoryOptionGroupSets/bw8KHXzxd9i?fields=categoryOptionGroups&paging=false')
                 .respond(200, fixtures.get('agenciesList'));
             userGroupRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Rwanda+Agency&paging=false')
                 .respond(200, {
@@ -81,7 +81,7 @@ describe('Agencies service', function () {
 
         it('promise should return an array with agencies', function () {
             var agencies;
-            var expectedAgencies = withFakeUserGroups(fixtures.get('agenciesList')).items;
+            var expectedAgencies = withFakeUserGroups(fixtures.get('agenciesList')).categoryOptionGroups;
             agenciesRequest.respond(200, withFakeUserGroups(fixtures.get('agenciesList')));
 
             agenciesService.getAgencies().then(function (data) {

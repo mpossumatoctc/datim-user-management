@@ -6,7 +6,7 @@ describe('Userlist controller', function () {
     var $rootScope;
     var dataGroupsService;
     var userListService;
-    var userActionsService;
+    var userActions;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         userStatusServiceMockFactory = function ($q) {
@@ -59,23 +59,35 @@ describe('Userlist controller', function () {
                 }
             };
         });
-        $provide.factory('userActionsService', function ($q) {
-            var success = $q.when([
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, hasAction: true},
-                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
-                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
-            ]);
-
+        $provide.factory('userActions', function ($q) {
             return {
-                getActionsForUser: jasmine.createSpy().and.returnValue(success)
+                actions: [
+                    {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                    {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                    {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                    {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                ],
+                getActionsForUserType: jasmine.createSpy('getActionsForUserType').and.returnValue(
+                    [{name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}]
+                ),
+                getActionsForUser: jasmine.createSpy('getActionsForUser')
+                    .and.returnValue($q.when([
+                        {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                    ])),
+                getUserRolesForUser: jasmine.createSpy('getUserRolesForUser'),
+                combineSelectedUserRolesWithExisting: jasmine.createSpy('combineSelectedUserRolesWithExisting'),
+                getDataEntryRestrictionDataGroups: jasmine.createSpy('getDataEntryRestrictionDataGroups')
+                    .and.returnValue(['SI', 'EA'])
             };
         });
         $provide.factory('userStatusService', userStatusServiceMockFactory);
         $provide.factory('errorHandler', function () {
             return {
                 error: jasmine.createSpy(),
-                warning: jasmine.createSpy()
+                warning: jasmine.createSpy(),
+                errorFn: jasmine.createSpy()
             };
         });
 
@@ -103,7 +115,7 @@ describe('Userlist controller', function () {
         userStatusService = $injector.get('userStatusService');
         dataGroupsService = $injector.get('dataGroupsService');
         userListService = $injector.get('userListService');
-        userActionsService = $injector.get('userActionsService');
+        userActions = $injector.get('userActions');
         errorHandler = $injector.get('errorHandler');
         $rootScope = $injector.get('$rootScope');
 
@@ -350,14 +362,14 @@ describe('Userlist controller', function () {
         it('should call the service for the userActions', function () {
             controller.showDetails(window.fixtures.get('userGroupsRoles'));
 
-            expect(userActionsService.getActionsForUser).toHaveBeenCalledWith(window.fixtures.get('userGroupsRoles'));
+            expect(userActions.getActionsForUser).toHaveBeenCalledWith(window.fixtures.get('userGroupsRoles'));
         });
 
         it('should set the detailsUserActions', function () {
             controller.showDetails(window.fixtures.get('userGroupsRoles'));
             $rootScope.$apply();
 
-            expect(controller.detailsUserActions.length).toBe(4);
+            expect(controller.detailsUserActions.length).toBe(3);
         });
     });
 

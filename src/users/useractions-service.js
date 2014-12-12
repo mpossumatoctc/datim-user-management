@@ -3,48 +3,60 @@ angular.module('PEPFAR.usermanagement').factory('userActionsService', userAction
 function userActionsService(Restangular, $q, userTypesService, dataGroupsService, userService,
                             errorHandler) {
     var availableAgencyActions = [
-        'Capture data', 'Accept data', 'Submit data', 'Manage users'
+        'Accept data', 'Submit data', 'Manage users'
     ];
     var availableInterAgencyActions = [
-        'Data Entry', 'Accept data', 'Submit data', 'Manage users'
+        'Accept data', 'Submit data', 'Manage users'
     ];
     var availablePartnerActions =  [
-        'Capture data', 'Submit data', 'Manage users'
+        'Submit data', 'Manage users'
     ];
     var actions = [
-        {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, dataEntryRestrictions: {
-            Partner: ['SI', 'EA'],
-            Agency: ['SI', 'SIMS']
-        }},
-        {name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI']},
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
         {name: 'Manage users', userRole: 'User Administrator'},
         {name: 'Read data', userRole: 'Read Only', default: true}
     ];
+
+    var dataEntryRestrictions = {
+        'Inter-Agency': {
+            SI: {
+                userRole: 'Data Entry SI Country Team'
+            },
+            EVAL: {
+                userRole: 'Data Entry EVAL'
+            }
+        },
+        Agency: {
+            SIMS: {
+                userRole: 'Data Entry SIMS'
+            }
+        },
+        Partner: {
+            SI: {
+                userRole: 'Data Entry SI'
+            },
+            EA: {
+                userRole: 'Data Entry EA'
+            }
+        }
+    };
+
     var actionRolesLoaded;
 
     initialise();
     return {
-        actions: actions,
-        getActionsForUserType: getActionsForUserType,
-        getActionsForUser: getActionsForUser,
-        getUserRolesForUser: getUserRolesForUser,
-        combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting
+        getActions: getActions
     };
 
     function initialise() {
         actionRolesLoaded = Restangular.one('userRoles').withHttpConfig({cache: true}).get({
             fields: 'id,name',
-            filter: getRoleFilters(),
             paging: false
         }).then(function (response) {
             var userRoles = response.userRoles;
 
             actions.forEach(function (action) {
-                //Only search roles for type independent actions
-                if (action.typeDependent) { return true; }
-
                 action.userRoleId = userRoles.reduce(function (current, value) {
                     if (value.name === action.userRole) {
                         return value.id;
@@ -52,19 +64,43 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                     return current;
                 }, action.userRoleId);
             });
+
+            addUserRolesForDataEntry(userRoles);
+
         }, errorHandler.errorFn('Failed to load user roles for actions'));
     }
 
-    function getRoleFilters() {
-        return actions.filter(function (action) {
-            return action.userRole && (!action.typeDependent || action.typeDependent !== true);
-        }).map(function (action) {
-            return [
-                'name',
-                'eq',
-                action.userRole
-            ].join(':');
+    function getActions() {
+        return $q.when(actionRolesLoaded)
+            .then(function () {
+                return {
+                    actions: actions,
+                    dataEntryRestrictions: dataEntryRestrictions,
+                    getDataEntryRestrictionDataGroups: getDataEntryRestrictionDataGroups,
+                    getActionsForUserType: getActionsForUserType,
+                    getActionsForUser: getActionsForUser,
+                    getUserRolesForUser: getUserRolesForUser,
+                    combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting
+                };
+            });
+    }
+
+    function addUserRolesForDataEntry(userRoles) {
+        Object.keys(dataEntryRestrictions).forEach(function (userType) {
+            Object.keys(dataEntryRestrictions[userType]).forEach(matchUserRolesWithDataGroups(userRoles, userType));
         });
+
+        function matchUserRolesWithDataGroups(userRoles, userType) {
+            return function (dataStream) {
+                userRoles.forEach(function (userRole) {
+                    var dataStreamObject = dataEntryRestrictions[userType][dataStream];
+
+                    if (userRole && userRole.name === dataStreamObject.userRole) {
+                        dataStreamObject.userRoleId = userRole.id;
+                    }
+                });
+            };
+        }
     }
 
     function getAvailableActionsForUserType(userType) {
@@ -95,32 +131,13 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         var actions = getActionsForUserType(userTypesService.getUserType(user));
         var userRoles = (user && user.userCredentials && user.userCredentials.userRoles) || [];
         var userRoleIds = userRoles.map(pick('id'));
-        var promise;
 
         return actionRolesLoaded.then(function () {
             actions.forEach(function (action) {
-                if (action.name === 'Capture data') {
-                    promise = hasDataEntry(user).then(function (hasDataEntry) {
-                        action.hasAction = hasDataEntry;
-                    });
-                } else {
-                    action.hasAction = hasUserRoleFor(userRoleIds, action);
-                }
+                action.hasAction = hasUserRoleFor(userRoleIds, action);
             });
-
-            return $q.when(promise).then(function () {
-                return actions;
-            });
+            return $q.when(actions);
         });
-    }
-
-    function hasDataEntry(user) {
-        return dataGroupsService.getDataGroupsForUser(user)
-            .then(function (dataGroups) {
-                return dataGroups.reduce(function (hasEntry, dataGroup) {
-                    return hasEntry || dataGroup.entry;
-                }, false);
-            });
     }
 
     function hasUserRoleFor(userRoleIds, action) {
@@ -152,14 +169,9 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         var dataEntryRoles;
         var userActions = (user && user.userActions) || [];
 
-        dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups, actions)
-            .map(function (dataGroup) {
-                if (userActions['Capture data'] === true || userActions['Data Entry'] === true) {
-                    dataGroup.entry = true;
-                } else {
-                    dataGroup.entry = false;
-                }
-                return dataGroup;
+        dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups)
+            .filter(function (dataGroup) {
+                return user.dataGroups && user.dataGroups[dataGroup.name] && user.dataGroups[dataGroup.name].entry === true;
             });
 
         userRoles = getUserActionsForNames(userActions, actions)
@@ -173,7 +185,6 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
             });
 
         dataEntryRoles = dataGroupsWithEntry
-            .filter(has('entry'))
             .map(pick('userRoles'))
             .reduce(flatten(), []);
 
@@ -207,6 +218,21 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         });
 
         return [].concat(userRoleBasis).concat(selectedUserRoles);
+    }
+
+    function getDataEntryRestrictionDataGroups(userType) {
+        var userTypeToCheck = getPreferredNameFormat(userType);
+        if (!userTypeToCheck || !dataEntryRestrictions[userTypeToCheck]) { return []; }
+
+        return Object.keys(dataEntryRestrictions[userTypeToCheck]);
+    }
+
+    function getPreferredNameFormat(userType) {
+        if (!angular.isString(userType)) { return ''; }
+
+        return userType.split('-').map(function (namePart) {
+            return namePart.charAt(0).toUpperCase() + namePart.substr(1).toLowerCase();
+        }).join('-');
     }
 
     /**********

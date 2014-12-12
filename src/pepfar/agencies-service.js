@@ -44,18 +44,18 @@ function agenciesService($q, currentUserService, Restangular, errorHandler) {
 
     function getAgencyObjects(cogsId) {
         var queryParams = {
+            fields: 'categoryOptionGroups',
             paging: 'false'
         };
 
         //categoryOptionGroupSets.json?fields=id&filter=name:eq:Funding%20Agency&paging=false
         return Restangular
-            .all('dimensions').withHttpConfig({cache: true})
-            .all(cogsId)
-            .get('items', queryParams)
+            .all('categoryOptionGroupSets').withHttpConfig({cache: true})
+            .get(cogsId, queryParams)
             .then(function (response) {
-                errorHandler.debug(errorHandler.message(['Found', (response.items && response.items.length) || 0, 'agencies that you can access']));
+                errorHandler.debug(errorHandler.message(['Found', (response.categoryOptionGroups && response.categoryOptionGroups.length) || 0, 'agencies that you can access']));
 
-                return response.items;
+                return response.categoryOptionGroups;
             })
             .then(function (agencies) {
                 var agenciesWithCodes = (agencies || []).filter(function (agency) {

@@ -26,7 +26,7 @@
                         <legend>Data streams<i class="fa fa-check valid-icon" ng-show="editUser.validateDataGroups()"></i></legend>
                         <ul class="checkbox-group">
                             <li ng-repeat="(name, value) in user.dataGroups">
-                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name]" type="checkbox">
+                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name].access" ng-change="editUser.updateDataEntry()" type="checkbox">
                                 <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                             </li>
                         </ul>
@@ -41,6 +41,12 @@
                     <fieldset name="User actions">
                         <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                         <ul class="checkbox-group">
+                            <li>
+                                <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="editUser.dataEntryAction" ng-change="editUser.updateDataEntry()">
+                                <label for="dataEntry">
+                                    <span translate>Data entry</span>
+                                </label>
+                            </li>
                             <li ng-repeat="action in editUser.actions">
                                 <input ng-model="user.userActions[action.name]" ng-checked="action.hasAction" ng-disabled="(action.default && action.hasAction) || !editUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
                                 <label for="userActions[{{::action.name}}]">

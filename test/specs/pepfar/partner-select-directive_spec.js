@@ -10,7 +10,7 @@ describe('Agency select directive', function () {
             this.getPartners = function () {
                 return {
                     then: function (callback) {
-                        callback(fixtures.get('partnerList').items);
+                        callback(fixtures.get('partnerList').categoryOptionGroups);
                     }
                 };
             };
@@ -41,7 +41,7 @@ describe('Agency select directive', function () {
     it('should have all the elements in the list', function () {
         var elements = element[0].querySelectorAll('.ui-select-choices-row');
 
-        expect(elements.length).toBe(fixtures.get('partnerList').items.length);
+        expect(elements.length).toBe(fixtures.get('partnerList').categoryOptionGroups.length);
     });
 
     it('should have the correct place holder', function () {
@@ -58,6 +58,6 @@ describe('Agency select directive', function () {
 
         elements = element[0].querySelectorAll('.ui-select-choices-row');
 
-        expect(elements.length).toBe(fixtures.get('partnerList').items.length);
+        expect(elements.length).toBe(fixtures.get('partnerList').categoryOptionGroups.length);
     });
 });

@@ -24,7 +24,7 @@
                 <legend>Data streams<i class="fa fa-check valid-icon" ng-show="addUser.validateDataGroups()"></i></legend>
                 <ul class="checkbox-group">
                     <li ng-repeat="(name, value) in user.dataGroups">
-                        <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name]" type="checkbox">
+                        <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name].access" ng-change="addUser.updateDataEntry()" type="checkbox">
                         <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                     </li>
                 </ul>
@@ -37,12 +37,16 @@
             <fieldset name="User actions">
                 <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                 <ul class="checkbox-group">
+                    <li>
+                        <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="addUser.dataEntryAction" ng-change="addUser.updateDataEntry()">
+                        <label for="dataEntry">
+                            <span translate>Data entry</span>
+                        </label>
+                    </li>
                     <li ng-repeat="action in addUser.actions">
                         <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default || !addUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
                         <label for="userActions[{{::action.name}}]">
                             <span ng-bind="action.name" translate></span>
-                            <span  class="action-datastream" ng-if="action.dataStream" ng-bind="action.dataStream" translate></span>
-                            <span class="action-datastream" ng-if="::action.dataEntryRestrictions[user.userType.name]" ng-bind="::action.dataEntryRestrictions[user.userType.name]" translate></span>
                         </label>
                     </li>
                 </ul>

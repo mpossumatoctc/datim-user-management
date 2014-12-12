@@ -43,6 +43,7 @@ describe('User service', function () {
         var dataGroups;
         var userObject;
         var expectedInviteObject;
+        var dataEntryRestrictions;
 
         beforeEach(function () {
             userObject = {
@@ -62,19 +63,26 @@ describe('User service', function () {
                     name: 'en'
                 },
                 userActions: {
-                    'Manage users': true,
-                    'Capture data': true
+                    'Manage users': true
                 },
                 userGroups: [],
                 userRoles: [],
                 dataGroups: {
-                    SI: true,
-                    EA: false,
-                    SIMS: false
+                    SI: {
+                        access: true,
+                        entry: true
+                    },
+                    EA: {
+                        access: false,
+                        entry: true
+                    },
+                    SIMS: {
+                        access: false,
+                        entry: true
+                    }
                 }
             };
             actions = [
-                {name: 'Capture data', userRole: 'Data Entry {{dataStream}}', typeDependent: true, $$hashKey: 'object:70'},
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', $$hashKey: 'object:71'},
                 {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', $$hashKey: 'object:72'},
                 {name: 'Read data', userRole: 'Read Only', default: true, $$hashKey: 'object:13', userRoleId: 'b2uHwX9YLhu'}
@@ -96,6 +104,36 @@ describe('User service', function () {
                     {id: 'iuD8wUFz95X', name: 'Data SIMS access'}
                 ]}
             ];
+
+            dataEntryRestrictions = {
+                'Inter-Agency': {
+                    SI: {
+                        userRole: 'Data Entry SI Country Team',
+                        userRoleId: 'yYOqiMTxAOF'
+                    }
+                },
+                Agency: {
+                    SI: {
+                        userRole: 'Data Entry SI',
+                        userRoleId: 'k7BWFXkG6zt'
+                    },
+                    EA: {
+                        userRole: 'Data Entry EA',
+                        userRoleId: 'OKKx4bf4ueV'
+                    }
+                },
+                Partner: {
+                    SI: {
+                        userRole: 'Data Entry SI',
+                        userRoleId: 'k7BWFXkG6zt'
+                    },
+                    SIMS: {
+                        userRole: 'Data Entry SIMS',
+                        userRoleId: 'iXkZzRKD0i4'
+                    }
+                }
+            };
+
             expectedInviteObject = {
                 email: 'mark@thedutchies.com',
                 organisationUnits: [],
@@ -118,7 +156,7 @@ describe('User service', function () {
         });
 
         it('should return the correct userGroups', function () {
-            expect(service.getUserInviteObject(userObject, dataGroups, actions)).toEqual(expectedInviteObject);
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions)).toEqual(expectedInviteObject);
         });
 
         it('should add the organisation units from the current user', function () {
@@ -126,7 +164,7 @@ describe('User service', function () {
             expectedInviteObject.organisationUnits = [{id: 'HfVjCurKxh2'}];
             expectedInviteObject.dataViewOrganisationUnits = [{id: 'HfVjCurKxh2'}];
 
-            expect(service.getUserInviteObject(userObject, dataGroups, actions, currentUser))
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, currentUser, dataEntryRestrictions))
                 .toEqual(expectedInviteObject);
         });
 
@@ -135,19 +173,19 @@ describe('User service', function () {
                 {id: 'k7BWFXkG6zt'},
                 {id: 'b2uHwX9YLhu'}
             ];
-            actions[2].userRoleId = undefined;
+            actions[1].userRoleId = undefined;
 
-            expect(service.getUserInviteObject(userObject, dataGroups, actions))
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions))
                 .toEqual(expectedInviteObject);
         });
 
         it('should have a addEntityUserGroup method', function () {
-            expect(service.getUserInviteObject(userObject, dataGroups, actions).addEntityUserGroup)
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions).addEntityUserGroup)
                 .toBeAFunction();
         });
 
         it('addEntityUserGroup should add the userGroup to the entity', function () {
-            var inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions);
+            var inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions);
 
             inviteEntity.addEntityUserGroup({id: 'userGroupId'});
 
@@ -163,11 +201,9 @@ describe('User service', function () {
 
         it('should add the action if it restricted by a selected usergroup', function () {
             var inviteEntity;
+            userObject.userType.name = 'Inter-Agency';
 
-            userObject.userActions['Data Entry'] = true;
-            actions.push({name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'});
-
-            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions);
+            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions);
 
             expect(inviteEntity.userCredentials.userRoles).toContain({id: 'yYOqiMTxAOF'});
         });
@@ -175,12 +211,15 @@ describe('User service', function () {
         it('should not add the action if it restricted by a not selected usergroup', function () {
             var inviteEntity;
 
-            userObject.dataGroups.SI = false;
-            userObject.dataGroups.EA = true;
-            userObject.userActions['Data Entry'] = true;
-            actions.push({name: 'Data Entry', userRole: 'Data Entry SI Country Team', dataStream: ['SI'], userRoleId: 'yYOqiMTxAOF'});
-
-            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions);
+            userObject.dataGroups.SI = {
+                entry: true,
+                access: true
+            };
+            userObject.dataGroups.EA = {
+                entry: true,
+                access: true
+            };
+            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions);
 
             expect(inviteEntity.userCredentials.userRoles).not.toContain({id: 'yYOqiMTxAOF'});
         });
@@ -518,9 +557,18 @@ describe('User service', function () {
             ];
             userDataGroups = {
                 dataGroups: {
-                    EA: true,
-                    MER: false,
-                    SIMS: true
+                    EA: {
+                        access: true,
+                        entry: true
+                    },
+                    MER: {
+                        access: false,
+                        entry: true
+                    },
+                    SIMS: {
+                        access: true,
+                        entry: true
+                    }
                 }
             };
         });
