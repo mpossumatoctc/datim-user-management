@@ -72,8 +72,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }, false);
     }
 
+    //TODO: This is partial duplicate code with the add controller and should be refactored
     function updateDataEntry() {
-        var userType = $scope.user && $scope.user.userType && $scope.user.userType.name;
+        var userType = getUserType(userToEdit);
         var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
 
         if (vm.dataEntryAction === true) {
@@ -99,7 +100,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function editUser() {
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
-
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
 
         setProcessingTo(true);
