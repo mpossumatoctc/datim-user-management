@@ -5,7 +5,6 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
         restrict: 'E',
         replace: true,
         scope: {
-            activeOrgUnit: '=',
             userTypes: '=',
             user: '='
         },
@@ -22,7 +21,8 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
             selected: scope.userType
         };
 
-        loadValues(scope.activeOrgUnit);
+        //TODO: Should not use parent $scope hack..
+        loadValues(scope.$parent && scope.$parent.userOrgUnit && scope.$parent.userOrgUnit.current);
 
         scope.$on('ORGUNITCHANGED', function (event, data) {
             console.log('Reloading types for ', data.name); //jshint ignore:line
