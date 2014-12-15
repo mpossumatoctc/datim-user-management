@@ -20,6 +20,7 @@ function currentUserService($q, Restangular, errorHandler) {
                 currentUser.hasAllAuthority = hasAllAuthority.bind(currentUser.authorities);
                 currentUser.hasUserRole = hasUserRole.bind(currentUser);
                 currentUser.isUserAdministrator = isUserAdministrator.bind(currentUser);
+                currentUser.isGlobalUser = isGlobalUser;
 
                 return currentUser;
             }, errorHandler.errorFn('Failed to load the current user data'));
@@ -55,5 +56,11 @@ function currentUserService($q, Restangular, errorHandler) {
 
     function isUserAdministrator() {
         return this.hasUserRole('User Administrator');
+    }
+
+    function isGlobalUser() {
+        var organisationUnit = this.organisationUnits && this.organisationUnits[0];
+
+        return organisationUnit && organisationUnit.name === 'Global';
     }
 }

@@ -123,6 +123,30 @@ describe('Current user', function () {
                 expect(errorHandler.error).toHaveBeenCalledWith('Failed to load the current user data');
             });
         });
+
+        describe('isGlobalUser', function () {
+            it('should return true for a global user', function () {
+                var result;
+                var currentUserResponse = fixtures.get('currentUser');
+                currentUserResponse.organisationUnits[0].name = 'Global';
+
+                userResponse.respond(200, currentUserResponse);
+                $httpBackend.flush();
+
+                result = currentUser.isGlobalUser();
+
+                expect(result).toEqual(true);
+            });
+
+            it('should return false for a not global user', function () {
+                var result;
+                $httpBackend.flush();
+
+                result = currentUser.isGlobalUser();
+
+                expect(result).toEqual(false);
+            });
+        });
     });
 
     describe('getCurrentUser', function () {

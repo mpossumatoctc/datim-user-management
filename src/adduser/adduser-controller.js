@@ -1,7 +1,8 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
-                           userActions, userService, $state, notify, interAgencyService, userFormService) {
+                           userActions, userService, $state, notify, interAgencyService,
+                           userFormService, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -19,10 +20,24 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryAction = false;
+    vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
+    vm.changeOrgUnit = function ($item) {
+        console.log($item); //jshint ignore:line
+    };
 
+    errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
+    $scope.userOrgUnit = {
+        current:  vm.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined
+    };
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
-    $scope.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined;
+
+    $scope.$watch('userOrgUnit.current', function (newVal, oldVal) {
+        if (newVal !== oldVal && newVal && newVal.name) {
+            console.log(newVal.name); //jshint ignore:line
+            $scope.$broadcast('ORGUNITCHANGED', newVal);
+        }
+    });
 
     initialize();
 

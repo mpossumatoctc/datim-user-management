@@ -12,10 +12,21 @@ function partnerSelectDirective(partnersService, $translate, errorHandler) {
                 placeholder: $translate.instant('Select a partner')
             };
 
-            errorHandler.debug('Loading partners for: ', scope.activeOrgUnit && scope.activeOrgUnit.name);
-            partnersService.getPartners(scope.activeOrgUnit || {}).then(function (partners) {
-                scope.selectbox.items = partners;
+            loadValues(scope.userOrgUnit && scope.userOrgUnit.current);
+
+            scope.$on('ORGUNITCHANGED', function (event, data) {
+                console.log('Reloading types for ', data.name); //jshint ignore:line
+                loadValues(data);
             });
+
+            function loadValues(orgUnit) {
+                orgUnit = orgUnit || {};
+
+                errorHandler.debug('Loading partners for: ', orgUnit.name);
+                partnersService.getPartners(orgUnit).then(function (partners) {
+                    scope.selectbox.items = partners;
+                });
+            }
         }
     };
 }
