@@ -19,6 +19,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryAction = false;
+    vm.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined;
 
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();

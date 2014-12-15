@@ -3,9 +3,9 @@
 </script>
 <form name="userForm">
     <div class="form-controls-wrap select-user-type" ng-controller="userTypeController as userType">
-        <select-usertype user="user" user-types="userType.userTypes"></select-usertype>
+        <select-usertype org-unit="addUser.activeOrgUnit" user="user" user-types="userType.userTypes"></select-usertype>
         <agency-select user="user" ng-if="userType.isAgency()"></agency-select>
-        <partner-select user="user" ng-if="userType.isPartner()"></partner-select>
+        <partner-select org-unit="addUser.activeOrgUnit" user="user" ng-if="userType.isPartner()"></partner-select>
     </div>
     <div class="form-controls-wrap">
         <span class="form-control-wrap" ng-class="{'ng-valid': userForm.emailAddress.$valid}">

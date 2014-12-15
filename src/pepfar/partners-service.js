@@ -1,23 +1,22 @@
 angular.module('PEPFAR.usermanagement').factory('partnersService', partnersService);
 
-function partnersService($q, currentUserService, Restangular, errorHandler) {
+function partnersService($q, Restangular, errorHandler) {
 
     return {
         getPartners: getPartners
     };
 
-    function getPartners() {
-        return currentUserService.getCurrentUser()
-            .then(getPartnersForUser);
+    function getPartners(organisationUnit) {
+        return getPartnersForOrganisationUnit(organisationUnit);
     }
 
-    function getPartnersForUser(user) {
+    function getPartnersForOrganisationUnit(organisationUnit) {
         var organisationUnitName;
 
-        if (!(user.organisationUnits && user.organisationUnits[0] && user.organisationUnits[0].name)) {
-            return $q.reject('No organisation unit found on the current user');
+        if (!(organisationUnit && organisationUnit.name)) {
+            return $q.reject('No organisation unit found');
         }
-        organisationUnitName = user.organisationUnits[0].name;
+        organisationUnitName = organisationUnit.name;
 
         return $q.all([
                 getImplementingPartnerCogs().then(getPartnersFromApi),

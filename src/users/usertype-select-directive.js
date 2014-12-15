@@ -5,6 +5,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
         restrict: 'E',
         replace: true,
         scope: {
+            orgUnit: '=',
             userTypes: '=',
             user: '='
         },
@@ -38,7 +39,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
             });
         });
 
-        partnersService.getPartners().then(function () {
+        partnersService.getPartners(scope.orgUnit || {}).then(function () {
             scope.userTypes.forEach(function (item) {
                 if (item.name === 'Partner') {
                     scope.selectbox.items.push(item);
