@@ -171,7 +171,6 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
 
         dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups)
             .filter(function (dataGroup) {
-                console.log(user.dataGroups); //jshint ignore:line
                 return user.dataGroups && user.dataGroups[dataGroup.name] && user.dataGroups[dataGroup.name].entry === true;
             });
 
