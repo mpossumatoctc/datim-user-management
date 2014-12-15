@@ -5,7 +5,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
         restrict: 'E',
         replace: true,
         scope: {
-            orgUnit: '=',
+            activeOrgUnit: '=',
             userTypes: '=',
             user: '='
         },
@@ -31,7 +31,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
             });
         });
 
-        agenciesService.getAgencies().then(function () {
+        agenciesService.getAgencies(scope.activeOrgUnit || {}).then(function () {
             scope.userTypes.forEach(function (item) {
                 if (item.name === 'Agency') {
                     scope.selectbox.items.push(item);
@@ -39,7 +39,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
             });
         });
 
-        partnersService.getPartners(scope.orgUnit || {}).then(function () {
+        partnersService.getPartners(scope.activeOrgUnit || {}).then(function () {
             scope.userTypes.forEach(function (item) {
                 if (item.name === 'Partner') {
                     scope.selectbox.items.push(item);

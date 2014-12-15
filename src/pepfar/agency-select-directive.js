@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').directive('agencySelect', agencySelectDirective);
 
-function agencySelectDirective(agenciesService, $translate) {
+function agencySelectDirective(agenciesService, $translate, errorHandler) {
     return {
         restrict: 'E',
         replace: true,
@@ -12,7 +12,8 @@ function agencySelectDirective(agenciesService, $translate) {
                 placeholder: $translate.instant('Select an agency')
             };
 
-            agenciesService.getAgencies().then(function (agencies) {
+            errorHandler.debug('Loading agencies for: ', scope.activeOrgUnit && scope.activeOrgUnit.name);
+            agenciesService.getAgencies(scope.activeOrgUnit || {}).then(function (agencies) {
                 scope.selectbox.items = agencies;
             });
         }

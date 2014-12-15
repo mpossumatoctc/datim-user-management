@@ -4,17 +4,16 @@ function partnerSelectDirective(partnersService, $translate, errorHandler) {
     return {
         restrict: 'E',
         replace: true,
-        scope: {
-            orgUnit: '='
-        },
+        scope: true,
         templateUrl: 'pepfar/agencypartner-select.html',
         link: function (scope) {
-            scope.selectbox = {};
-            scope.selectbox.placeholder = $translate.instant('Select a partner');
-            scope.selectbox.items = [];
+            scope.selectbox = {
+                items: [],
+                placeholder: $translate.instant('Select a partner')
+            };
 
-            errorHandler.debug('Loading partners for: ', scope.orgUnit && scope.orgUnit.name);
-            partnersService.getPartners(scope.orgUnit || {}).then(function (partners) {
+            errorHandler.debug('Loading partners for: ', scope.activeOrgUnit && scope.activeOrgUnit.name);
+            partnersService.getPartners(scope.activeOrgUnit || {}).then(function (partners) {
                 scope.selectbox.items = partners;
             });
         }

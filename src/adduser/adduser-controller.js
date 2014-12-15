@@ -19,10 +19,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryAction = false;
-    vm.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined;
 
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
+    $scope.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined;
 
     initialize();
 
@@ -84,6 +84,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
 
         //Add the all mechanisms group from the user entity
+        console.log($scope.user); //jshint ignore:line
         if ($scope.user.userEntity &&
             $scope.user.userEntity.mechUserGroup &&
             $scope.user.userEntity.userUserGroup &&
