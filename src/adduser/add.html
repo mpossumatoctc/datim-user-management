@@ -41,7 +41,10 @@
                     <li ng-show="addUser.dataEntryStreamNamesForUserType.length > 0">
                         <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="addUser.dataEntryAction" ng-change="addUser.updateDataEntry()">
                         <label for="dataEntry">
-                            <span translate>Data entry</span><span class="data-entry-streams" ng-bind="addUser.dataEntryStreamNamesForUserType"></span>
+                            <span translate>Data entry</span>
+                            <span class="data-entry-streams">
+                                <span ng-repeat="streamName in addUser.dataEntryStreamNamesForUserType" ng-bind="streamName" translate></span>
+                            </span>
                         </label>
                     </li>
                     <li ng-repeat="action in addUser.actions">

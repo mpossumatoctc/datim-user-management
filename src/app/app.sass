@@ -128,13 +128,19 @@ ul.checkbox-group
   width: 25%
 
 .action-datastream, .data-entry-streams
-  color: #DDDDDD
+  color: #999999
 
   &:before
     content: "("
 
   &:after
     content: ")"
+
+  span:first-child:before
+    content: ""
+
+  span:before
+    content: ", "
 
 legend
   font-size: 1.5em

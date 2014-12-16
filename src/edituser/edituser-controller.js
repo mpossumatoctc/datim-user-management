@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit,
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 36
                             userLocale, userFormService, userActions,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
@@ -22,6 +22,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.getUserType = getUserType;
     vm.changeUserStatus = changeUserStatus;
     vm.updateDataEntry = updateDataEntry;
+    vm.dataEntryStreamNamesForUserType = [];
 
     $scope.user = vm.user;
 
@@ -36,6 +37,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
         vm.userToEdit = userToEdit;
         vm.user.locale = userLocale;
+
+        vm.dataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType();
 
         dataGroupsService.getDataGroupsForUser(userToEdit)
             .then(correctUserRolesForType)
@@ -159,6 +162,10 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function getUserType() {
         return userTypesService.getUserType(userToEdit);
+    }
+
+    function getDataEntryStreamNamesForUserType() {
+        return userActions.getDataEntryRestrictionDataGroups(getUserType());
     }
 
     function changeUserStatus() {
