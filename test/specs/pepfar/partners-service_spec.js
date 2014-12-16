@@ -1,6 +1,7 @@
 describe('Partners service', function () {
     var errorHandler;
     var partnersService;
+    var organisationUnit;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.value('$window', {alert: function () {}});
@@ -10,6 +11,10 @@ describe('Partners service', function () {
         errorHandler.isDebugOn = true;
         spyOn(errorHandler, 'debug').and.callThrough();
         partnersService = $injector.get('partnersService');
+
+        organisationUnit = {
+            name: 'Kenya'
+        };
     }));
 
     it('should be an object', function () {
@@ -19,7 +24,6 @@ describe('Partners service', function () {
     describe('getPartners', function () {
         var $httpBackend;
         var fixtures = window.fixtures;
-        var userRequest;
         var partnersRequest;
         var userGroupsRequest;
         var cogsRequest;
@@ -36,17 +40,6 @@ describe('Partners service', function () {
 
         beforeEach(inject(function ($injector) {
             $httpBackend = $injector.get('$httpBackend');
-
-            userRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
-                .respond(200, {
-                    organisationUnits: [
-                        {
-                            name: 'Kenya'
-                        }
-                    ]
-                });
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
-                .respond(200, []);
 
             cogsRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/categoryOptionGroupSets?fields=id&filter=name:eq:Implementing+Partner&paging=false')
                 .respond(200, {
@@ -71,12 +64,11 @@ describe('Partners service', function () {
 
         it('should be a function', function () {
             $httpBackend.resetExpectations();
-            $httpBackend.flush();
             expect(partnersService.getPartners).toBeAFunction();
         });
 
         it('should return a promise like object', function () {
-            expect(partnersService.getPartners()).toBeAPromiseLikeObject();
+            expect(partnersService.getPartners(organisationUnit)).toBeAPromiseLikeObject();
             $httpBackend.flush();
         });
 
@@ -85,7 +77,7 @@ describe('Partners service', function () {
             var expectedPartnerList = withFakeUserGroups(fixtures.get('partnerList')).categoryOptionGroups;
             partnersRequest.respond(200, withFakeUserGroups(fixtures.get('partnerList')));
 
-            partnersService.getPartners().then(function (data) {
+            partnersService.getPartners(organisationUnit).then(function (data) {
                 partnerList = data;
             });
             $httpBackend.flush();
@@ -96,7 +88,7 @@ describe('Partners service', function () {
         it('should request the userGroups for partners', function () {
             partnersRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
-            partnersService.getPartners();
+            partnersService.getPartners(organisationUnit);
             $httpBackend.flush();
         });
 
@@ -124,7 +116,7 @@ describe('Partners service', function () {
 
             userGroupsRequest.respond(200, fixtures.get('kenyaPartnerUserGroups'));
 
-            partnersService.getPartners().then(function (data) {
+            partnersService.getPartners(organisationUnit).then(function (data) {
                 partners = data;
             });
             $httpBackend.flush();
@@ -137,7 +129,7 @@ describe('Partners service', function () {
 
             userGroupsRequest.respond(200, fixtures.get('kenyaPartnerUserGroups'));
 
-            partnersService.getPartners().then(function (data) {
+            partnersService.getPartners(organisationUnit).then(function (data) {
                 partners = data;
             });
             $httpBackend.flush();
@@ -154,33 +146,31 @@ describe('Partners service', function () {
 
             partnersRequest.respond(200, []);
 
-            partnersService.getPartners().catch(catchFunction);
+            partnersService.getPartners(organisationUnit).catch(catchFunction);
             $httpBackend.flush();
 
             expect(catchFunction).toHaveBeenCalled();
             expect(errorHandler.debug).toHaveBeenCalledWith('No partners found in Kenya that you can access all mechanisms for');
         });
 
-        it('should reject the promise with the correct message on no org unit', function () {
+        it('should reject the promise with the correct message on no org unit', inject(function ($rootScope) {
             var partnersMessage;
-            userRequest.respond(200, {});
-            partnersRequest.respond(200, fixtures.get('partnerList'));
+            $httpBackend.resetExpectations();
 
-            partnersService.getPartners().catch(function (response) {
+            partnersService.getPartners({}).catch(function (response) {
                 partnersMessage = response;
             });
-            $httpBackend.resetExpectations();
-            $httpBackend.flush();
+            $rootScope.$apply();
 
-            expect(partnersMessage).toEqual('No organisation unit found on the current user');
-        });
+            expect(partnersMessage).toEqual('No organisation unit found');
+        }));
 
         it('should reject the promise when the cogs can not be found', function () {
             var catchFunction = jasmine.createSpy();
             $httpBackend.resetExpectations();
 
             cogsRequest.respond(500);
-            partnersService.getPartners().catch(catchFunction);
+            partnersService.getPartners(organisationUnit).catch(catchFunction);
 
             $httpBackend.flush();
 
@@ -193,7 +183,7 @@ describe('Partners service', function () {
             $httpBackend.resetExpectations();
 
             cogsRequest.respond(200, {categoryOptionGroupSets: []});
-            partnersService.getPartners().catch(catchFunction);
+            partnersService.getPartners(organisationUnit).catch(catchFunction);
 
             $httpBackend.flush();
 

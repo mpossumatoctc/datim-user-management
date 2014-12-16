@@ -107,30 +107,30 @@ describe('User service', function () {
 
             dataEntryRestrictions = {
                 'Inter-Agency': {
-                    SI: {
+                    SI: [{
                         userRole: 'Data Entry SI Country Team',
                         userRoleId: 'yYOqiMTxAOF'
-                    }
+                    }]
                 },
                 Agency: {
-                    SI: {
+                    SI: [{
                         userRole: 'Data Entry SI',
                         userRoleId: 'k7BWFXkG6zt'
-                    },
-                    EA: {
+                    }],
+                    EA: [{
                         userRole: 'Data Entry EA',
                         userRoleId: 'OKKx4bf4ueV'
-                    }
+                    }]
                 },
                 Partner: {
-                    SI: {
+                    SI: [{
                         userRole: 'Data Entry SI',
                         userRoleId: 'k7BWFXkG6zt'
-                    },
-                    SIMS: {
+                    }],
+                    SIMS: [{
                         userRole: 'Data Entry SIMS',
                         userRoleId: 'iXkZzRKD0i4'
-                    }
+                    }]
                 }
             };
 
@@ -160,11 +160,10 @@ describe('User service', function () {
         });
 
         it('should add the organisation units from the current user', function () {
-            var currentUser =  fixtures.get('currentUser');
             expectedInviteObject.organisationUnits = [{id: 'HfVjCurKxh2'}];
             expectedInviteObject.dataViewOrganisationUnits = [{id: 'HfVjCurKxh2'}];
 
-            expect(service.getUserInviteObject(userObject, dataGroups, actions, currentUser, dataEntryRestrictions))
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, [{id: 'HfVjCurKxh2'}], dataEntryRestrictions))
                 .toEqual(expectedInviteObject);
         });
 

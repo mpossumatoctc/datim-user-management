@@ -20,25 +20,27 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
 
     var dataEntryRestrictions = {
         'Inter-Agency': {
-            SI: {
-                userRole: 'Data Entry SI Country Team'
-            },
-            EVAL: {
-                userRole: 'Data Entry EVAL'
-            }
+            SI: [{
+                    userRole: 'Data Entry SI Country Team'
+                }, {
+                    userRole: 'Tracker'
+                }],
+            EVAL: [{
+                    userRole: 'Data Entry EVAL'
+                }]
         },
         Agency: {
-            SIMS: {
-                userRole: 'Data Entry SIMS'
-            }
+            SIMS: [{
+                    userRole: 'Data Entry SIMS'
+                }]
         },
         Partner: {
-            SI: {
+            SI: [{
                 userRole: 'Data Entry SI'
-            },
-            EA: {
+            }],
+            EA: [{
                 userRole: 'Data Entry EA'
-            }
+            }]
         }
     };
 
@@ -93,11 +95,13 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         function matchUserRolesWithDataGroups(userRoles, userType) {
             return function (dataStream) {
                 userRoles.forEach(function (userRole) {
-                    var dataStreamObject = dataEntryRestrictions[userType][dataStream];
+                    var dataStreamRoleList = dataEntryRestrictions[userType][dataStream];
 
-                    if (userRole && userRole.name === dataStreamObject.userRole) {
-                        dataStreamObject.userRoleId = userRole.id;
-                    }
+                    dataStreamRoleList.forEach(function (dataStreamRole) {
+                        if (userRole && userRole.name === dataStreamRole.userRole) {
+                            dataStreamRole.userRoleId = userRole.id;
+                        }
+                    });
                 });
             };
         }
@@ -171,7 +175,6 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
 
         dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups)
             .filter(function (dataGroup) {
-                console.log(user.dataGroups); //jshint ignore:line
                 return user.dataGroups && user.dataGroups[dataGroup.name] && user.dataGroups[dataGroup.name].entry === true;
             });
 

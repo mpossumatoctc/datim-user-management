@@ -1,22 +1,35 @@
 angular.module('PEPFAR.usermanagement').factory('agenciesService', agenciesService);
 
-function agenciesService($q, currentUserService, Restangular, errorHandler) {
+function agenciesService($q, Restangular, errorHandler) {
 
     return {
         getAgencies: getAgencies
     };
 
-    function getAgencies() {
-        return currentUserService.getCurrentUser().then(function (user) {
-            var organisationUnitName;
+    function getAgencies(organisationUnit) {
+        return getAgenciesForOrganisationUnit(organisationUnit);
 
-            if (!(user.organisationUnits && user.organisationUnits[0] && user.organisationUnits[0].name)) {
-                return $q.reject('No organisation unit found on the current user');
-            }
-            organisationUnitName = user.organisationUnits[0].name;
+        //return currentUserService.getCurrentUser().then(function (user) {
+        //    var organisationUnitName;
+        //
+        //    if (!(user.organisationUnits && user.organisationUnits[0] && user.organisationUnits[0].name)) {
+        //        return $q.reject('No organisation unit found on the current user');
+        //    }
+        //    organisationUnitName = user.organisationUnits[0].name;
+        //
+        //    return matchUserGroupsWithAgencies(organisationUnitName).catch(errorHandler.debug);
+        //});
+    }
 
-            return matchUserGroupsWithAgencies(organisationUnitName).catch(errorHandler.debug);
-        });
+    function getAgenciesForOrganisationUnit(organisationUnit) {
+        var organisationUnitName;
+
+        if (!(organisationUnit && organisationUnit.name)) {
+            return $q.reject('No organisation unit found');
+        }
+        organisationUnitName = organisationUnit.name;
+
+        return matchUserGroupsWithAgencies(organisationUnitName).catch(errorHandler.debug);
     }
 
     function matchUserGroupsWithAgencies(organisationUnitName) {

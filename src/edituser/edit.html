@@ -41,10 +41,13 @@
                     <fieldset name="User actions">
                         <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                         <ul class="checkbox-group">
-                            <li>
+                            <li ng-show="editUser.dataEntryStreamNamesForUserType.length > 0">
                                 <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="editUser.dataEntryAction" ng-change="editUser.updateDataEntry()">
                                 <label for="dataEntry">
                                     <span translate>Data entry</span>
+                                    <span class="data-entry-streams">
+                                        <span ng-repeat="streamName in editUser.dataEntryStreamNamesForUserType" ng-bind="streamName" translate></span>
+                                    </span>
                                 </label>
                             </li>
                             <li ng-repeat="action in editUser.actions">

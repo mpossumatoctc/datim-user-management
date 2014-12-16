@@ -1,7 +1,8 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
-                           userActions, userService, $state, notify, interAgencyService, userFormService) {
+                           userActions, userService, $state, notify, interAgencyService,
+                           userFormService, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -19,9 +20,22 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryAction = false;
+    vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
+    vm.dataEntryStreamNamesForUserType = [];
+    vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
 
+    errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
+    $scope.userOrgUnit = {
+        current:  vm.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined
+    };
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
+
+    $scope.$watch('userOrgUnit.current', function (newVal, oldVal) {
+        if (newVal !== oldVal && newVal && newVal.name) {
+            $scope.$broadcast('ORGUNITCHANGED', newVal);
+        }
+    });
 
     initialize();
 
@@ -31,15 +45,17 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             vm.actions = userActions.getActionsForUserType(newVal.name);
 
             if (newVal.name === 'Inter-Agency') {
-                interAgencyService.getUserGroups().then(function (interAgencyUserGroups) {
+                interAgencyService.getUserGroups(getCurrentOrgUnit()).then(function (interAgencyUserGroups) {
                     $scope.user.userEntity = interAgencyUserGroups;
                 });
             }
+
+            vm.dataEntryStreamNamesForUserType = vm.getDataEntryStreamNamesForUserType();
         }
     });
 
     function updateDataEntry() {
-        var userType = $scope.user && $scope.user.userType && $scope.user.userType.name;
+        var userType = getUserType();
         var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
 
         Object.keys($scope.user.dataGroups)
@@ -70,13 +86,27 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         vm.actions = userActions.getActionsForUserType();
     }
 
+    function getCurrentOrgUnit() {
+        return ($scope.userOrgUnit && $scope.userOrgUnit.current) || {};
+    }
+
     function addUser() {
         var managerRole = 'Manage users';
 
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser, userActions.dataEntryRestrictions);
-        vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+        vm.userInviteObject = userService.getUserInviteObject(
+            $scope.user,
+            vm.dataGroups,
+            vm.actions,
+            [getCurrentOrgUnit()],
+            userActions.dataEntryRestrictions
+        );
+
+        if (getUserType() !== 'Inter-Agency') {
+            vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+        }
+
         if (!userService.verifyInviteData(vm.userInviteObject)) {
             notify.error('Invite did not pass basic validation');
             return;
@@ -95,6 +125,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             return false;
         }
 
+        //TODO: Perhaps this logic should be moved to the userService?
         if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
         }
@@ -127,5 +158,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function isRequiredDataStreamSelected(dataGroupNames) {
         return validations.isRequiredDataStreamSelected(dataGroupNames, $scope.user, vm.dataGroups);
+    }
+
+    function getDataEntryStreamNamesForUserType() {
+        return userActions.getDataEntryRestrictionDataGroups(getUserType());
+    }
+
+    function getUserType() {
+        return $scope.user && $scope.user.userType && $scope.user.userType.name;
     }
 }

@@ -1,6 +1,7 @@
 describe('Agencies service', function () {
     var errorHandler;
     var agenciesService;
+    var organisationUnit;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.value('$window', {alert: function () {}});
@@ -10,6 +11,10 @@ describe('Agencies service', function () {
         errorHandler.isDebugOn = true;
         spyOn(errorHandler, 'debug').and.callThrough();
         agenciesService = $injector.get('agenciesService');
+
+        organisationUnit = {
+            name: 'Rwanda'
+        };
     }));
 
     it('should be an object', function () {
@@ -24,7 +29,6 @@ describe('Agencies service', function () {
         var $httpBackend;
         var fixtures = window.fixtures;
         var agenciesRequest;
-        var userRequest;
         var userGroupRequest;
         var cogsRequest;
 
@@ -40,18 +44,6 @@ describe('Agencies service', function () {
 
         beforeEach(inject(function ($injector) {
             $httpBackend = $injector.get('$httpBackend');
-
-            userRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
-                .respond(200, {
-                    organisationUnits: [
-                        {
-                            name: 'Rwanda'
-                        }
-                    ]
-                });
-
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
-                .respond(200, []);
 
             cogsRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/categoryOptionGroupSets?fields=id&filter=name:eq:Funding+Agency&paging=false')
                 .respond(200, {
@@ -75,8 +67,8 @@ describe('Agencies service', function () {
         });
 
         it('should return a promise like function', function () {
+            $httpBackend.resetExpectations();
             expect(agenciesService.getAgencies()).toBeAPromiseLikeObject();
-            $httpBackend.flush();
         });
 
         it('promise should return an array with agencies', function () {
@@ -84,7 +76,7 @@ describe('Agencies service', function () {
             var expectedAgencies = withFakeUserGroups(fixtures.get('agenciesList')).categoryOptionGroups;
             agenciesRequest.respond(200, withFakeUserGroups(fixtures.get('agenciesList')));
 
-            agenciesService.getAgencies().then(function (data) {
+            agenciesService.getAgencies(organisationUnit).then(function (data) {
                 agencies = data;
             });
             $httpBackend.flush();
@@ -95,7 +87,7 @@ describe('Agencies service', function () {
         it('should request the userGroups for agencies', function () {
             userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
-            agenciesService.getAgencies();
+            agenciesService.getAgencies(organisationUnit);
             $httpBackend.flush();
         });
 
@@ -124,7 +116,7 @@ describe('Agencies service', function () {
 
             userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
-            agenciesService.getAgencies().then(function (data) {
+            agenciesService.getAgencies(organisationUnit).then(function (data) {
                 agencies = data;
             });
             $httpBackend.flush();
@@ -136,7 +128,7 @@ describe('Agencies service', function () {
             var agencies;
             userGroupRequest.respond(200, fixtures.get('rwandaUserGroupWithoutUSAIDUserGroup'));
 
-            agenciesService.getAgencies().then(function (data) {
+            agenciesService.getAgencies(organisationUnit).then(function (data) {
                 agencies = data;
             });
             $httpBackend.flush();
@@ -149,7 +141,7 @@ describe('Agencies service', function () {
             var agencies;
             userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));
 
-            agenciesService.getAgencies().then(function (data) {
+            agenciesService.getAgencies(organisationUnit).then(function (data) {
                 agencies = data;
             });
             $httpBackend.flush();
@@ -163,7 +155,7 @@ describe('Agencies service', function () {
             var agencies;
             userGroupRequest.respond(200, fixtures.get('rwandaUserGroupWithoutUSAIDAdminUserGroup'));
 
-            agenciesService.getAgencies().then(function (data) {
+            agenciesService.getAgencies(organisationUnit).then(function (data) {
                 agencies = data;
             });
             $httpBackend.flush();
@@ -177,33 +169,31 @@ describe('Agencies service', function () {
             var catchFunction = jasmine.createSpy();
             agenciesRequest.respond(200, fixtures.get('agenciesList'));
 
-            agenciesService.getAgencies().catch(catchFunction);
+            agenciesService.getAgencies(organisationUnit).catch(catchFunction);
             $httpBackend.flush();
 
             expect(catchFunction).toHaveBeenCalled();
             expect(errorHandler.debug).toHaveBeenCalledWith('No agencies found in Rwanda that you can access all mechanisms for');
         });
 
-        it('should reject the promise with the correct message on no org unit', function () {
+        it('should reject the promise with the correct message on no org unit', inject(function ($rootScope) {
             var agenciesMessage;
-            userRequest.respond(200, {});
-            agenciesRequest.respond(200, fixtures.get('agenciesList'));
+            $httpBackend.resetExpectations();
 
             agenciesService.getAgencies().catch(function (response) {
                 agenciesMessage = response;
             });
-            $httpBackend.resetExpectations();
-            $httpBackend.flush();
+            $rootScope.$apply();
 
-            expect(agenciesMessage).toEqual('No organisation unit found on the current user');
-        });
+            expect(agenciesMessage).toEqual('No organisation unit found');
+        }));
 
         it('should reject the promise when the cogs can not be found', function () {
             var catchFunction = jasmine.createSpy();
             $httpBackend.resetExpectations();
 
             cogsRequest.respond(500);
-            agenciesService.getAgencies().catch(catchFunction);
+            agenciesService.getAgencies(organisationUnit).catch(catchFunction);
 
             $httpBackend.flush();
 
@@ -216,7 +206,7 @@ describe('Agencies service', function () {
             $httpBackend.resetExpectations();
 
             cogsRequest.respond(200, {categoryOptionGroupSets: []});
-            agenciesService.getAgencies().catch(catchFunction);
+            agenciesService.getAgencies(organisationUnit).catch(catchFunction);
 
             $httpBackend.flush();
 

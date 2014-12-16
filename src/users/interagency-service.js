@@ -1,42 +1,38 @@
 angular.module('PEPFAR.usermanagement').factory('interAgencyService', interAgencyService);
 
-function interAgencyService($q, Restangular, currentUserService, errorHandler) {
+function interAgencyService($q, Restangular, errorHandler) {
     var userGroupEndPoint = Restangular.one('userGroups').withHttpConfig({cache: true});
 
     return {
         getUserGroups: getUserGroups
     };
 
-    function getUserGroups() {
-        return currentUserService.getCurrentUser()
-            .then(function (user) {
-                var organisationUnitName;
-                if (!(user.organisationUnits && user.organisationUnits[0] && user.organisationUnits[0].name)) {
-                    return $q.reject('No organisation unit found on the current user');
-                }
-                organisationUnitName = user.organisationUnits[0].name;
+    function getUserGroups(organisationUnit) {
+        var organisationUnitName;
+        if (!(organisationUnit && organisationUnit.name)) {
+            return $q.reject('No organisation unit found on the current user');
+        }
+        organisationUnitName = organisationUnit.name;
 
-                return $q.all([
-                    getUserUserGroup(organisationUnitName),
-                    getAdminUserGroup(organisationUnitName),
-                    getMechUserGroup(organisationUnitName)
-                ]).then(function (responses) {
+        return $q.all([
+            getUserUserGroup(organisationUnitName),
+            getAdminUserGroup(organisationUnitName),
+            getMechUserGroup(organisationUnitName)
+        ]).then(function (responses) {
 
-                    errorHandler.debug(
-                        'The following inter-agency user groups were found:',
-                        'for users:', responses[0],
-                        'for usermanagement:', responses[1],
-                        'for mechanisms:', responses[2]
-                    );
+            errorHandler.debug(
+                'The following inter-agency user groups were found:',
+                'for users:', responses[0],
+                'for usermanagement:', responses[1],
+                'for mechanisms:', responses[2]
+            );
 
-                    return {
-                        userUserGroup: responses[0],
-                        userAdminUserGroup: responses[1],
-                        mechUserGroup: responses[2]
-                    };
-                }, errorHandler.errorFn('Unable to load all the inter agency user groups'));
-            });
-
+            return {
+                userUserGroup: responses[0],
+                userAdminUserGroup: responses[1],
+                mechUserGroup: responses[2]
+            };
+        }, errorHandler.errorFn('Unable to load all the inter agency user groups'));
     }
 
     function getUserUserGroup(organisationUnitName) {

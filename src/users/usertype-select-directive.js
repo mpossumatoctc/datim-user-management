@@ -21,29 +21,43 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
             selected: scope.userType
         };
 
-        interAgencyService.getUserGroups().then(function (interAgency) {
-            scope.userTypes.forEach(function (item) {
-                if (item.name === 'Inter-Agency' &&
-                    (interAgency.userUserGroup || interAgency.userUserGroup)) {
-                    scope.selectbox.items.push(item);
-                }
-            });
+        //TODO: Should not use parent $scope hack..
+        loadValues(scope.$parent && scope.$parent.userOrgUnit && scope.$parent.userOrgUnit.current);
+
+        scope.$on('ORGUNITCHANGED', function (event, data) {
+            console.log('Reloading types for ', data.name); //jshint ignore:line
+            loadValues(data);
+            scope.selectbox.selected = undefined;
+            scope.user.userType = undefined;
         });
 
-        agenciesService.getAgencies().then(function () {
-            scope.userTypes.forEach(function (item) {
-                if (item.name === 'Agency') {
-                    scope.selectbox.items.push(item);
-                }
-            });
-        });
+        function loadValues(orgUnit) {
+            scope.selectbox.items = [];
 
-        partnersService.getPartners().then(function () {
-            scope.userTypes.forEach(function (item) {
-                if (item.name === 'Partner') {
-                    scope.selectbox.items.push(item);
-                }
+            interAgencyService.getUserGroups(orgUnit).then(function (interAgency) {
+                scope.userTypes.forEach(function (item) {
+                    if (item.name === 'Inter-Agency' &&
+                        (interAgency.userUserGroup || interAgency.userUserGroup)) {
+                        scope.selectbox.items.push(item);
+                    }
+                });
             });
-        });
+
+            agenciesService.getAgencies(orgUnit).then(function () {
+                scope.userTypes.forEach(function (item) {
+                    if (item.name === 'Agency') {
+                        scope.selectbox.items.push(item);
+                    }
+                });
+            });
+
+            partnersService.getPartners(orgUnit).then(function () {
+                scope.userTypes.forEach(function (item) {
+                    if (item.name === 'Partner') {
+                        scope.selectbox.items.push(item);
+                    }
+                });
+            });
+        }
     }
 }

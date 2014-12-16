@@ -80,7 +80,7 @@ function userService($q, Restangular, _) {
         }
     }
 
-    function getUserInviteObject(user, dataGroups, allActions, currentUser, dataEntryRestrictions) {
+    function getUserInviteObject(user, dataGroups, allActions, organisationUnits, dataEntryRestrictions) {
         var inviteObject = getInviteObject();
         var selectedDataGroups = getSelectedDataGroups(user, dataGroups);
         var actions = getActionsForGroups(user, selectedDataGroups, allActions);
@@ -92,13 +92,14 @@ function userService($q, Restangular, _) {
             }));
         });
         Object.keys(user.dataGroups).forEach(function (dataGroup) {
-            var userRoleId;
-
             if (user.userType.name && dataEntryRestrictions && user.dataGroups[dataGroup].access === true && user.dataGroups[dataGroup].entry === true) {
-                userRoleId = dataEntryRestrictions[user.userType.name][dataGroup] && dataEntryRestrictions[user.userType.name][dataGroup].userRoleId;
-                if (userRoleId) {
-                    inviteObject.userCredentials.userRoles.push({id: userRoleId});
-                }
+                var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataGroup] || [];
+                dataEntryUserRoles.forEach(function (dataEntryUserRole) {
+                    var userRoleId = dataEntryUserRole.userRoleId;
+                    if (userRoleId) {
+                        inviteObject.userCredentials.userRoles.push({id: userRoleId});
+                    }
+                });
             }
         });
 
@@ -109,14 +110,12 @@ function userService($q, Restangular, _) {
             }
         });
 
-        //TODO: Create get functions for these on the userobject?
-        var orgUnits = (currentUser && currentUser.organisationUnits) || [];
-        var dataOrgUnits = (currentUser && currentUser.dataViewOrganisationUnits) || [];
+        organisationUnits = (Array.isArray(organisationUnits) && organisationUnits) || [];
 
-        inviteObject.organisationUnits = orgUnits.map(function (orgUnit) {
+        inviteObject.organisationUnits = (organisationUnits).map(function (orgUnit) {
             return {id: orgUnit.id};
         });
-        inviteObject.dataViewOrganisationUnits = dataOrgUnits.map(function (orgUnit) {
+        inviteObject.dataViewOrganisationUnits = organisationUnits.map(function (orgUnit) {
             return {id: orgUnit.id};
         });
 

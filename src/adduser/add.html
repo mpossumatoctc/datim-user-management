@@ -3,9 +3,10 @@
 </script>
 <form name="userForm">
     <div class="form-controls-wrap select-user-type" ng-controller="userTypeController as userType">
+        <organisation-unit-select on-select="addUser.changeOrgUnit($item, $model)" ng-if="addUser.isGlobalUser"></organisation-unit-select>
         <select-usertype user="user" user-types="userType.userTypes"></select-usertype>
-        <agency-select user="user" ng-if="userType.isAgency()"></agency-select>
-        <partner-select user="user" ng-if="userType.isPartner()"></partner-select>
+        <agency-select active-org-unit="activeOrgUnit" user="user" ng-if="userType.isAgency()"></agency-select>
+        <partner-select active-org-unit="activeOrgUnit" user="user" ng-if="userType.isPartner()"></partner-select>
     </div>
     <div class="form-controls-wrap">
         <span class="form-control-wrap" ng-class="{'ng-valid': userForm.emailAddress.$valid}">
@@ -37,10 +38,13 @@
             <fieldset name="User actions">
                 <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                 <ul class="checkbox-group">
-                    <li>
+                    <li ng-show="addUser.dataEntryStreamNamesForUserType.length > 0">
                         <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="addUser.dataEntryAction" ng-change="addUser.updateDataEntry()">
                         <label for="dataEntry">
                             <span translate>Data entry</span>
+                            <span class="data-entry-streams">
+                                <span ng-repeat="streamName in addUser.dataEntryStreamNamesForUserType" ng-bind="streamName" translate></span>
+                            </span>
                         </label>
                     </li>
                     <li ng-repeat="action in addUser.actions">

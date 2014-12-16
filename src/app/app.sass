@@ -127,14 +127,20 @@ ul.checkbox-group
 .add-user-button
   width: 25%
 
-.action-datastream
-  color: #DDDDDD
+.action-datastream, .data-entry-streams
+  color: #999999
 
   &:before
     content: "("
 
   &:after
     content: ")"
+
+  span:first-child:before
+    content: ""
+
+  span:before
+    content: ", "
 
 legend
   font-size: 1.5em

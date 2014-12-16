@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit,
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 36
                             userLocale, userFormService, userActions,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
@@ -22,6 +22,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.getUserType = getUserType;
     vm.changeUserStatus = changeUserStatus;
     vm.updateDataEntry = updateDataEntry;
+    vm.dataEntryStreamNamesForUserType = [];
 
     $scope.user = vm.user;
 
@@ -31,17 +32,38 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     function initialise() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+            return;
         }
 
         vm.userToEdit = userToEdit;
         vm.user.locale = userLocale;
 
+        vm.dataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType();
+
         dataGroupsService.getDataGroupsForUser(userToEdit)
+            .then(correctUserRolesForType)
             .then(createDataGroupsObject)
             .then(setDataEntryModelValue);
 
         userActions.getActionsForUser(userToEdit)
             .then(setUserActionsForThisUser);
+    }
+
+    function correctUserRolesForType(response) {
+        ((Array.isArray(vm.dataGroups) && vm.dataGroups) || []).forEach(function (dataGroup) {
+            var userRoles = userActions.dataEntryRestrictions && userActions.dataEntryRestrictions[getUserType()] && userActions.dataEntryRestrictions[getUserType()][dataGroup.name];
+            dataGroup.userRoles = (userRoles || []).filter(function (userRole) {
+                return userRole.userRole && userRole.userRoleId && userRole.userRoleId !== '';
+            }).map(function (userRole) {
+                return {
+                    id: userRole.userRoleId,
+                    name: userRole.userRole
+                };
+            });
+            return dataGroup;
+        });
+
+        return response;
     }
 
     function createDataGroupsObject(dataGroups) {
@@ -140,6 +162,10 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function getUserType() {
         return userTypesService.getUserType(userToEdit);
+    }
+
+    function getDataEntryStreamNamesForUserType() {
+        return userActions.getDataEntryRestrictionDataGroups(getUserType());
     }
 
     function changeUserStatus() {

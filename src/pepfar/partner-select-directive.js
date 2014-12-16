@@ -1,19 +1,32 @@
 angular.module('PEPFAR.usermanagement').directive('partnerSelect', partnerSelectDirective);
 
-function partnerSelectDirective(partnersService, $translate) {
+function partnerSelectDirective(partnersService, $translate, errorHandler) {
     return {
         restrict: 'E',
         replace: true,
         scope: true,
         templateUrl: 'pepfar/agencypartner-select.html',
         link: function (scope) {
-            scope.selectbox = {};
-            scope.selectbox.placeholder = $translate.instant('Select a partner');
-            scope.selectbox.items = [];
+            scope.selectbox = {
+                items: [],
+                placeholder: $translate.instant('Select a partner')
+            };
 
-            partnersService.getPartners().then(function (partners) {
-                scope.selectbox.items = partners;
+            loadValues(scope.userOrgUnit && scope.userOrgUnit.current);
+
+            scope.$on('ORGUNITCHANGED', function (event, data) {
+                console.log('Reloading types for ', data.name); //jshint ignore:line
+                loadValues(data);
             });
+
+            function loadValues(orgUnit) {
+                orgUnit = orgUnit || {};
+
+                errorHandler.debug('Loading partners for: ', orgUnit.name);
+                partnersService.getPartners(orgUnit).then(function (partners) {
+                    scope.selectbox.items = partners;
+                });
+            }
         }
     };
 }
