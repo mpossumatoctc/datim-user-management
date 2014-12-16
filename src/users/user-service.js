@@ -94,7 +94,6 @@ function userService($q, Restangular, _) {
         Object.keys(user.dataGroups).forEach(function (dataGroup) {
             if (user.userType.name && dataEntryRestrictions && user.dataGroups[dataGroup].access === true && user.dataGroups[dataGroup].entry === true) {
                 var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataGroup] || [];
-                console.log(dataEntryUserRoles); //jshint ignore:line
                 dataEntryUserRoles.forEach(function (dataEntryUserRole) {
                     var userRoleId = dataEntryUserRole.userRoleId;
                     if (userRoleId) {
