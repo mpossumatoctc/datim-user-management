@@ -34,7 +34,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
         function loadValues(orgUnit) {
             scope.selectbox.items = [];
 
-            interAgencyService.getUserGroups().then(function (interAgency) {
+            interAgencyService.getUserGroups(orgUnit).then(function (interAgency) {
                 scope.userTypes.forEach(function (item) {
                     if (item.name === 'Inter-Agency' &&
                         (interAgency.userUserGroup || interAgency.userUserGroup)) {

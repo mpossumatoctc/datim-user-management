@@ -45,7 +45,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             vm.actions = userActions.getActionsForUserType(newVal.name);
 
             if (newVal.name === 'Inter-Agency') {
-                interAgencyService.getUserGroups().then(function (interAgencyUserGroups) {
+                interAgencyService.getUserGroups(getCurrentOrgUnit()).then(function (interAgencyUserGroups) {
                     $scope.user.userEntity = interAgencyUserGroups;
                 });
             }
@@ -103,7 +103,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             userActions.dataEntryRestrictions
         );
 
-        vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+        if (getUserType() !== 'Inter-Agency') {
+            vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+        }
+
         if (!userService.verifyInviteData(vm.userInviteObject)) {
             notify.error('Invite did not pass basic validation');
             return;
