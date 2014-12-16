@@ -24,6 +24,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.doSearch = doSearch;
     vm.editUser = editUser;
     vm.placeHolder = 'Search for user';
+    vm.checkDownload = checkDownload;
 
     vm.search = {
         options: userFilter,
@@ -31,7 +32,12 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         filterTypeSecondary: undefined,
         searchWord: '',
         doSearch: _.debounce(vm.doSearch, 400),
-        doSecondarySearch: doSecondarySearch
+        doSecondarySearch: doSecondarySearch,
+        fileCreated: false,
+        fileDownload: {
+            url: '',
+            download: ''
+        }
     };
 
     initialise();
@@ -40,6 +46,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             return $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
         }
+        //window.console.log(currentUser);
 
         loadList();
     }
@@ -58,6 +65,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         vm.listIsLoading = true;
         userListService.getList()
             .then(setUserList)
+            .then(buildCSV)
             .catch(function () {
                 vm.listIsLoading = false;
             });
@@ -154,6 +162,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             'organisation unit': 'organisationUnits.name',
             types: 'userGroups.name'
         };
+        resetFileDownload();
 
         if (!selectedFilterType && (!vm.search.filterTypeSecondary || vm.search.searchWord === '')) {
             return;
@@ -190,4 +199,62 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         }
     }
 
+    //TODO: Refactor to factory if CSV functionality is needed elsewhere
+    function checkDownload() {
+        return !window.externalHost && 'download' in document.createElement('a'); //jshint ignore:line
+    }
+
+    function resetFileDownload() {
+        vm.search.fileCreated = false;
+    }
+
+    function buildCSV() {
+        var header = 'Name, Email, Last Login, Access Level, Groups\n';
+        var localUsers = vm.users;
+        var finalCSV = [];
+
+        if (!vm.checkDownload()) {
+            return;
+        }
+
+        for (var i = 0, len = localUsers.length; i < len; i = i + 1) {
+            finalCSV.push(buildRow(localUsers[i]));
+        }
+
+        vm.search.fileDownload.url = 'data:text/csv;base64,' + window.btoa(
+            header + finalCSV.join('\n')
+        );
+        vm.search.fileDownload.download = getFileName();
+        vm.search.fileCreated = true;
+
+    }
+
+    function buildRow(row) {
+        var tempObj = [];
+        tempObj = [];
+        tempObj.push(row.name);
+        tempObj.push(row.email || '');
+        tempObj.push(row.userCredentials.userRoles[0].name || '');
+        tempObj.push(row.userCredentials.userRoles[0].lastUpdated);
+        tempObj.push(row.userGroups || '');
+        tempObj.push(row.organisationUnits || '');
+
+        return tempObj.join(',');
+    }
+
+    function getFileName() {
+        var res = new Date().toISOString();
+        var filterName = vm.search.filterType && vm.search.filterType.name.toLowerCase() || '';
+        var fileName = [];
+		//jscs:disable
+        fileName.push(res.substring(0,16).replace(/:/g,''));
+        window.console.log(res.substring(0,16));
+        //jscs:enable
+        fileName.push(currentUser.name);
+        if (filterName.length > 0) {
+            fileName.push(filterName);
+        }
+
+        return fileName.join('-') + '.csv';
+    }
 }

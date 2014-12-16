@@ -38,12 +38,21 @@
 		</div>
 	</div>
 
-    <p ng-pluralize count="userList.pagination.getTotalItemCount()"
-       when="{'0': 'No users have been found, please make your search less specific',
-		'1': '1 User found',
-		'other': '{} Users found'
-
-		}"></p>
+    <div class="row">
+        <div class="col-sm-6">
+            <p ng-pluralize count="userList.pagination.getTotalItemCount()"
+               when="{'0': 'No users have been found, please make your search less specific',
+               '1': '1 User found',
+               'other': '{} Users found'
+               }"></p>
+        </div>
+        <div class="col-sm-6">
+            <a ng-show="userList.search.fileCreated" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
+                <i class="fa fa-save"></i>
+                <span translate class="ng-scope">Download csv list</span> 
+            </a>
+        </div>
+    </div>
 
 	<div class="search-result" ng-show="userList.users">
         <div class="loading-mask" ng-show="userList.listIsLoading">
