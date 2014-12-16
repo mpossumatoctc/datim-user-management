@@ -127,6 +127,9 @@ angular.module('PEPFAR.usermanagement').config(translateConfig);
 angular.module('PEPFAR.usermanagement').config(routerConfig);
 angular.module('PEPFAR.usermanagement').config(angularUiSelectConfig);
 angular.module('PEPFAR.usermanagement').value('SETTINGS', window.PEPFARUSERMANAGEMENT);
+angular.module('PEPFAR.usermanagement').config(['$compileProvider', function ($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|tel|data):/);
+}]);
 
 //==================================================================================
 // Angular run blocks
