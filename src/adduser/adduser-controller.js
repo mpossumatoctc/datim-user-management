@@ -21,6 +21,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryAction = false;
     vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
+    vm.dataEntryStreamNamesForUserType = [];
+    vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
 
     errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
     $scope.userOrgUnit = {
@@ -47,11 +49,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                     $scope.user.userEntity = interAgencyUserGroups;
                 });
             }
+
+            vm.dataEntryStreamNamesForUserType = vm.getDataEntryStreamNamesForUserType();
         }
     });
 
     function updateDataEntry() {
-        var userType = $scope.user && $scope.user.userType && $scope.user.userType.name;
+        var userType = getUserType();
         var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
 
         Object.keys($scope.user.dataGroups)
@@ -82,12 +86,23 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         vm.actions = userActions.getActionsForUserType();
     }
 
+    function getCurrentOrgUnit() {
+        return ($scope.userOrgUnit && $scope.userOrgUnit.current) || {};
+    }
+
     function addUser() {
         var managerRole = 'Manage users';
 
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = userService.getUserInviteObject($scope.user, vm.dataGroups, vm.actions, currentUser, userActions.dataEntryRestrictions);
+        vm.userInviteObject = userService.getUserInviteObject(
+            $scope.user,
+            vm.dataGroups,
+            vm.actions,
+            [getCurrentOrgUnit()],
+            userActions.dataEntryRestrictions
+        );
+
         vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
         if (!userService.verifyInviteData(vm.userInviteObject)) {
             notify.error('Invite did not pass basic validation');
@@ -95,7 +110,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
 
         //Add the all mechanisms group from the user entity
-        console.log($scope.user); //jshint ignore:line
         if ($scope.user.userEntity &&
             $scope.user.userEntity.mechUserGroup &&
             $scope.user.userEntity.userUserGroup &&
@@ -140,5 +154,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function isRequiredDataStreamSelected(dataGroupNames) {
         return validations.isRequiredDataStreamSelected(dataGroupNames, $scope.user, vm.dataGroups);
+    }
+
+    function getDataEntryStreamNamesForUserType() {
+        return userActions.getDataEntryRestrictionDataGroups(getUserType());
+    }
+
+    function getUserType() {
+        return $scope.user && $scope.user.userType && $scope.user.userType.name;
     }
 }

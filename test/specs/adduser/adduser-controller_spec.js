@@ -827,4 +827,50 @@ describe('Add user controller', function () {
             expect(scope.user.dataGroups.EA.entry).toBe(false);
         });
     });
+
+    describe('getDataEntryStreamNamesForUserType', function () {
+        var controller;
+        var userActionsMock;
+
+        beforeEach(inject(function ($controller, $rootScope, $httpBackend, userActions) {
+            userActionsMock = userActions;
+            scope = $rootScope.$new();
+            $httpBackend.whenGET()
+                .respond(200, {});
+
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: [],
+                dataGroups: [
+                    {name: 'SI'},
+                    {name: 'EA'},
+                    {name: 'SIMS'}
+                ],
+                dimensionConstraint: {id: 'SomeID'},
+                currentUser: currentUserMock()
+            });
+
+            scope.user.dataGroups.SI.access = true;
+            scope.user.userType = {
+                name: 'Partner'
+            };
+            controller.dataEntryAction = true;
+        }));
+
+        it('should return EA, SI for partner', function () {
+            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI', 'EA']);
+        });
+
+        it('should return SIMS for agency', function () {
+            userActionsMock.getDataEntryRestrictionDataGroups.and.returnValue(['SIMS']);
+
+            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SIMS']);
+        });
+
+        it('should return SI, EVAL for Inter-Agency', function () {
+            userActionsMock.getDataEntryRestrictionDataGroups.and.returnValue(['SI', 'EVAL']);
+
+            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI', 'EVAL']);
+        });
+    });
 });

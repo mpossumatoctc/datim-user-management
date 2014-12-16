@@ -41,7 +41,7 @@
                     <li>
                         <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="addUser.dataEntryAction" ng-change="addUser.updateDataEntry()">
                         <label for="dataEntry">
-                            <span translate>Data entry</span>
+                            <span translate>Data entry</span><span class="data-entry-streams" ng-bind="addUser.dataEntryStreamNamesForUserType"></span>
                         </label>
                     </li>
                     <li ng-repeat="action in addUser.actions">

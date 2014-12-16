@@ -80,7 +80,7 @@ function userService($q, Restangular, _) {
         }
     }
 
-    function getUserInviteObject(user, dataGroups, allActions, currentUser, dataEntryRestrictions) {
+    function getUserInviteObject(user, dataGroups, allActions, organisationUnits, dataEntryRestrictions) {
         var inviteObject = getInviteObject();
         var selectedDataGroups = getSelectedDataGroups(user, dataGroups);
         var actions = getActionsForGroups(user, selectedDataGroups, allActions);
@@ -109,14 +109,12 @@ function userService($q, Restangular, _) {
             }
         });
 
-        //TODO: Create get functions for these on the userobject?
-        var orgUnits = (currentUser && currentUser.organisationUnits) || [];
-        var dataOrgUnits = (currentUser && currentUser.dataViewOrganisationUnits) || [];
+        organisationUnits = (Array.isArray(organisationUnits) && organisationUnits) || [];
 
-        inviteObject.organisationUnits = orgUnits.map(function (orgUnit) {
+        inviteObject.organisationUnits = (organisationUnits).map(function (orgUnit) {
             return {id: orgUnit.id};
         });
-        inviteObject.dataViewOrganisationUnits = dataOrgUnits.map(function (orgUnit) {
+        inviteObject.dataViewOrganisationUnits = organisationUnits.map(function (orgUnit) {
             return {id: orgUnit.id};
         });
 
