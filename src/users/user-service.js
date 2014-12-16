@@ -92,13 +92,15 @@ function userService($q, Restangular, _) {
             }));
         });
         Object.keys(user.dataGroups).forEach(function (dataGroup) {
-            var userRoleId;
-
             if (user.userType.name && dataEntryRestrictions && user.dataGroups[dataGroup].access === true && user.dataGroups[dataGroup].entry === true) {
-                userRoleId = dataEntryRestrictions[user.userType.name][dataGroup] && dataEntryRestrictions[user.userType.name][dataGroup].userRoleId;
-                if (userRoleId) {
-                    inviteObject.userCredentials.userRoles.push({id: userRoleId});
-                }
+                var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataGroup] || [];
+                console.log(dataEntryUserRoles); //jshint ignore:line
+                dataEntryUserRoles.forEach(function (dataEntryUserRole) {
+                    var userRoleId = dataEntryUserRole.userRoleId;
+                    if (userRoleId) {
+                        inviteObject.userCredentials.userRoles.push({id: userRoleId});
+                    }
+                });
             }
         });
 

@@ -107,30 +107,30 @@ describe('User service', function () {
 
             dataEntryRestrictions = {
                 'Inter-Agency': {
-                    SI: {
+                    SI: [{
                         userRole: 'Data Entry SI Country Team',
                         userRoleId: 'yYOqiMTxAOF'
-                    }
+                    }]
                 },
                 Agency: {
-                    SI: {
+                    SI: [{
                         userRole: 'Data Entry SI',
                         userRoleId: 'k7BWFXkG6zt'
-                    },
-                    EA: {
+                    }],
+                    EA: [{
                         userRole: 'Data Entry EA',
                         userRoleId: 'OKKx4bf4ueV'
-                    }
+                    }]
                 },
                 Partner: {
-                    SI: {
+                    SI: [{
                         userRole: 'Data Entry SI',
                         userRoleId: 'k7BWFXkG6zt'
-                    },
-                    SIMS: {
+                    }],
+                    SIMS: [{
                         userRole: 'Data Entry SIMS',
                         userRoleId: 'iXkZzRKD0i4'
-                    }
+                    }]
                 }
             };
 

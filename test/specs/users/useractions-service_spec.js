@@ -523,7 +523,7 @@ describe('User actions', function () {
         it('should have loaded the userRoles for dataEntry restrictions', function () {
             var partnerDataGroups = userActions.dataEntryRestrictions.Partner;
 
-            expect(partnerDataGroups.SI.userRoleId).toBe('k7BWFXkG6zt');
+            expect(partnerDataGroups.SI[0].userRoleId).toBe('k7BWFXkG6zt');
         });
     });
 });

@@ -31,17 +31,36 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     function initialise() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+            return;
         }
 
         vm.userToEdit = userToEdit;
         vm.user.locale = userLocale;
 
         dataGroupsService.getDataGroupsForUser(userToEdit)
+            .then(correctUserRolesForType)
             .then(createDataGroupsObject)
             .then(setDataEntryModelValue);
 
         userActions.getActionsForUser(userToEdit)
             .then(setUserActionsForThisUser);
+    }
+
+    function correctUserRolesForType(response) {
+        ((Array.isArray(vm.dataGroups) && vm.dataGroups) || []).forEach(function (dataGroup) {
+            var userRoles = userActions.dataEntryRestrictions && userActions.dataEntryRestrictions[getUserType()] && userActions.dataEntryRestrictions[getUserType()][dataGroup.name];
+            dataGroup.userRoles = (userRoles || []).filter(function (userRole) {
+                return userRole.userRole && userRole.userRoleId && userRole.userRoleId !== '';
+            }).map(function (userRole) {
+                return {
+                    id: userRole.userRoleId,
+                    name: userRole.userRole
+                };
+            });
+            return dataGroup;
+        });
+
+        return response;
     }
 
     function createDataGroupsObject(dataGroups) {

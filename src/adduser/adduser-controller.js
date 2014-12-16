@@ -125,6 +125,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             return false;
         }
 
+        //TODO: Perhaps this logic should be moved to the userService?
         if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
         }
