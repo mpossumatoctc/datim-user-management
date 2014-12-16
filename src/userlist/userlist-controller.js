@@ -25,6 +25,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.editUser = editUser;
     vm.placeHolder = 'Search for user';
     vm.checkDownload = checkDownload;
+    vm.closeDetails = closeDetails;
 
     vm.search = {
         options: userFilter,
@@ -104,7 +105,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function showDetails(user) {
+        //window.console.log(user);
+
         if (user !== vm.detailsUser) {
+            //jscs:disable
+            var position = $('.user-list li[user-id=' + user.id + ']').position(); //jshint ignore:line
+            $('.user-details-view').offset({top: position.top, right: 0}); //jshint ignore:line
+			//jscs:enable
             vm.detailsUser = user;
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
@@ -112,10 +119,15 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             userActions.getActionsForUser(user).then(function (actions) {
                 vm.detailsUserActions = actions;
             });
+
         } else {
-            vm.detailsUser = undefined;
-            vm.detailsOpen = false;
+            closeDetails();
         }
+    }
+
+    function closeDetails() {
+        vm.detailsUser = undefined;
+        vm.detailsOpen = false;
     }
 
     function isDetailsUser(user) {
@@ -234,10 +246,10 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         tempObj = [];
         tempObj.push(row.name);
         tempObj.push(row.email || '');
-        tempObj.push(row.userCredentials.userRoles[0].name || '');
+        tempObj.push(buildList(row.userCredentials.userRoles) || '');
         tempObj.push(row.userCredentials.userRoles[0].lastUpdated);
-        tempObj.push(row.userGroups || '');
-        tempObj.push(row.organisationUnits || '');
+        tempObj.push(buildList(row.userGroups) || '');
+        tempObj.push(buildList(row.organisationUnits) || '');
 
         return tempObj.join(',');
     }
@@ -248,13 +260,22 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         var fileName = [];
 		//jscs:disable
         fileName.push(res.substring(0,16).replace(/:/g,''));
-        window.console.log(res.substring(0,16));
         //jscs:enable
         fileName.push(currentUser.name);
         if (filterName.length > 0) {
             fileName.push(filterName);
         }
 
-        return fileName.join('-') + '.csv';
+        return fileName.join('-') + '-Page1.csv';
+    }
+
+    function buildList(listArr) {
+        var arr = [];
+
+        for (var i = 0, len = listArr.length; i < len; i = i + 1) {
+            arr.push('"' + listArr[i].name + '"');
+        }
+
+        return '"' + arr.join(',') + '"';
     }
 }
