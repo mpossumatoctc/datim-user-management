@@ -63,7 +63,7 @@
 		    	<div class="result">
 		    		<div class="row user-details-main">
 		    			<div class="col-sm-5">
-		    				<span class="user-name" ng-bind="::user.name"></span>
+		    				<span class="user-name" ng-bind="::user.name | limitTo(40)"></span>
 		    			</div>
                         <div class="col-sm-7">
                             <div class="deactivate">
