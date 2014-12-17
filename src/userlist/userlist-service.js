@@ -7,7 +7,8 @@ function userListService(Restangular, paginationService, errorHandler) {
     return {
         getList: getList,
         pagination: paginationService,
-        setFilter: setFilter
+        setFilter: setFilter,
+        getFilters: getFilters
     };
 
     function getList() {
@@ -30,6 +31,7 @@ function userListService(Restangular, paginationService, errorHandler) {
     }
 
     function getRequestParams() {
+        cleanFilters();
         return {
             fields: fields.join(','),
             page: paginationService.getCurrentPage(),
@@ -38,7 +40,29 @@ function userListService(Restangular, paginationService, errorHandler) {
         };
     }
 
+    function getFilters() {
+        return filters;
+    }
+
     function setFilter(filter) {
-        filters = [filter];
+        filters.push(filter);
+    }
+
+    function resetFilters() {
+        filters = [];
+    }
+
+    function removeFilter(index) {
+        filters.splice(index, 1);
+    }
+
+    function cleanFilters() {
+        var arr = [];
+        for (var i = 0, len = filters.length; i < len; i = i + 1) {
+            if (filters[i].length > 0) {
+                arr.push(filters[i]);
+            }
+        }
+        filters = arr;
     }
 }

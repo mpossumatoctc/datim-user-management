@@ -9,34 +9,46 @@
 				<li>Start typing your filter value</li>
 			</ul>
 			<p>Your results will autopopulate below.</p>
+            <h3>Filters</h3>
 		</div>
 	</div>
-	<div class="row">
-		<div class="select-filters col-sm-12">
-            <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType.secondary}">
-                <ui-select ng-required="true" ng-model="userList.search.filterType">
-                    <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
-                    <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
-                        <div>{{item.name}}</div>
-                    </ui-select-choices>
-                </ui-select>
+	<div class="filterForm" ng-repeat="filter in userListService.getFilters()" ng-form="repeatForm">
+        <div class="row" ng-show="userListService.getFilters().length > 1">
+            <div class="col-sm-12"><button class="btn btn-secondary" ng-click="userList.removeFilter($index)">Remove Filter</button></div>
+        </div>
+        <div class="row" >
+            <div class="select-filters col-sm-12">
+                <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType.secondary}">
+                    <ui-select ng-required="true" ng-model="userList.search.filterType">
+                        <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
+                        <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
+                            <div>{{item.name}}</div>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+                <div class="select-filtertype-secondary half" ng-show="userList.search.filterType.secondary">
+                    <ui-select ng-model="userList.search.filterTypeSecondary" on-select="userList.search.doSecondarySearch($item, $model)">
+                        <ui-select-match placeholder="Please pick an option here">{{$select.selected.name}}</ui-select-match>
+                        <ui-select-choices repeat="item in userList.search.filterType.secondary | filter: $select.search">
+                            <div>{{item.name}}</div>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
             </div>
-            <div class="select-filtertype-secondary half" ng-show="userList.search.filterType.secondary">
-                <ui-select ng-model="userList.search.filterTypeSecondary" on-select="userList.search.doSecondarySearch($item, $model)">
-                    <ui-select-match placeholder="Please pick an option here">{{$select.selected.name}}</ui-select-match>
-                    <ui-select-choices repeat="item in userList.search.filterType.secondary | filter: $select.search">
-                        <div>{{item.name}}</div>
-                    </ui-select-choices>
-                </ui-select>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <input class="form-control" ng-change="userList.search.doSearch()" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord" ng-hide="!!userList.search.filterType.secondary" ng-disabled="!userList.search.filterType" typeahead-loading="loadingLocations">
+                <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
             </div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12">
-			<input class="form-control" ng-change="userList.search.doSearch()" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord" ng-hide="!!userList.search.filterType.secondary" ng-disabled="!userList.search.filterType" typeahead-loading="loadingLocations">
-            <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
-		</div>
-	</div>
+        </div>    
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+                <button class="btn btn-secondary" ng-click="userList.addFilter()">Add Filter</button>
+                <button class="btn btn-secondary" ng-click="userList.resetFilters()">Clear Filters</button>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-sm-6">

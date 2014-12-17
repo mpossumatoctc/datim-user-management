@@ -32,7 +32,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         filterType: undefined,
         filterTypeSecondary: undefined,
         searchWord: '',
-        doSearch: _.debounce(vm.doSearch, 400),
+        doSearch: _.debounce(vm.doSearch, 500),
         doSecondarySearch: doSecondarySearch,
         fileCreated: false,
         fileDownload: {
@@ -162,7 +162,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     });
 
     //TODO: Move the search stuff to the filter service
-    function doSearch() {
+    function doSearch($item) {
         var selectedFilterType = vm.search.filterType.name.toLowerCase();
         var filter = [];
         var fieldNames = {
@@ -198,6 +198,18 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         console.log(filter.join(':')); //jshint ignore:line
         userListService.setFilter(filter.join(':'));
         loadList();
+    }
+
+    function removeFilter($item) {
+        userListService.removeFilter($item);
+    }
+
+    function addFilter() {
+        userListService.setFilter('');
+    }
+
+    function resetFilters() {
+        userListService.resetFilters();
     }
 
     function doSecondarySearch($item) {
