@@ -26,6 +26,9 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.placeHolder = 'Search for user';
     vm.checkDownload = checkDownload;
     vm.closeDetails = closeDetails;
+    vm.removeFilter = removeFilter;
+    vm.addFilter = addFilter;
+    vm.resetFilters = resetFilters;
 
     vm.search = {
         options: userFilter,
@@ -38,7 +41,10 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         fileDownload: {
             url: '',
             download: ''
-        }
+        },
+        getFilters: getFilters,
+        filterCount: [],
+        addFilter: addFilter
     };
 
     initialise();
@@ -50,6 +56,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         //window.console.log(currentUser);
 
         loadList();
+        vm.search.addFilter();
     }
 
     function setUserList(users) {
@@ -162,7 +169,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     });
 
     //TODO: Move the search stuff to the filter service
-    function doSearch($item) {
+    function doSearch() {
         var selectedFilterType = vm.search.filterType.name.toLowerCase();
         var filter = [];
         var fieldNames = {
@@ -201,14 +208,19 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function removeFilter($item) {
+        vm.search.filterCount.splice($item, 1);
         userListService.removeFilter($item);
     }
 
     function addFilter() {
-        userListService.setFilter('');
+        window.console.log('UserList: Added filter');
+        if (vm.search.filterCount.length < 5) {
+            vm.search.filterCount.push(new Date().toString());
+        }
     }
 
     function resetFilters() {
+        vm.search.filterCount = ['1'];
         userListService.resetFilters();
     }
 
@@ -221,6 +233,10 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (user && user.id && user.userCredentials && user.userCredentials.code) {
             $state.go('edit', {userId: user.id, username: user.userCredentials.code});
         }
+    }
+
+    function getFilters() {
+        vm.search.filters = userListService.getFilters();
     }
 
     //TODO: Refactor to factory if CSV functionality is needed elsewhere

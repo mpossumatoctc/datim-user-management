@@ -8,7 +8,10 @@ function userListService(Restangular, paginationService, errorHandler) {
         getList: getList,
         pagination: paginationService,
         setFilter: setFilter,
-        getFilters: getFilters
+        getFilters: getFilters,
+        resetFilters: resetFilters,
+        removeFilter: removeFilter,
+        filters: filters
     };
 
     function getList() {
@@ -32,6 +35,7 @@ function userListService(Restangular, paginationService, errorHandler) {
 
     function getRequestParams() {
         cleanFilters();
+        window.console.log('Cleaned the filters');
         return {
             fields: fields.join(','),
             page: paginationService.getCurrentPage(),
@@ -41,10 +45,12 @@ function userListService(Restangular, paginationService, errorHandler) {
     }
 
     function getFilters() {
+        window.console.log('ListService: Getting the filters' + filters);
         return filters;
     }
 
     function setFilter(filter) {
+        window.console.log('ListService: pushing filter: "' + filter + '" length ' + filter.length);
         filters.push(filter);
     }
 
