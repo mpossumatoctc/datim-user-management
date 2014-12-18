@@ -118,6 +118,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             //jscs:disable
             var position = $('.user-list li[user-id=' + user.id + ']').position(); //jshint ignore:line
             $('.user-details-view').offset({top: position.top, right: 0}); //jshint ignore:line
+            //window.console.log(position);
 			//jscs:enable
             vm.detailsUser = user;
             vm.detailsOpen = true;
@@ -155,6 +156,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         var phText = 'Search for ';
         var outputStr = '';
 
+        window.console.log(newVal);
         if (newVal) {
 
             if (newVal.name === 'E-Mail' || newVal.name === 'Roles') {
@@ -169,7 +171,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     });
 
     //TODO: Move the search stuff to the filter service
-    function doSearch() {
+    function doSearch(item) {
         var selectedFilterType = vm.search.filterType.name.toLowerCase();
         var filter = [];
         var fieldNames = {
@@ -189,7 +191,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         filter.push(fieldNames[selectedFilterType]);
         filter.push('like');
-        if (vm.search.filterType.secondary) {
+        if (vm.search.filterType[item].secondary) {
             //secondary search
             //TODO: Don't compare the string here but make it some option in the filter service
             if (vm.search.filterTypeSecondary.name === 'Inter-Agency') {
@@ -224,8 +226,9 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         userListService.resetFilters();
     }
 
-    function doSecondarySearch($item) {
-        vm.search.filterTypeSecondary = $item;
+    function doSecondarySearch($index, $item) {
+        window.console.log('Index: ' + $index + ' item: ' + $item);
+        vm.search.filterType[$index].secondary = $item;
         vm.doSearch();
     }
 
