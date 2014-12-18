@@ -171,8 +171,9 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     });
 
     //TODO: Move the search stuff to the filter service
-    function doSearch(item) {
-        var selectedFilterType = vm.search.filterType.name.toLowerCase();
+    function doSearch($item) {
+        window.console.log($item);
+        var selectedFilterType = vm.search.filterType[$item].name.toLowerCase();
         var filter = [];
         var fieldNames = {
             name: 'name',
@@ -191,13 +192,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         filter.push(fieldNames[selectedFilterType]);
         filter.push('like');
-        if (vm.search.filterType[item].secondary) {
+        if (vm.search.filterType[$item].secondary) {
             //secondary search
             //TODO: Don't compare the string here but make it some option in the filter service
-            if (vm.search.filterTypeSecondary.name === 'Inter-Agency') {
+            if (vm.search.filterTypeSecondary[$item].name === 'Inter-Agency') {
                 filter.push('Country team');
             } else {
-                filter.push(vm.search.filterTypeSecondary.name);
+                filter.push(vm.search.filterTypeSecondary[$item].name);
             }
 
         } else {
@@ -207,6 +208,11 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         console.log(filter.join(':')); //jshint ignore:line
         userListService.setFilter(filter.join(':'));
         loadList();
+    }
+
+    function doSecondarySearch($index, $item) {
+        vm.search.filterTypeSecondary = $item;
+        vm.doSearch();
     }
 
     function removeFilter($item) {
@@ -224,12 +230,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     function resetFilters() {
         vm.search.filterCount = ['1'];
         userListService.resetFilters();
-    }
-
-    function doSecondarySearch($index, $item) {
-        window.console.log('Index: ' + $index + ' item: ' + $item);
-        vm.search.filterType[$index].secondary = $item;
-        vm.doSearch();
     }
 
     function editUser(user) {

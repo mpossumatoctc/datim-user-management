@@ -33,7 +33,7 @@
                         <div class="select-filtertype-secondary half" ng-show="userList.search.filterType[$index].secondary">
                             <ui-select ng-model="userList.search.filterTypeSecondary[$index]" on-select="userList.search.doSecondarySearch($item, $model)">
                                 <ui-select-match placeholder="Please pick an option here">{{$select.selected.name}}</ui-select-match>
-                                <ui-select-choices repeat="item in userList.search.filterType.secondary | filter: $select.search">
+                                <ui-select-choices repeat="item in userList.search.filterType[$index].secondary | filter: $select.search">
                                     <div>{{item.name}}</div>
                                 </ui-select-choices>
                             </ui-select>
@@ -42,7 +42,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <input class="form-control" ng-change="userList.search.doSearch($item)" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
+                        <input class="form-control" ng-change="userList.search.doSearch()" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
                         <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
                     </div>
                 </div>
