@@ -12,7 +12,7 @@
             <h3>Filters {{userList.search.filterCount.length}}</h3>
 		</div>
 	</div>
-	<form class="form-demo" novalidate>
+	<form class="search-form" novalidate>
         <div class="filterForm form-group" ng-repeat="filter in userList.search.filterCount">
             <ng-form name="searchForm">
                 <div class="row" >
@@ -57,13 +57,13 @@
             </div>
         </div>
     </form>
-    <div class="row">
+    <div class="row search-result-header">
         <div class="col-sm-6">
-            <p ng-pluralize count="userList.pagination.getTotalItemCount()"
+            <h3 ng-pluralize count="userList.pagination.getTotalItemCount()"
                when="{'0': 'No users have been found, please make your search less specific',
                '1': '1 User found',
                'other': '{} Users found'
-               }"></p>
+               }"></h3>
         </div>
         <div class="col-sm-6">
             <a ng-show="userList.search.fileCreated && userList.users.length > 0" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
@@ -72,7 +72,7 @@
             </a>
         </div>
     </div>
-
+    
 	<div class="search-result" ng-show="userList.users">
         <div class="loading-mask" ng-show="userList.listIsLoading">
             <div class="loading-mask-inner"><i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;Loading users...</div>
