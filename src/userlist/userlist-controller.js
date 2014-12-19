@@ -24,6 +24,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.doSearch = doSearch;
     vm.editUser = editUser;
     vm.placeHolder = 'Search for user';
+    vm.updatePlaceholder = updatePlaceholder;
     vm.checkDownload = checkDownload;
     vm.closeDetails = closeDetails;
     vm.removeFilter = removeFilter;
@@ -44,7 +45,8 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         },
         getFilters: getFilters,
         filterCount: [],
-        addFilter: addFilter
+        addFilter: addFilter,
+        placeHolderText: []
     };
 
     initialise();
@@ -152,23 +154,25 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             });
     }
 
-    $scope.$watch('userList.search.filterType[$index]', function (newVal) {
+    function updatePlaceholder($index) {
+        var newVal = vm.search.filterType[$index];
         var phText = 'Search for ';
         var outputStr = '';
 
-        window.console.log(newVal);
-        if (newVal) {
+        //window.console.log('newSearch ' + newVal.name);
+        //window.console.log(vm.search.filterType[$index]);
 
-            if (newVal.name === 'E-Mail' || newVal.name === 'Roles') {
-                outputStr = phText + 'user ';
-            } else {
-                outputStr = phText;
-            }
+        if (newVal.name === 'E-Mail' || newVal.name === 'Roles') {
+            outputStr = phText + 'user ';
+        } else {
+            outputStr = phText;
+        }
             //vm.placeHolder = phText + ' ' + newVal.name;
 
-            vm.placeHolder = outputStr + newVal.name;
-        }
-    });
+        window.console.log(vm.search.placeHolderText[$index]);
+        vm.search.placeHolderText[$index] = outputStr + newVal.name;
+
+    }
 
     //TODO: Move the search stuff to the filter service
     function doSearch($item) {
@@ -198,7 +202,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
             filter.push(fieldNames[selectedFilterType]);
             filter.push('like');
-            console.log(vm.search.filterType[i].secondary); //jshint ignore:line
+
             if (vm.search.filterType[i].secondary) {
                 //secondary search
                 //TODO: Don't compare the string here but make it some option in the filter service
@@ -212,7 +216,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                 //text search
                 filter.push(vm.search.searchWord[i]);
             }
-            console.log(filter.join(':')); //jshint ignore:line
+            //console.log(filter.join(':')); //jshint ignore:line
             userListService.setFilter(filter.join(':'));
         }
 

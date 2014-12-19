@@ -18,7 +18,7 @@
                 <div class="row" >
                     <div class="select-filters col-sm-12">
                         <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType[$index].secondary}">
-                            <ui-select ng-required="true" ng-model="userList.search.filterType[$index]">
+                            <ui-select ng-required="true" ng-model="userList.search.filterType[$index]" ng-change="userList.updatePlaceholder($index)">
                                 <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
                                 <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
                                     <div>{{item.name}}</div>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <input class="form-control" ng-change="userList.search.doSearch($index)" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
+                        <input class="form-control" ng-change="userList.search.doSearch($index)" placeholder="{{userList.search.placeHolderText[$index] || userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
                         <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                }"></p>
         </div>
         <div class="col-sm-6">
-            <a ng-show="userList.search.fileCreated" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
+            <a ng-show="userList.search.fileCreated && userList.users.length > 0" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
                 <i class="fa fa-save"></i>
                 <span translate class="ng-scope">Download csv list</span> 
             </a>
