@@ -152,7 +152,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             });
     }
 
-    $scope.$watch('userList.search.filterType', function (newVal) {
+    $scope.$watch('userList.search.filterType[$index]', function (newVal) {
         var phText = 'Search for ';
         var outputStr = '';
 
@@ -190,38 +190,47 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             return;
         }
 
-        filter.push(fieldNames[selectedFilterType]);
-        filter.push('like');
-        if (vm.search.filterType[$item].secondary) {
-            //secondary search
-            //TODO: Don't compare the string here but make it some option in the filter service
-            if (vm.search.filterTypeSecondary[$item].name === 'Inter-Agency') {
-                filter.push('Country team');
-            } else {
-                filter.push(vm.search.filterTypeSecondary[$item].name);
-            }
+        userListService.resetFilters();
 
-        } else {
-            //text search
-            filter.push(vm.search.searchWord);
+        for (var i = 0, len = vm.search.filterCount.length; i < len; i = i + 1) {
+            selectedFilterType = vm.search.filterType[i].name.toLowerCase();
+            filter = [];
+
+            filter.push(fieldNames[selectedFilterType]);
+            filter.push('like');
+            console.log(vm.search.filterType[i].secondary); //jshint ignore:line
+            if (vm.search.filterType[i].secondary) {
+                //secondary search
+                //TODO: Don't compare the string here but make it some option in the filter service
+                if (vm.search.filterTypeSecondary[i].name === 'Inter-Agency') {
+                    filter.push('Country team');
+                } else {
+                    filter.push(vm.search.filterTypeSecondary[i].name);
+                }
+
+            } else {
+                //text search
+                filter.push(vm.search.searchWord[i]);
+            }
+            console.log(filter.join(':')); //jshint ignore:line
+            userListService.setFilter(filter.join(':'));
         }
-        console.log(filter.join(':')); //jshint ignore:line
-        userListService.setFilter(filter.join(':'));
+
         loadList();
     }
 
     function doSecondarySearch($index, $item) {
         vm.search.filterTypeSecondary = $item;
-        vm.doSearch();
+        vm.doSearch($index);
     }
 
     function removeFilter($item) {
         vm.search.filterCount.splice($item, 1);
         userListService.removeFilter($item);
+        vm.doSearch($item);
     }
 
     function addFilter() {
-        window.console.log('UserList: Added filter');
         if (vm.search.filterCount.length < 5) {
             vm.search.filterCount.push(new Date().toString());
         }
@@ -287,15 +296,17 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function getFileName() {
         var res = new Date().toISOString();
-        var filterName = vm.search.filterType && vm.search.filterType.name.toLowerCase() || '';
+        //var filterName = vm.search.filterType && vm.search.filterType.name.toLowerCase() || '';
         var fileName = [];
 		//jscs:disable
         fileName.push(res.substring(0,16).replace(/:/g,''));
         //jscs:enable
         fileName.push(currentUser.name);
+        /*
         if (filterName.length > 0) {
             fileName.push(filterName);
         }
+        */
 
         return fileName.join('-') + '-Page1.csv';
     }

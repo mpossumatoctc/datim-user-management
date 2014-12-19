@@ -9,17 +9,12 @@
 				<li>Start typing your filter value</li>
 			</ul>
 			<p>Your results will autopopulate below.</p>
-            <h3>Filters</h3>
+            <h3>Filters {{userList.search.filterCount.length}}</h3>
 		</div>
 	</div>
 	<form class="form-demo" novalidate>
         <div class="filterForm form-group" ng-repeat="filter in userList.search.filterCount">
             <ng-form name="searchForm">
-                <div class="row" ng-show="userList.search.filterCount.length > 1">
-                    <div class="col-sm-12"><button class="btn btn-secondary" ng-click="userList.removeFilter($index)">Remove Filter</button>
-                    {{$index}}
-                    </div>
-                </div>
                 <div class="row" >
                     <div class="select-filters col-sm-12">
                         <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType[$index].secondary}">
@@ -42,8 +37,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <input class="form-control" ng-change="userList.search.doSearch()" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
+                        <input class="form-control" ng-change="userList.search.doSearch($index)" placeholder="{{userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
                         <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
+                    </div>
+                </div>
+                <div class="row" ng-show="userList.search.filterCount.length > 1">
+                    <div class="col-sm-12"><button class="btn btn-info btn-xs" ng-click="userList.removeFilter($index)">Remove Filter</button>
                     </div>
                 </div>
             </ng-form>
@@ -51,8 +50,10 @@
 
         <div class="row">
             <div class="col-md-12">
-                    <button class="btn btn-secondary" ng-click="userList.addFilter()">Add Filter</button>
-                    <button class="btn btn-secondary" ng-click="userList.resetFilters()">Clear Filters</button>
+                    <button class="btn btn-primary" ng-click="userList.addFilter()"
+                    ng-disabled="userList.search.filterCount.length == 4">Add Filter</button>
+                    <button class="btn btn-warning" ng-click="userList.resetFilters()"
+                    ng-show="userList.search.filterCount.length > 1">Clear Filters</button>
             </div>
         </div>
     </form>
