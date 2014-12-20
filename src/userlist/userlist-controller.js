@@ -235,6 +235,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function buildRow(row) {
         var tempObj = [];
+
         tempObj.push(row.name);
         tempObj.push(row.email || '');
         tempObj.push(row.userCredentials.userRoles[0].name || '');
