@@ -3,10 +3,8 @@
 [![Coverage Status](https://img.shields.io/coveralls/dhis2/user-management-pepfar.svg)](https://coveralls.io/r/dhis2/user-management-pepfar)
 
 ####Dependency statuses
-Dependency file | Status
----- | ----
-package.json | [![Dependency Status](https://www.versioneye.com/user/projects/54595f4b2b4804e10b0000c1/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54595f4b2b4804e10b0000c1)
-bower.json | [![Dependency Status](https://www.versioneye.com/user/projects/54595fc12b48049ecc00004e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54595fc12b48049ecc00004e)
+[![Dependency Status](https://www.versioneye.com/user/projects/54595f4b2b4804e10b0000c1/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54595f4b2b4804e10b0000c1)
+[![Dependency Status](https://www.versioneye.com/user/projects/54595fc12b48049ecc00004e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54595fc12b48049ecc00004e)
 
 ####The app uses the following depencencies
 To get more familiar with the techniques we are using in this project please see the following websites.
