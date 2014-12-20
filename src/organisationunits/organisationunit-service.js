@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('organisationUnitService', organisationUnitService);
 
-function organisationUnitService(Restangular) {
+function organisationUnitService(Restangular, _) {
     return {
         getOrganisationUnitsForLevel: getOrganisationUnitsForLevel
     };
@@ -13,6 +13,9 @@ function organisationUnitService(Restangular) {
             })
             .then(function (response) {
                 return response.organisationUnits || [];
+            })
+            .then(function (organisationUnits) {
+                return _.sortBy(organisationUnits, 'name');
             });
     }
 }

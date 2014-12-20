@@ -1,14 +1,10 @@
-
-
 <div class="search-users">
 	<div class="row">
-		<div class="col-sm-12">
-			<p>This form will allow you to add system users to your group in DHIS2.</p>
+		<div class="col-sm-12 well">
 			<ul>
 				<li>Select your filter type to limit your search</li>
 				<li>Start typing your filter value</li>
 			</ul>
-			<p>Your results will autopopulate below.</p>
 		</div>
 	</div>
 	<div class="row">
@@ -49,7 +45,7 @@
         <div class="col-sm-6">
             <a ng-show="userList.search.fileCreated" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
                 <i class="fa fa-save"></i>
-                <span translate class="ng-scope">Download csv list</span> 
+                <span translate class="ng-scope">Download as CSV</span>
             </a>
         </div>
     </div>

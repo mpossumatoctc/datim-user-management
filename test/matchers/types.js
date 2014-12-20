@@ -1,5 +1,5 @@
 beforeEach(function () {
-    jasmine.Expectation.addMatchers({
+    jasmine.addMatchers({
         toBeAnObject: function () {
             return {
                 compare: function (actual) {

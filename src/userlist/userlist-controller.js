@@ -217,8 +217,12 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             return;
         }
 
-        for (var i = 0, len = localUsers.length; i < len; i = i + 1) {
-            finalCSV.push(buildRow(localUsers[i]));
+        try {
+            for (var i = 0, len = localUsers.length; i < len; i = i + 1) {
+                finalCSV.push(buildRow(localUsers[i]));
+            }
+        } catch (e) {
+            window.console.error(e);
         }
 
         vm.search.fileDownload.url = 'data:text/csv;base64,' + window.btoa(
@@ -231,7 +235,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function buildRow(row) {
         var tempObj = [];
-        tempObj = [];
         tempObj.push(row.name);
         tempObj.push(row.email || '');
         tempObj.push(row.userCredentials.userRoles[0].name || '');
@@ -246,10 +249,8 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         var res = new Date().toISOString();
         var filterName = vm.search.filterType && vm.search.filterType.name.toLowerCase() || '';
         var fileName = [];
-		//jscs:disable
-        fileName.push(res.substring(0,16).replace(/:/g,''));
-        window.console.log(res.substring(0,16));
-        //jscs:enable
+        fileName.push(res.substring(0, 16).replace(/:/g, ''));
+        window.console.log(res.substring(0, 16));
         fileName.push(currentUser.name);
         if (filterName.length > 0) {
             fileName.push(filterName);
