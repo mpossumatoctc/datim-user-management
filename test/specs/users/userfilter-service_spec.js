@@ -9,6 +9,14 @@ describe('Userlist service', function () {
                 getUserTypes: jasmine.createSpy().and.returnValue(success)
             };
         });
+        $provide.factory('organisationUnitService', function ($q) {
+            var success = $q.when([
+                {name: 'Rwanda'}
+            ]);
+            return {
+                getOrganisationUnitsForLevel: jasmine.createSpy().and.returnValue(success)
+            };
+        });
     }));
     beforeEach(inject(function ($injector) {
         userTypesService = $injector.get('userTypesService');
@@ -37,8 +45,8 @@ describe('Userlist service', function () {
                 {name: 'E-Mail'},
                 {name: 'Roles'},
                 {name: 'User Groups'},
-                {name: 'Organisation Unit'},
-                {name: 'Types', secondary: [{name: 'Inter-Agency'}, {name: 'Agency'}, {name: 'Partner'}]}
+                {name: 'Types', secondary: [{name: 'Inter-Agency'}, {name: 'Agency'}, {name: 'Partner'}]},
+                {name: 'Organisation Unit', secondary: [{name: 'Rwanda'}]}
             ];
         }));
 

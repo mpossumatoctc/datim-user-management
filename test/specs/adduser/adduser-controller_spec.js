@@ -424,8 +424,8 @@ describe('Add user controller', function () {
             };
             controller.addUser();
 
-            expect(controller.userInviteObject.groups[0]).toEqual({id: 'agencyGroupIdMech'});
-            expect(controller.userInviteObject.groups[1]).toEqual({id: 'agencyGroupIdUsers'});
+            expect(controller.userInviteObject.userGroups[0]).toEqual({id: 'agencyGroupIdMech'});
+            expect(controller.userInviteObject.userGroups[1]).toEqual({id: 'agencyGroupIdUsers'});
         });
 
         it('should not call inviteUser when there is no mechGroup', function () {
@@ -462,7 +462,7 @@ describe('Add user controller', function () {
             it('should add the user manager group when the user manager role is present', function () {
                 controller.addUser();
 
-                expect(controller.userInviteObject.groups[2]).toEqual({id: 'userAdminUserGroup'});
+                expect(controller.userInviteObject.userGroups[2]).toEqual({id: 'userAdminUserGroup'});
             });
 
             it('should not add the user manager group when the user manager role is present but false', function () {
@@ -470,7 +470,7 @@ describe('Add user controller', function () {
 
                 controller.addUser();
 
-                expect(controller.userInviteObject.groups.length).toBe(2);
+                expect(controller.userInviteObject.userGroups.length).toBe(2);
             });
 
             it('should not add the user manager group when the user manager role is present but not the group', function () {
@@ -479,7 +479,7 @@ describe('Add user controller', function () {
 
                 controller.addUser();
 
-                expect(controller.userInviteObject.groups.length).toBe(0);
+                expect(controller.userInviteObject.userGroups.length).toBe(0);
             });
 
             it('should call the inviteUser method on the user service', function () {

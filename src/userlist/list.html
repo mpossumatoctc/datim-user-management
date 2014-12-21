@@ -1,62 +1,86 @@
-
-
 <div class="search-users">
 	<div class="row">
 		<div class="col-sm-12">
-			<p>This form will allow you to add system users to your group in DHIS2.</p>
-			<ul>
-				<li>Select your filter type to limit your search</li>
-				<li>Start typing your filter value</li>
-			</ul>
-			<p>Your results will autopopulate below.</p>
-            <h3>Filters {{userList.search.filterCount.length}}</h3>
+
+            <div class="well help-text">
+                <ul>
+                    <li>Select your filter type to limit your search</li>
+                    <li>Start typing your filter value</li>
+                </ul>
+            </div>
+
 		</div>
 	</div>
-	<form class="search-form" novalidate>
-        <div class="filterForm form-group" ng-repeat="filter in userList.search.filterCount">
-            <ng-form name="searchForm">
-                <div class="row" >
-                    <div class="select-filters col-sm-12">
-                        <div class="select-filtertype" ng-class="{'half': !!userList.search.filterType[$index].secondary}">
-                            <ui-select ng-required="true" ng-model="userList.search.filterType[$index]" ng-change="userList.updatePlaceholder($index)">
-                                <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
-                                <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
-                                    <div>{{item.name}}</div>
-                                </ui-select-choices>
-                            </ui-select>
+    <div class="search-form">
+	<!--<form class="search-form" novalidate>-->
+        <div class="filters">
+            <div class="filterForm form-group" ng-repeat="filter in userList.search.activeFilters">
+                    <div class="row" >
+                        <div class="select-filters col-sm-6">
+                            <div class="select-filtertype">
+                                <ui-select ng-required="true" ng-model="userList.search.activeFilters[$index].type">
+                                    <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
+                                    <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
+                                        <div>{{item.name}}</div>
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
                         </div>
-                        <div class="select-filtertype-secondary half" ng-show="userList.search.filterType[$index].secondary">
-                            <ui-select ng-model="userList.search.filterTypeSecondary[$index]" on-select="userList.search.doSecondarySearch($item, $model)">
-                                <ui-select-match placeholder="Please pick an option here">{{$select.selected.name}}</ui-select-match>
-                                <ui-select-choices repeat="item in userList.search.filterType[$index].secondary | filter: $select.search">
-                                    <div>{{item.name}}</div>
-                                </ui-select-choices>
-                            </ui-select>
+                        <div class="col-md-6">
+                            <div class="select-filtertype-secondary-wrap">
+                                <div class="select-filtertype-secondary" ng-hide="userList.search.hasSecondaryFilter($index)">
+                                    <input class="form-control"
+                                           ng-model="userList.search.activeFilters[$index].value"
+                                           ng-change="userList.search.doSearch($index)"
+                                           placeholder="{{ filter.type ? 'Search for users by ' + (filter.type.name | lowercase) : 'Search for users' }}"
+                                           type="text"
+                                           ng-hide="!!userList.search.filterType[$index].secondary"
+                                           ng-disabled="!userList.search.activeFilters[$index].type"
+                                           typeahead-loading="loadingLocations">
+                                    <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
+                                </div>
+                                <div class="select-filtertype-secondary" ng-show="userList.search.hasSecondaryFilter($index)">
+                                    <ui-select ng-model="userList.search.activeFilters[$index].value" on-select="userList.search.doSearch($item, $model)">
+                                        <ui-select-match placeholder="Please pick an option here">{{$select.selected.name}}</ui-select-match>
+                                        <ui-select-choices repeat="item in userList.search.getSecondaryFilter($index) | filter: $select.search">
+                                            <div>{{item.name}}</div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <input class="form-control" ng-change="userList.search.doSearch($index)" placeholder="{{userList.search.placeHolderText[$index] || userList.placeHolder}}" type="text" ng-model="userList.search.searchWord[$index]" ng-hide="!!userList.search.filterType[$index].secondary" ng-disabled="!userList.search.filterType[$index]" typeahead-loading="loadingLocations">
-                        <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
+                    <div class="row" ng-show="userList.search.activeFilters.length > 1">
+                        <div class="col-sm-12">
+                            <div class="button-group">
+                                <button class="btn btn-info btn-xs" ng-click="userList.removeFilter($index)">
+                                    <i class="fa fa-minus-square-o"></i>
+                                    <span>Remove Filter</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row" ng-show="userList.search.filterCount.length > 1">
-                    <div class="col-sm-12"><button class="btn btn-info btn-xs" ng-click="userList.removeFilter($index)">Remove Filter</button>
-                    </div>
-                </div>
-            </ng-form>
+            </div>
         </div>
 
         <div class="row">
             <div class="col-md-12">
-                    <button class="btn btn-primary" ng-click="userList.addFilter()"
-                    ng-disabled="userList.search.filterCount.length == 4">Add Filter</button>
+                <div class="button-group">
+                    <button class="btn btn-default" ng-click="userList.addFilter()"
+                            ng-disabled="userList.search.activeFilters.length == 4">
+                        <i class="fa fa-plus-square-o"></i>
+                        <span>Add Filter</span>
+                    </button>
                     <button class="btn btn-warning" ng-click="userList.resetFilters()"
-                    ng-show="userList.search.filterCount.length > 1">Clear Filters</button>
+                            ng-show="userList.search.activeFilters.length > 0">
+                        <i class="fa fa-times"></i>
+                        <span>Clear Filters</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </form>
+    <!--</form>-->
+    </div>
     <div class="row search-result-header">
         <div class="col-sm-6">
             <h3 ng-pluralize count="userList.pagination.getTotalItemCount()"
@@ -66,10 +90,12 @@
                }"></h3>
         </div>
         <div class="col-sm-6">
-            <a ng-show="userList.search.fileCreated && userList.users.length > 0" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
-                <i class="fa fa-save"></i>
-                <span translate class="ng-scope">Download csv list</span> 
-            </a>
+            <div class="button-group">
+                <a ng-show="userList.search.fileCreated && userList.users.length > 0" download="{{userList.search.fileDownload.download}}" ng-model='userList.search.fileDownload' ng-href='{{userList.search.fileDownload.url}}' class="btn btn-default pull-right">
+                    <i class="fa fa-save"></i>
+                    <span translate class="ng-scope">Download as CSV</span>
+                </a>
+            </div>
         </div>
     </div>
     

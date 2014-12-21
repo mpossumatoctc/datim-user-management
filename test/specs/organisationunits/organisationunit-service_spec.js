@@ -62,8 +62,8 @@ describe('Organisation unit service', function () {
                 });
             $httpBackend.flush();
 
-            expect(organisationUnit.name).toEqual('Indonesia');
-            expect(organisationUnit.id).toEqual('W73PRZcjFIU');
+            expect(organisationUnit.name).toEqual('Angola');
+            expect(organisationUnit.id).toEqual('XOivy2uDpMF');
         });
 
         it('should only do the api request once', function () {

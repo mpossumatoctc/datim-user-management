@@ -1,5 +1,5 @@
 beforeEach(function () {
-    jasmine.Expectation.addMatchers({
+    jasmine.addMatchers({
         toHaveClass: function () {
             return {
                 compare: function (actual, className) {

@@ -34,19 +34,20 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.search = {
         options: userFilter,
         filterType: undefined,
-        filterTypeSecondary: undefined,
         searchWord: '',
         doSearch: _.debounce(vm.doSearch, 500),
-        doSecondarySearch: doSecondarySearch,
         fileCreated: false,
         fileDownload: {
             url: '',
             download: ''
         },
         getFilters: getFilters,
-        filterCount: [],
+        activeFilters: [],
         addFilter: addFilter,
-        placeHolderText: []
+        placeHolderText: [],
+        hasSecondaryFilter: hasSecondaryFilter,
+        getSecondaryFilter: getSecondaryFilter
+
     };
 
     initialise();
@@ -55,10 +56,18 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             return $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
         }
-        //window.console.log(currentUser);
 
         loadList();
-        vm.search.addFilter();
+    }
+
+    function hasSecondaryFilter(filterIndex) {
+        return (vm.search.activeFilters[filterIndex] && vm.search.activeFilters[filterIndex].type && vm.search.activeFilters[filterIndex].type.secondary);
+    }
+
+    function getSecondaryFilter(filterIndex) {
+        if (hasSecondaryFilter(filterIndex)) {
+            return vm.search.activeFilters[filterIndex].type.secondary;
+        }
     }
 
     function setUserList(users) {
@@ -118,7 +127,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         if (user !== vm.detailsUser) {
             //jscs:disable
-            var position = $('.user-list li[user-id=' + user.id + ']').position(); //jshint ignore:line
+            var position = $('.user-list li[user-id=' + user.id + ']').position() || {}; //jshint ignore:line
             $('.user-details-view').offset({top: position.top, right: 0}); //jshint ignore:line
             //window.console.log(position);
 			//jscs:enable
@@ -159,15 +168,11 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         var phText = 'Search for ';
         var outputStr = '';
 
-        //window.console.log('newSearch ' + newVal.name);
-        //window.console.log(vm.search.filterType[$index]);
-
         if (newVal.name === 'E-Mail' || newVal.name === 'Roles') {
             outputStr = phText + 'user ';
         } else {
             outputStr = phText;
         }
-            //vm.placeHolder = phText + ' ' + newVal.name;
 
         window.console.log(vm.search.placeHolderText[$index]);
         vm.search.placeHolderText[$index] = outputStr + newVal.name;
@@ -175,10 +180,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     //TODO: Move the search stuff to the filter service
-    function doSearch($item) {
-        window.console.log($item);
-        var selectedFilterType = vm.search.filterType[$item].name.toLowerCase();
-        var filter = [];
+    function doSearch() {
         var fieldNames = {
             name: 'name',
             username: 'userCredentials.code',
@@ -190,59 +192,55 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         };
         resetFileDownload();
 
-        if (!selectedFilterType && (!vm.search.filterTypeSecondary || vm.search.searchWord === '')) {
-            return;
-        }
-
         userListService.resetFilters();
 
-        for (var i = 0, len = vm.search.filterCount.length; i < len; i = i + 1) {
-            selectedFilterType = vm.search.filterType[i].name.toLowerCase();
-            filter = [];
+        vm.search.activeFilters.forEach(function (filterDefinition) {
+            var filter;
 
-            filter.push(fieldNames[selectedFilterType]);
-            filter.push('like');
+            //Only use valid filters
+            if (!isValidFilter(filterDefinition)) { return; }
 
-            if (vm.search.filterType[i].secondary) {
-                //secondary search
-                //TODO: Don't compare the string here but make it some option in the filter service
-                if (vm.search.filterTypeSecondary[i].name === 'Inter-Agency') {
-                    filter.push('Country team');
-                } else {
-                    filter.push(vm.search.filterTypeSecondary[i].name);
-                }
+            filter = [
+                fieldNames[filterDefinition.type.name.toLowerCase()],
+                filterDefinition.comparator,
+                angular.isString(filterDefinition.value) ? filterDefinition.value : filterDefinition.value.name
+            ];
 
-            } else {
-                //text search
-                filter.push(vm.search.searchWord[i]);
-            }
-            //console.log(filter.join(':')); //jshint ignore:line
             userListService.setFilter(filter.join(':'));
-        }
+        });
 
         loadList();
     }
 
-    function doSecondarySearch($index, $item) {
-        vm.search.filterTypeSecondary = $item;
-        vm.doSearch($index);
+    function isValidFilter(filterDefinition) {
+        return filterDefinition &&
+            filterDefinition.type &&
+            filterDefinition.type.name &&
+            filterDefinition.comparator &&
+            filterDefinition.value;
     }
 
-    function removeFilter($item) {
-        vm.search.filterCount.splice($item, 1);
-        userListService.removeFilter($item);
-        vm.doSearch($item);
+    function removeFilter($index) {
+        vm.search.activeFilters.splice($index, 1);
+        userListService.removeFilter($index);
+        doSearch();
     }
 
     function addFilter() {
-        if (vm.search.filterCount.length < 5) {
-            vm.search.filterCount.push(new Date().toString());
+        if (vm.search.activeFilters.length < 5) {
+            vm.search.activeFilters.push({
+                id: new Date().toString(),
+                type: undefined,
+                value: undefined,
+                comparator: 'like'
+            });
         }
     }
 
     function resetFilters() {
-        vm.search.filterCount = ['1'];
+        vm.search.activeFilters = [];
         userListService.resetFilters();
+        doSearch();
     }
 
     function editUser(user) {
@@ -273,13 +271,19 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             return;
         }
 
-        for (var i = 0, len = localUsers.length; i < len; i = i + 1) {
-            finalCSV.push(buildRow(localUsers[i]));
+        try {
+            for (var i = 0, len = localUsers.length; i < len; i = i + 1) {
+                finalCSV.push(buildRow(localUsers[i]));
+            }
+
+            vm.search.fileDownload.url = 'data:text/csv;base64,' + window.btoa(
+                header + finalCSV.join('\n')
+            );
+
+        } catch (e) {
+            window.console.error(e);
         }
 
-        vm.search.fileDownload.url = 'data:text/csv;base64,' + window.btoa(
-            header + finalCSV.join('\n')
-        );
         vm.search.fileDownload.download = getFileName();
         vm.search.fileCreated = true;
 
@@ -287,7 +291,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function buildRow(row) {
         var tempObj = [];
-        tempObj = [];
+
         tempObj.push(row.name);
         tempObj.push(row.email || '');
         tempObj.push(buildList(row.userCredentials.userRoles) || '');
@@ -300,17 +304,12 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function getFileName() {
         var res = new Date().toISOString();
-        //var filterName = vm.search.filterType && vm.search.filterType.name.toLowerCase() || '';
         var fileName = [];
-		//jscs:disable
-        fileName.push(res.substring(0,16).replace(/:/g,''));
-        //jscs:enable
+
+        fileName.push(res.substring(0, 16).replace(/:/g, ''));
         fileName.push(currentUser.name);
-        /*
-        if (filterName.length > 0) {
-            fileName.push(filterName);
-        }
-        */
+
+        window.console.log(res.substring(0, 16));
 
         return fileName.join('-') + '-Page1.csv';
     }

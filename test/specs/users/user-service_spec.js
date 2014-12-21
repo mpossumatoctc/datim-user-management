@@ -138,7 +138,7 @@ describe('User service', function () {
                 email: 'mark@thedutchies.com',
                 organisationUnits: [],
                 dataViewOrganisationUnits: [],
-                groups: [
+                userGroups: [
                     {id:'c6hGi8GEZot'}
                 ],
                 userCredentials: {
@@ -188,7 +188,7 @@ describe('User service', function () {
 
             inviteEntity.addEntityUserGroup({id: 'userGroupId'});
 
-            expect(inviteEntity.groups.some(hasId('userGroupId')))
+            expect(inviteEntity.userGroups.some(hasId('userGroupId')))
                 .toBe(true);
 
             function hasId(requestedId) {
@@ -329,7 +329,7 @@ describe('User service', function () {
                 dataViewOrganisationUnits:[
                     {id:'ybg3MO3hcf4'}
                 ],
-                groups: [
+                userGroups: [
                     {id:'iuD8wUFz95X'},
                     {id:'gh9tn4QBbKZ'}
                 ],
@@ -379,7 +379,7 @@ describe('User service', function () {
         });
 
         it('should return false when there are no userGroups', function () {
-            inviteObject.groups = [];
+            inviteObject.userGroups = [];
 
             expect(service.verifyInviteData(inviteObject)).toBe(false);
         });

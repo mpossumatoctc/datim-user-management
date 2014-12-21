@@ -1,4 +1,4 @@
-describe('Userlist service', function () {
+describe('Pagination service', function () {
     var service;
     var paginationOptions;
 
@@ -51,7 +51,7 @@ describe('Userlist service', function () {
     });
 
     it('should have a page size method that returns 25', function () {
-        expect(service.getPageSize()).toBe(50);
+        expect(service.getPageSize()).toBe(25);
     });
 
     it('should have a setCurrentPage method', function () {

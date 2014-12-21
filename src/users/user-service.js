@@ -9,7 +9,7 @@ function userService($q, Restangular, _) {
         dataViewOrganisationUnits:[
             //{'id':'ybg3MO3hcf4'}
         ],
-        groups: [
+        userGroups: [
             //{'id':'iuD8wUFz95X'},
             //{'id':'gh9tn4QBbKZ'}
         ],
@@ -72,10 +72,10 @@ function userService($q, Restangular, _) {
         }
 
         function addEntityUserGroup(userGroup) {
-            this.groups = this.groups || [];
+            this.userGroups = this.userGroups || [];
 
             if (userGroup && userGroup.id) {
-                this.groups.push({id: userGroup.id});
+                this.userGroups.push({id: userGroup.id});
             }
         }
     }
@@ -87,7 +87,7 @@ function userService($q, Restangular, _) {
         //Add the usergroups to the invite object
         selectedDataGroups.forEach(function (dataGroup) {
 
-            inviteObject.groups = inviteObject.groups.concat(dataGroup.userGroups.map(function (userGroup) {
+            inviteObject.userGroups = inviteObject.userGroups.concat(dataGroup.userGroups.map(function (userGroup) {
                 return {id: userGroup.id};
             }));
         });
@@ -219,7 +219,7 @@ function userService($q, Restangular, _) {
 
     function verifyInviteData(inviteObject) {
         if (verifyEmail(inviteObject.email) && verifyOrganisationUnits(inviteObject) &&
-            verifyUserRoles(inviteObject.userCredentials) && verifyUserGroups(inviteObject.groups)) {
+            verifyUserRoles(inviteObject.userCredentials) && verifyUserGroups(inviteObject.userGroups)) {
             return true;
         }
         return false;

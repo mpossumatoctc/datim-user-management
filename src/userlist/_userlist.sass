@@ -1,5 +1,11 @@
-.search-form div.row
-  margin-bottom: 30px
+.search-form
+  div.row
+    margin-bottom: 2px
+    &:last-child
+      margin-bottom: 15px
+
+  .button-group
+    float: inherit
 
 .select-filters
   position: relative
@@ -11,24 +17,31 @@
   -webkit-transition: 300ms width
   transition: 300ms width
 
+.select-filtertype-secondary-wrap
+  position: relative
+
+  div
+    right: 0
+
+  & div:first-child
+    left: 0
+
 .select-filtertype-secondary
+  position: absolute
   -webkit-transition: 400ms width
   transition: 400ms width
-  position: absolute
   right: 15px
   top: 0
-  width: 48%
+  width: 100%
 
 .select-filtertype-secondary.ng-hide
+  position: absolute
   width: 0%
 
-.select-filtertype.half
-  width: 48%
-
 .search-result-header
-  border-top: 1px solid grey
-  padding-top: 20px
-  padding-bottom: 20px
+  border-top: 1px solid #CCCCCC
+  padding-top: 15px
+  padding-bottom: 15px
 
 .search-result
   position: relative
@@ -63,12 +76,13 @@
   transition: 300ms all
 
 .user-list-row
-  padding: 10px
-  padding-bottom: 10px
+  padding: 5px
+  padding-left: 10px
   border-radius: 5px
   min-height: 80px
   max-height: 80px
-  border-bottom: 1px solid #ccc
+  border-bottom: 1px solid #CCCCCC
+  border-left: 1px solid #CCCCCC
 
   &:hover, &.is-details-user:hover, &:nth-child(odd):hover, &.is-details-user:nth-child(odd):hover
     background-color: #276696
@@ -176,9 +190,9 @@
 
   .user-list-row &
     display: block
-    transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
-    -ms-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
-    -webkit-transform: rotateZ(-90deg) translateY(31px) translateX(-11px)
+    transform: rotateZ(-90deg) translateY(31px) translateX(-15px)
+    -ms-transform: rotateZ(-90deg) translateY(31px) translateX(-15px)
+    -webkit-transform: rotateZ(-90deg) translateY(31px) translateX(-15px)
     box-shadow: 0px 7px 4px -6px #555 inset
     border-top: 1px solid #666
     border-bottom-left-radius: 5px
@@ -232,6 +246,10 @@
 
   ul
     padding: 0
+
+.help-text
+  ul
+    margin: 0
 
 @media (min-width: 1000px)
   .user-list

@@ -1,4 +1,4 @@
-describe('Userlist controller', function () {
+describe('Userlist controller', function () { //jshint ignore:line
     var controller;
     var userStatusServiceMockFactory;
     var userStatusService;
@@ -56,7 +56,9 @@ describe('Userlist controller', function () {
                 pagination: paginationService,
                 SETTOFAIL: function () {
                     this.getList = jasmine.createSpy().and.returnValue(failure);
-                }
+                },
+                removeFilter: jasmine.createSpy('removeFilter'),
+                resetFilters: jasmine.createSpy('resetFilters')
             };
         });
         $provide.factory('userActions', function ($q) {
@@ -491,18 +493,6 @@ describe('Userlist controller', function () {
         });
     });
 
-    describe('doSecondarySearch', function () {
-        beforeEach(function () {
-            spyOn(controller, 'doSearch');
-        });
-
-        it('should set the secondary filter type', function () {
-            controller.search.doSecondarySearch({name: 'Partner'});
-
-            expect(controller.search.filterTypeSecondary).toEqual({name: 'Partner'});
-        });
-    });
-
     describe('editUser', function () {
         var $state;
 
@@ -518,6 +508,73 @@ describe('Userlist controller', function () {
             controller.editUser({id: 'stuff', userCredentials: {code: 'markpo'}});
 
             expect($state.go).toHaveBeenCalled();
+        });
+    });
+
+    describe('addFilter', function () {
+
+        it('should add a filter to the activeFilters', function () {
+            controller.search.activeFilters = [];
+
+            controller.addFilter();
+
+            expect(controller.search.activeFilters.length).toBe(1);
+        });
+
+        it('should add a filter with empty properties to the', function () {
+            var addedFilter;
+
+            controller.addFilter();
+            addedFilter = controller.search.activeFilters[0];
+
+            expect(addedFilter.id).toBeDefined();
+            expect(addedFilter.type).not.toBeDefined();
+            expect(addedFilter.value).not.toBeDefined();
+            expect(addedFilter.comparator).toEqual('like');
+        });
+    });
+
+    describe('resetFilters', function () {
+
+        it('should reset a filter the filter list', function () {
+            controller.search.activeFilters = [];
+
+            controller.addFilter();
+            controller.addFilter();
+            controller.addFilter();
+
+            controller.resetFilters();
+            expect(controller.search.activeFilters.length).toBe(0);
+        });
+    });
+
+    describe('removeFilter', function () {
+
+        beforeEach(function () {
+            controller.search.activeFilters = [];
+
+            controller.addFilter();
+            controller.addFilter();
+            controller.addFilter();
+
+            controller.search.activeFilters[0].type = 'name';
+            controller.search.activeFilters[1].type = 'roles';
+            controller.search.activeFilters[2].type = 'email';
+
+            spyOn(controller, 'doSearch');
+        });
+
+        it('should remove a filter from the list', function () {
+            controller.removeFilter();
+
+            expect(controller.search.activeFilters.length).toBe(2);
+        });
+
+        it('should remove the correct filter from the list', function () {
+            controller.removeFilter(1);
+
+            expect(controller.search.activeFilters[0].type).toEqual('name');
+            expect(controller.search.activeFilters[1].type).toEqual('email');
         });
     });
 });
