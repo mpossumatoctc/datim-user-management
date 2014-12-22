@@ -136,7 +136,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                 if (newUser.userCredentials && angular.isString(newUser.userCredentials.code) && $scope.user.locale && $scope.user.locale.name) {
                     userService.saveUserLocale(newUser.userCredentials.code, $scope.user.locale.name)
                         .then(function () {
-                            notify.success('User added successfully');
+                            notify.success('User invitation sent');
                             $scope.user = userService.getUserObject();
                             vm.isProcessingAddUser = false;
                             $state.go('add', {}, {reload: true});
