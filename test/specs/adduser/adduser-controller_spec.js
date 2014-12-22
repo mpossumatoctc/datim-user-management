@@ -56,7 +56,9 @@ describe('Add user controller', function () {
             controller = $controller('addUserController', {
                 $scope: scope,
                 userTypes: undefined,
-                dataGroups: undefined,
+                dataGroups: [
+                    {}
+                ],
                 dimensionConstraint: {},
                 userActionsService: {
                     getActionsForUserType: function () {
@@ -80,7 +82,7 @@ describe('Add user controller', function () {
         });
 
         it('should have an array for "data streams"', function () {
-            expect(controller.dataGroups).toEqual([]);
+            expect(controller.dataGroups).toEqual([{}]);
         });
 
         it('should have an array for actions', function () {
@@ -561,7 +563,7 @@ describe('Add user controller', function () {
 
                 it('should call notify with success', function () {
                     expect(notify.success).toHaveBeenCalled();
-                    expect(notify.success).toHaveBeenCalledWith('User added successfully');
+                    expect(notify.success).toHaveBeenCalledWith('User invitation sent');
                 });
             });
 

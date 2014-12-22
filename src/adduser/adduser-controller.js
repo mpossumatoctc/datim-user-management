@@ -66,11 +66,18 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function initialize() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
+            errorHandler.debug('This user is not a user administrator');
+            errorHandler.debug('All authority returned: ', currentUser.hasAllAuthority());
+            errorHandler.debug('User administrator role returned: ', currentUser.isUserAdministrator());
             $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+            return;
         }
 
         if (vm.dataGroups.length <= 0) {
+            errorHandler.debug('This user does not seem to have access to any data streams');
+            errorHandler.debug('User data streams', vm.dataGroups, dataGroups);
             $state.go('noaccess', {message: 'Your user account does not seem to have access to any of the data streams.'});
+            return;
         }
 
         vm.dataGroups.reduce(function (dataGroups, dataGroup) {

@@ -96,7 +96,10 @@ function routerConfig($stateProvider, $urlRouterProvider) {
         .state('noaccess', {
             url: '/noaccess',
             templateUrl: 'noaccess/noaccess.html',
-            controller: 'noAccessController as noAccess'
+            controller: 'noAccessController as noAccess',
+            params: {
+                message: 'Your user account does not seem to have the right permissions to access this functionality.'
+            }
         });
 }
 

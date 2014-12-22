@@ -104,7 +104,7 @@
     ], "catDimensionConstraints": [
         {"name": "Funding Mechanism", "created": "2014-02-18T07:51:04.612+0000", "lastUpdated": "2014-10-16T12:18:02.751+0000", "id": "SH885jaRe0o"}
     ], "lastLogin": "2014-11-20T11:06:25.756+0000", "selfRegistered": false, "disabled": false, "id": "fpYv7pe4Kbh"},
-        "groups": [
+        "userGroups": [
             {"name": "OU Kenya Mechanism 1001 - Banana USAID Mechanism", "created": "2014-09-29T13:08:16.040+0000", "lastUpdated": "2014-10-16T16:47:55.750+0000", "id": "UUejaqD9UNe"},
             {"name": "OU Kenya Partner 10001 users - Banana", "created": "2014-09-29T13:08:16.357+0000", "lastUpdated": "2014-10-18T12:52:38.664+0000", "id": "pGh2wzc7bMY"}
         ], "organisationUnits": [
