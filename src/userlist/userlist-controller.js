@@ -263,7 +263,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function buildCSV() {
-        var header = 'Name, Email, Last Login, Access Level, Groups\n';
+        var header = 'Name, Email, Last Login, Access Level, Groups\r\n';
         var localUsers = vm.users;
         var finalCSV = [];
 
@@ -276,12 +276,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                 finalCSV.push(buildRow(localUsers[i]));
             }
 
-            vm.search.fileDownload.url = 'data:text/csv;base64,' + window.btoa(
-                header + finalCSV.join('\n')
+            vm.search.fileDownload.url = 'data:text/csv;charset=utf-8,' + window.escape(
+                header + finalCSV.join('\r\n')
             );
 
         } catch (e) {
             window.console.error(e);
+            return;
         }
 
         vm.search.fileDownload.download = getFileName();
@@ -295,7 +296,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         tempObj.push(row.name);
         tempObj.push(row.email || '');
         tempObj.push(buildList(row.userCredentials.userRoles) || '');
-        tempObj.push(row.userCredentials.userRoles[0].lastUpdated);
+        tempObj.push(row.userCredentials.userRoles[0].lastUpdated || '');
         tempObj.push(buildList(row.userGroups) || '');
         tempObj.push(buildList(row.organisationUnits) || '');
 
@@ -311,14 +312,14 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         window.console.log(res.substring(0, 16));
 
-        return fileName.join('-') + '-Page1.csv';
+        return fileName.join('-') + '.csv';
     }
 
     function buildList(listArr) {
         var arr = [];
 
         for (var i = 0, len = listArr.length; i < len; i = i + 1) {
-            arr.push('"' + listArr[i].name + '"');
+            arr.push(listArr[i].name);
         }
 
         return '"' + arr.join(',') + '"';
