@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular, _) {
+function userService($q, Restangular, _, partnersService, agenciesService) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -28,6 +28,7 @@ function userService($q, Restangular, _) {
         saveUserLocale: saveUserLocale,
         getSelectedDataGroups: getSelectedDataGroups,
         getUser: getUser,
+        getUserEntity: getUserEntity,
         getUserLocale: getUserLocale,
         updateUser: updateUser
     };
@@ -336,4 +337,16 @@ function userService($q, Restangular, _) {
             .one(['userGroups', userGroupId, 'users', userId].join('/'))
             .remove();
     }
+
+    function getUserEntity(user) {
+        var organisationUnit = user && Array.isArray(user.organisationUnits) && user.organisationUnits[0] || undefined;
+
+        return $q.all([partnersService.getPartners(organisationUnit), agenciesService.getAgencies(organisationUnit)])
+            .then(function (responses) {
+                console.log(responses[0]);
+                console.log(responses[1]);
+            });
+    }
+
+
 }

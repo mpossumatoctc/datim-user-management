@@ -2,7 +2,25 @@ describe('User service', function () {
     var fixtures = window.fixtures;
     var service;
 
-    beforeEach(module('PEPFAR.usermanagement'));
+    beforeEach(module('PEPFAR.usermanagement', function ($provide) {
+        $provide.factory('partnersService', function ($q) {
+            var success = $q.when(window.fixtures.get('getPartners'));
+
+            return {
+                getPartners: jasmine.createSpy('getPartners')
+                    .and.returnValue(success)
+            };
+        });
+
+        $provide.factory('agenciesService', function ($q) {
+            var success = $q.when(window.fixtures.get('getAgencies'));
+
+            return {
+                getAgencies: jasmine.createSpy('getAgencies')
+                    .and.returnValue(success)
+            };
+        });
+    }));
     beforeEach(inject(function ($injector) {
         service = $injector.get('userService');
     }));
@@ -603,6 +621,43 @@ describe('User service', function () {
 
             service.getUser('dfersddd');
             $httpBackend.flush();
+        });
+    });
+
+    describe('getUserEntity', function () {
+        var $httpBackend;
+        var $rootScope;
+        var user;
+
+        beforeEach(inject(function ($injector) {
+            $httpBackend = $injector.get('$httpBackend');
+            $rootScope = $injector.get('$rootScope');
+
+            user = {
+                organisationUnits: [
+                    {name: 'Rwanda'}
+                ]
+            };
+        }));
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('should be a method', function () {
+            expect(service.getUserEntity).toBeAFunction();
+        });
+
+        it('should ask for agencies', function () {
+            service.getUserEntity(user);
+            $httpBackend.flush();
+            $rootScope.$apply();
+        });
+
+        it('should ask for partners', function () {
+            service.getUserEntity(user);
+            $rootScope.$apply();
         });
     });
 

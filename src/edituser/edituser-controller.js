@@ -124,6 +124,13 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
 
+        //TODO: Get the actual user entity that the user is linked to
+        // If the user entity has a user manager group.
+        // If it is not a user manager, remove the user manager group for that entity
+        if ($scope.user.userActions && $scope.user.userActions['Manage users'] === true) {
+            window.console.log('This is a user manager');
+        }
+
         setProcessingTo(true);
 
         userService.updateUser(userToEdit, userGroups)
