@@ -122,15 +122,28 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         return (vm.processing[id] && vm.processing[id] === true) ? true : false;
     }
 
+    //TODO: Move the jQuery stuff out of the controller as it's considered bad practice.
+    //      Very nice solution provided by Paul but we should move it into a directive.
+    //TODO: Perhaps it would also be nice to never have it be out of sight if it is available?
+    var detailsBlock = jQuery('.user-details-view');
     function showDetails(user) {
-        //window.console.log(user);
+        var detailsRow = jQuery('.user-list li[user-id=' + user.id + ']');
+        var detailsWrap = detailsRow.parent();
+        var parentHeight = detailsWrap.innerHeight();
+        var position = detailsRow.position() || {};
+        var detailsBlockHeight = detailsBlock.innerHeight() || 400; //TODO: Remove this static 400 in favour of some jQuery actual height calculation
+
+        if (detailsBlockHeight + position.top >= parentHeight) {
+            position.top = parentHeight - detailsBlockHeight;
+        }
+
+        if (!vm.detailsOpen) {
+            detailsBlock.offset({top: position.top, right: 0}); //jshint ignore:line
+        } else {
+            detailsBlock.css('top', position.top); //jshint ignore:line
+        }
 
         if (user !== vm.detailsUser) {
-            //jscs:disable
-            var position = $('.user-list li[user-id=' + user.id + ']').position() || {}; //jshint ignore:line
-            $('.user-details-view').offset({top: position.top, right: 0}); //jshint ignore:line
-            //window.console.log(position);
-			//jscs:enable
             vm.detailsUser = user;
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
