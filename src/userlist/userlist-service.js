@@ -39,7 +39,8 @@ function userListService(Restangular, paginationService, errorHandler) {
             fields: fields.join(','),
             page: paginationService.getCurrentPage(),
             pageSize: paginationService.getPageSize(),
-            filter: filters
+            filter: filters,
+            manage: 'true'
         };
     }
 
