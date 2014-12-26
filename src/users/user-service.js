@@ -343,10 +343,23 @@ function userService($q, Restangular, _, partnersService, agenciesService) {
 
         return $q.all([partnersService.getPartners(organisationUnit), agenciesService.getAgencies(organisationUnit)])
             .then(function (responses) {
-                console.log(responses[0]);
-                console.log(responses[1]);
+                return (responses[0] || []).concat(responses[1] || []);
+            })
+            .then(function (partnersAndAgencies) {
+                return partnersAndAgencies.reduce(function (current, partnerAgency) {
+                    if (partnerAgency && partnerAgency.userUserGroup && partnerAgency.userAdminUserGroup &&
+                        partnerAgency.userUserGroup.name && partnerAgency.userAdminUserGroup.id &&
+                        hasUserGroup(user, partnerAgency.userUserGroup)) {
+                        return partnerAgency;
+                    }
+                    return current;
+                }, undefined);
             });
     }
 
-
+    function hasUserGroup(user, userGroupToCheck) {
+        return (user.userGroups || []).reduce(function (current, userGroup) {
+            return current || (userGroup.name === userGroupToCheck.name);
+        }, false);
+    }
 }

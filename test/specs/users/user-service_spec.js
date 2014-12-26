@@ -627,11 +627,15 @@ describe('User service', function () {
     describe('getUserEntity', function () {
         var $httpBackend;
         var $rootScope;
+        var agenciesService;
+        var partnersService;
         var user;
 
         beforeEach(inject(function ($injector) {
             $httpBackend = $injector.get('$httpBackend');
             $rootScope = $injector.get('$rootScope');
+            agenciesService = $injector.get('agenciesService');
+            partnersService = $injector.get('partnersService');
 
             user = {
                 organisationUnits: [
@@ -650,14 +654,96 @@ describe('User service', function () {
         });
 
         it('should ask for agencies', function () {
-            service.getUserEntity(user);
-            $httpBackend.flush();
+            var agencies;
+
+            service.getUserEntity(user)
             $rootScope.$apply();
+
+            expect(agenciesService.getAgencies).toHaveBeenCalled();
+            expect(agenciesService.getAgencies).toHaveBeenCalledWith(user.organisationUnits[0]);
         });
 
         it('should ask for partners', function () {
-            service.getUserEntity(user);
+            var partners;
+
+            service.getUserEntity(user)
+                .then(function (response) {
+                    partners = response;
+                });
             $rootScope.$apply();
+
+            expect(partnersService.getPartners).toHaveBeenCalled();
+            expect(agenciesService.getAgencies).toHaveBeenCalledWith(user.organisationUnits[0]);
+        });
+
+        it('should return agency hhs/cdc as userEntity', function () {
+            var userEntity;
+            var expectedUserEntity = {
+                id: 'FPUgmtt8HRi',
+                code: 'Agency_HHS/CDC',
+                name: 'HHS/CDC',
+                created: '2014-05-09T23:23:06.953+0000',
+                lastUpdated: '2014-10-05T13:07:55.940+0000',
+                mechUserGroup: {
+                    id: 'Stc8jiohyTg',
+                    name: 'OU Rwanda Agency HHS/CDC all mechanisms'
+                },
+                userUserGroup: {
+                    id: 'hjLU7Ug0vKG',
+                    name: 'OU Rwanda Agency HHS/CDC users'
+                },
+                userAdminUserGroup: {
+                    id: 'x47aP9pWYlu',
+                    name: 'OU Rwanda Agency HHS/CDC user administrators'
+                }
+            };
+
+            user.userGroups = [
+                {name: 'OU Rwanda Agency HHS/CDC users'}
+            ];
+
+            service.getUserEntity(user)
+                .then(function (response) {
+                   userEntity = response;
+                });
+            $rootScope.$apply();
+
+            expect(userEntity).toEqual(expectedUserEntity);
+        });
+
+        it('should return partner Banana as the userEntity', function () {
+            var userEntity;
+            var expectedUserEntity = {
+                id: 'pBimh5znu2H',
+                code: 'Partner_10001',
+                name: 'Banana',
+                created: '2014-05-28T19:50:31.398+0000',
+                lastUpdated: '2014-10-05T13:07:56.182+0000',
+                mechUserGroup: {
+                    id: 'tICoPGZAWNk',
+                    name: 'OU Kenya Partner 10001 all mechanisms - Banana'
+                },
+                userUserGroup: {
+                    id: 'pGh2wzc7bMY',
+                    name: 'OU Kenya Partner 10001 users - Banana'
+                },
+                userAdminUserGroup: {
+                    id: 'UCnkwxHKAAm',
+                    name: 'OU Kenya Partner 10001 user administrators - Banana'
+                }
+            };
+            user.userGroups = [
+                {name: 'OU Kenya Partner 10001 users - Banana'}
+            ];
+
+
+            service.getUserEntity(user)
+                .then(function (response) {
+                    userEntity = response;
+                });
+            $rootScope.$apply();
+
+            expect(userEntity).toEqual(expectedUserEntity);
         });
     });
 
