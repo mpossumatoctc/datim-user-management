@@ -654,9 +654,7 @@ describe('User service', function () {
         });
 
         it('should ask for agencies', function () {
-            var agencies;
-
-            service.getUserEntity(user)
+            service.getUserEntity(user);
             $rootScope.$apply();
 
             expect(agenciesService.getAgencies).toHaveBeenCalled();
@@ -664,12 +662,7 @@ describe('User service', function () {
         });
 
         it('should ask for partners', function () {
-            var partners;
-
-            service.getUserEntity(user)
-                .then(function (response) {
-                    partners = response;
-                });
+            service.getUserEntity(user);
             $rootScope.$apply();
 
             expect(partnersService.getPartners).toHaveBeenCalled();
@@ -704,7 +697,7 @@ describe('User service', function () {
 
             service.getUserEntity(user)
                 .then(function (response) {
-                   userEntity = response;
+                    userEntity = response;
                 });
             $rootScope.$apply();
 
@@ -736,7 +729,6 @@ describe('User service', function () {
                 {name: 'OU Kenya Partner 10001 users - Banana'}
             ];
 
-
             service.getUserEntity(user)
                 .then(function (response) {
                     userEntity = response;
@@ -752,10 +744,12 @@ describe('User service', function () {
         var userGroups;
         var $q;
         var $httpBackend;
+        var $rootScope;
 
         beforeEach(inject(function ($injector) {
             $q = $injector.get('$q');
             $httpBackend = $injector.get('$httpBackend');
+            $rootScope = $injector.get('$rootScope');
 
             userToUpdate = {
                 id: 'myUserId',
@@ -799,6 +793,7 @@ describe('User service', function () {
 
         it('should call the save method on the userToEdit', function () {
             service.updateUser(userToUpdate, userToUpdate.userGroups);
+            $rootScope.$apply();
 
             expect(userToUpdate.save).toHaveBeenCalled();
         });
