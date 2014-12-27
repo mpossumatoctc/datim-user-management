@@ -155,7 +155,6 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                 if (selectedActions[key] === true) {
                     return key;
                 }
-                return undefined;
             }).filter(function (action) {
                 return action && action !== '';
             });
