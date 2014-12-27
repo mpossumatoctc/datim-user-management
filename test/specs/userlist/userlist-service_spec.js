@@ -96,4 +96,42 @@ describe('Userlist service', function () {
             $httpBackend.flush();
         });
     });
+
+    describe('getFilters', function () {
+        it('should return the filters', function () {
+            expect(service.getFilters()).toEqual([]);
+        });
+    });
+
+    describe('setFilter', function () {
+        it('should set a filter', function () {
+            service.setFilter('name:like:Mark');
+
+            expect(service.getFilters()[0]).toBe('name:like:Mark');
+        });
+    });
+
+    describe('removeFilter', function () {
+        it('should remove filter with passed index', function () {
+            service.setFilter('name:like:Mark');
+            service.setFilter('email:like:mark@dhis2.org');
+            service.setFilter('role:like:Admin');
+
+            service.removeFilter(1);
+
+            expect(service.getFilters()).toEqual(['name:like:Mark', 'role:like:Admin']);
+        });
+    });
+
+    describe('resetFilters', function () {
+        it('should reset the filter list to 0', function () {
+            service.setFilter('name:like:Mark');
+            service.setFilter('email:like:mark@dhis2.org');
+            service.setFilter('role:like:Admin');
+
+            service.resetFilters();
+
+            expect(service.getFilters()).toEqual([]);
+        });
+    });
 });
