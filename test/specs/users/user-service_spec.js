@@ -20,6 +20,28 @@ describe('User service', function () {
                     .and.returnValue(success)
             };
         });
+
+        $provide.factory('interAgencyService', function ($q) {
+            var success = $q.when({
+                userUserGroup: {
+                    id: 'LqrnY1CgnCv',
+                    name: 'OU Rwanda Country team'
+                },
+                userAdminUserGroup: {
+                    id: 'sJSLgsi6KjY',
+                    name: 'OU Rwanda User administrators'
+                },
+                mechUserGroup: {
+                    id: 'OGAFubEVJK0',
+                    name: 'OU Rwanda All mechanisms'
+                }
+            });
+
+            return {
+                getUserGroups: jasmine.createSpy('getUserGroups')
+                    .and.returnValue(success)
+            };
+        });
     }));
     beforeEach(inject(function ($injector) {
         service = $injector.get('userService');
@@ -629,6 +651,7 @@ describe('User service', function () {
         var $rootScope;
         var agenciesService;
         var partnersService;
+        var interAgencyService;
         var user;
 
         beforeEach(inject(function ($injector) {
@@ -636,6 +659,7 @@ describe('User service', function () {
             $rootScope = $injector.get('$rootScope');
             agenciesService = $injector.get('agenciesService');
             partnersService = $injector.get('partnersService');
+            interAgencyService = $injector.get('interAgencyService');
 
             user = {
                 organisationUnits: [
@@ -667,6 +691,13 @@ describe('User service', function () {
 
             expect(partnersService.getPartners).toHaveBeenCalled();
             expect(agenciesService.getAgencies).toHaveBeenCalledWith(user.organisationUnits[0]);
+        });
+
+        it('should ask for interAgency groups', function () {
+            service.getUserEntity(user);
+            $rootScope.$apply();
+
+            expect(interAgencyService.getUserGroups).toHaveBeenCalled();
         });
 
         it('should return agency hhs/cdc as userEntity', function () {
@@ -727,6 +758,35 @@ describe('User service', function () {
             };
             user.userGroups = [
                 {name: 'OU Kenya Partner 10001 users - Banana'}
+            ];
+
+            service.getUserEntity(user)
+                .then(function (response) {
+                    userEntity = response;
+                });
+            $rootScope.$apply();
+
+            expect(userEntity).toEqual(expectedUserEntity);
+        });
+
+        it('should return the country team user groups', function () {
+            var userEntity;
+            var expectedUserEntity = {
+                userUserGroup: {
+                    id: 'LqrnY1CgnCv',
+                    name: 'OU Rwanda Country team'
+                },
+                userAdminUserGroup: {
+                    id: 'sJSLgsi6KjY',
+                    name: 'OU Rwanda User administrators'
+                },
+                mechUserGroup: {
+                    id: 'OGAFubEVJK0',
+                    name: 'OU Rwanda All mechanisms'
+                }
+            };
+            user.userGroups = [
+                {name: 'OU Rwanda Country team'}
             ];
 
             service.getUserEntity(user)
