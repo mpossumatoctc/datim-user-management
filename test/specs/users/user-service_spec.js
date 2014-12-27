@@ -638,7 +638,7 @@ describe('User service', function () {
         });
 
         it('should request a user', function () {
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/dfersddd?fields=:all,userCredentials%5Bid,code,disabled,userRoles%5D')
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/dfersddd?fields=:all,userCredentials%5Bid,code,disabled,userRoles,catDimensionConstraints,cogsDimensionConstraints%5D')
                 .respond(200, {});
 
             service.getUser('dfersddd');
