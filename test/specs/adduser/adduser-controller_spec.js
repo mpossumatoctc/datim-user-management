@@ -246,6 +246,43 @@ describe('Add user controller', function () {
         }));
     });
 
+    describe('userOrgUnit.current watch', function () {
+        var controller;
+        var watcherSpy;
+
+        beforeEach(inject(function ($controller, $rootScope) {
+            scope = $rootScope.$new();
+            scope.user = {
+                userType: undefined
+            };
+
+            watcherSpy = jasmine.createSpy('watcherSpy');
+            scope.$on('ORGUNITCHANGED', watcherSpy);
+
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: undefined,
+                dataGroups: [{name: 'EA'}],
+                dimensionConstraint: {},
+                currentUser: currentUserMock(),
+                $state: {} //Fake the state to not load the default
+            });
+            scope.$apply();
+        }));
+
+        it('should not broadcast the event on initial load', function () {
+            expect(watcherSpy).not.toHaveBeenCalled();
+        });
+
+        it('should broadcast the ORGUNITCHANGED event', function () {
+            scope.userOrgUnit.current = {
+                name: 'NewOrgUnitName'
+            };
+            scope.$apply();
+            expect(watcherSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('validation for', function () {
         var controller;
         var scope;

@@ -3,16 +3,15 @@ describe('Agency select directive', function () {
     var $scope;
     var element;
     var $rootScope;
+    var partnersService;
 
     beforeEach(module('pepfar/agencypartner-select.html'));
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
-        $provide.service('partnersService', function () {
-            this.getPartners = function () {
-                return {
-                    then: function (callback) {
-                        callback(fixtures.get('partnerList').categoryOptionGroups);
-                    }
-                };
+        $provide.factory('partnersService', function ($q) {
+            var success = $q.when(fixtures.get('partnerList').categoryOptionGroups);
+            return {
+                getPartners: jasmine.createSpy('getPartners')
+                    .and.returnValue(success)
             };
         });
     }));
@@ -21,6 +20,7 @@ describe('Agency select directive', function () {
         var innerScope;
         var $compile = $injector.get('$compile');
         $rootScope = $injector.get('$rootScope');
+        partnersService = $injector.get('partnersService');
 
         element = angular.element('<partner-select></partner-select>');
 
@@ -59,5 +59,12 @@ describe('Agency select directive', function () {
         elements = element[0].querySelectorAll('.ui-select-choices-row');
 
         expect(elements.length).toBe(fixtures.get('partnerList').categoryOptionGroups.length);
+    });
+
+    it('should call getAgencies after an event is recieved', function () {
+        partnersService.getPartners.calls.reset();
+        $rootScope.$broadcast('ORGUNITCHANGED', {name: 'Rwanda'});
+
+        expect(partnersService.getPartners).toHaveBeenCalled();
     });
 });

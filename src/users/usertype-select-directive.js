@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').directive('selectUsertype', userTypeSelectDirective);
 
-function userTypeSelectDirective(partnersService, agenciesService, interAgencyService) {
+function userTypeSelectDirective(partnersService, agenciesService, interAgencyService, errorHandler) {
     var directive = {
         restrict: 'E',
         replace: true,
@@ -25,7 +25,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
         loadValues(scope.$parent && scope.$parent.userOrgUnit && scope.$parent.userOrgUnit.current);
 
         scope.$on('ORGUNITCHANGED', function (event, data) {
-            console.log('Reloading types for ', data.name); //jshint ignore:line
+            errorHandler.debug('Reloading types for ', data.name); //jshint ignore:line
             loadValues(data);
             scope.selectbox.selected = undefined;
             scope.user.userType = undefined;
