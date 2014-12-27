@@ -31,7 +31,7 @@ describe('Userlist service', function () {
 
             userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
                     'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups' +
-                    '&manage=true&page=1&pageSize=25')
+                    '&manage=true&page=1&pageSize=50')
                 .respond(200, window.fixtures.get('usersPage1'));
         }));
 
@@ -87,7 +87,7 @@ describe('Userlist service', function () {
             $httpBackend.resetExpectations();
             userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
                     'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups&filter=name:like:Mark' +
-                    '&manage=true&page=1&pageSize=25')
+                    '&manage=true&page=1&pageSize=50')
                 .respond(200, window.fixtures.get('usersPage1'));
 
             service.setFilter('name:like:Mark');

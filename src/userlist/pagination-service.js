@@ -4,7 +4,7 @@ function paginationService() {
     var currentPage = 1;
     var totalItemCount = 0;
     var numberOfPages = 0;
-    var defaultPageSize = 25;
+    var defaultPageSize = 50;
 
     return {
         getCurrentPage: getCurrentPage,

@@ -133,7 +133,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         var position = detailsRow.position() || {};
         var detailsBlockHeight = detailsBlock.innerHeight() || 400; //TODO: Remove this static 400 in favour of some jQuery actual height calculation
 
-        if (detailsBlockHeight + position.top >= parentHeight) {
+        if (parentHeight > detailsBlockHeight && (detailsBlockHeight + position.top >= parentHeight)) {
             position.top = parentHeight - detailsBlockHeight;
         }
 
