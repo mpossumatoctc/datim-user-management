@@ -59,7 +59,7 @@
     fixtures.actionsListWithRoles = [
         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
-        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+        {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
         {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
     ];
 

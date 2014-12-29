@@ -14,7 +14,7 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
     var actions = [
         {name: 'Accept data', userRole: 'Data Accepter'},
         {name: 'Submit data', userRole: 'Data Submitter'},
-        {name: 'Manage users', userRole: 'User Administrator'},
+        {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true},
         {name: 'Read data', userRole: 'Read Only', default: true}
     ];
 
@@ -127,7 +127,7 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
         var availableActions = getAvailableActionsForUserType(userType);
 
         return actions.filter(function (action) {
-            return (availableActions.indexOf(action.name) >= 0) || action.default;
+            return action.userRoleId && ((availableActions.indexOf(action.name) >= 0) || action.default);
         });
     }
 
