@@ -83,7 +83,8 @@
     </div>
     <div class="row search-result-header">
         <div class="col-sm-6">
-            <h3 ng-pluralize count="userList.pagination.getTotalItemCount()"
+            <h3 ng-hide="userList.listIsLoading"
+               ng-pluralize count="userList.pagination.getTotalItemCount()"
                when="{'0': 'No users have been found, please make your search less specific',
                '1': '1 User found',
                'other': '{} Users found'
