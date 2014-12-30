@@ -294,7 +294,8 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             );
 
         } catch (e) {
-            window.console.error(e);
+            //FIXME: Logging of the error disabled because Lars wanted a clean console for Mike Gehron
+            //window.console.error(e);
         }
 
         vm.search.fileDownload.download = getFileName();
@@ -321,8 +322,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         fileName.push(res.substring(0, 16).replace(/:/g, ''));
         fileName.push(currentUser.name);
-
-        window.console.log(res.substring(0, 16));
 
         return fileName.join('-') + '-Page1.csv';
     }
