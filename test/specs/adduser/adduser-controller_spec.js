@@ -581,7 +581,7 @@ describe('Add user controller', function () {
                             success.call(undefined, {
                                 name: '(TBD), (TBD)',
                                 userCredentials: {
-                                    code: 'username'
+                                    username: 'username'
                                 }
                             });
                         }
@@ -636,7 +636,7 @@ describe('Add user controller', function () {
                             success.call(undefined, {
                                 name: '(TBD), (TBD)',
                                 userCredentials: {
-                                    code: 'username'
+                                    username: 'username'
                                 }
                             });
                         }
@@ -666,7 +666,7 @@ describe('Add user controller', function () {
                             success.call(undefined, {
                                 name: '(TBD), (TBD)',
                                 userCredentials: {
-                                    code: 'username'
+                                    username: 'username'
                                 }
                             });
                         }

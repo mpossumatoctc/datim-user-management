@@ -196,7 +196,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     function doSearch() {
         var fieldNames = {
             name: 'name',
-            username: 'userCredentials.code',
+            username: 'userCredentials.username',
             'e-mail': 'email',
             roles: 'userCredentials.userRoles.name',
             'user groups': 'userGroups.name',
@@ -257,8 +257,8 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function editUser(user) {
-        if (user && user.id && user.userCredentials && user.userCredentials.code) {
-            $state.go('edit', {userId: user.id, username: user.userCredentials.code});
+        if (user && user.id && user.userCredentials && user.userCredentials.username) {
+            $state.go('edit', {userId: user.id, username: user.userCredentials.username});
         }
     }
 

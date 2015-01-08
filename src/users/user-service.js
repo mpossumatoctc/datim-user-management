@@ -295,7 +295,7 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
         return Restangular
             .all('users')
             .get(userId, {
-                fields: [':all', 'userCredentials[id,code,disabled,userRoles,catDimensionConstraints,cogsDimensionConstraints]'].join(',')
+                fields: [':all', 'userCredentials[id,username,disabled,userRoles,catDimensionConstraints,cogsDimensionConstraints]'].join(',')
             });
     }
 

@@ -30,7 +30,7 @@ describe('Userlist service', function () {
             spyOn(errorHandler, 'errorFn');
 
             userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
-                    'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups' +
+                    'fields=id,name,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups' +
                     '&manage=true&page=1&pageSize=50')
                 .respond(200, window.fixtures.get('usersPage1'));
         }));
@@ -86,7 +86,7 @@ describe('Userlist service', function () {
         it('should add a filter to the query', function () {
             $httpBackend.resetExpectations();
             userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
-                    'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups&filter=name:like:Mark' +
+                    'fields=id,name,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups&filter=name:like:Mark' +
                     '&manage=true&page=1&pageSize=50')
                 .respond(200, window.fixtures.get('usersPage1'));
 
