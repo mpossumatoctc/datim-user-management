@@ -77,7 +77,7 @@ describe('User actions', function () {
             var expectedActions = [
                 {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
             ];
             userActionsService.getActions()
@@ -94,7 +94,7 @@ describe('User actions', function () {
             var expectedActions = [
                 {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
             ];
 
@@ -111,7 +111,7 @@ describe('User actions', function () {
             var userActions;
             var expectedActions = [
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
             ];
 
@@ -143,13 +143,33 @@ describe('User actions', function () {
             var userActions;
             var expectedActions = [
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
             ];
 
             userActionsService.getActions()
                 .then(function (actions) {
                     userActions = actions.getActionsForUserType('partner');
+                });
+            $httpBackend.flush();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should return only the user actions which have userRoles', function () {
+            var userActions;
+            var expectedActions = [
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+            ];
+            userRoleRequest.respond(200, {userRoles: [
+                {id: 'n777lf1THwQ', name: 'Data Submitter'},
+                {id: 'b2uHwX9YLhu', name: 'Read Only'}
+            ]});
+
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions.getActionsForUserType('agency');
                 });
             $httpBackend.flush();
 
@@ -212,7 +232,7 @@ describe('User actions', function () {
             var user = window.fixtures.get('userGroupsRoles');
             var expectedActions = [
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr', hasAction: false},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
                 ];
 
@@ -278,7 +298,7 @@ describe('User actions', function () {
         ];
         var actions = [
             {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
-            {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+            {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr', hasAction: false},
             {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
         ];
 
@@ -402,7 +422,7 @@ describe('User actions', function () {
             };
             actions = [
                 {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
-                {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr', hasAction: false},
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
             ];
 

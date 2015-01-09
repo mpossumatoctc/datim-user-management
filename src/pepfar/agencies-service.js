@@ -8,17 +8,6 @@ function agenciesService($q, Restangular, errorHandler) {
 
     function getAgencies(organisationUnit) {
         return getAgenciesForOrganisationUnit(organisationUnit);
-
-        //return currentUserService.getCurrentUser().then(function (user) {
-        //    var organisationUnitName;
-        //
-        //    if (!(user.organisationUnits && user.organisationUnits[0] && user.organisationUnits[0].name)) {
-        //        return $q.reject('No organisation unit found on the current user');
-        //    }
-        //    organisationUnitName = user.organisationUnits[0].name;
-        //
-        //    return matchUserGroupsWithAgencies(organisationUnitName).catch(errorHandler.debug);
-        //});
     }
 
     function getAgenciesForOrganisationUnit(organisationUnit) {

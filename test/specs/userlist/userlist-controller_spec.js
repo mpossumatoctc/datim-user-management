@@ -505,7 +505,7 @@ describe('Userlist controller', function () { //jshint ignore:line
         });
 
         it('should call $state.go', function () {
-            controller.editUser({id: 'stuff', userCredentials: {code: 'markpo'}});
+            controller.editUser({id: 'stuff', userCredentials: {username: 'markpo'}});
 
             expect($state.go).toHaveBeenCalled();
         });

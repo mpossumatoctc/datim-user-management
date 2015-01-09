@@ -157,7 +157,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function saveUserLocale() {
-        return userService.saveUserLocale(userToEdit.userCredentials.code, $scope.user.locale.name);
+        return userService.saveUserLocale(userToEdit.userCredentials.username, $scope.user.locale.name);
     }
 
     function getUserType() {

@@ -20,7 +20,7 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
     function initialise() {
         deferred = $q.all([loadUserGroups(), loadUserRoles(), currentUserService.getCurrentUser()]).then(function (responses) {
             var currentUser = responses[2];
-            var currentUserGroups = currentUser.groups || [];
+            var currentUserGroups = currentUser.userGroups || [];
             var currentUserGroupIds = currentUserGroups.map(function (userGroup) {
                 return userGroup.id;
             });

@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular, _) {
+function userService($q, Restangular, _, partnersService, agenciesService, interAgencyService) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -28,6 +28,7 @@ function userService($q, Restangular, _) {
         saveUserLocale: saveUserLocale,
         getSelectedDataGroups: getSelectedDataGroups,
         getUser: getUser,
+        getUserEntity: getUserEntity,
         getUserLocale: getUserLocale,
         updateUser: updateUser
     };
@@ -294,19 +295,48 @@ function userService($q, Restangular, _) {
         return Restangular
             .all('users')
             .get(userId, {
-                fields: [':all', 'userCredentials[id,code,disabled,userRoles]'].join(',')
+                fields: [':all', 'userCredentials[id,username,disabled,userRoles,catDimensionConstraints,cogsDimensionConstraints]'].join(',')
             });
     }
 
     function updateUser(userToUpdate, userGroups) {
-        getUserGroupsToAdd(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
-            return addUserGroup(userGroup.id, userToUpdate.id);
-        });
-        getUserGroupsToRemove(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
-            return removeUserGroup(userGroup.id, userToUpdate.id);
-        });
+        return getUserEntity(userToUpdate).then(function (userEntity) {
+            var removedUserGroupPromises;
+            var addedUserGroupPromises;
+            var userAdminGroupName = userEntity && userEntity.userAdminUserGroup && userEntity.userAdminUserGroup.name;
 
-        return userToUpdate.save();
+            userEntity = userEntity || {};
+
+            if (hasUserRole(userToUpdate, {name: 'User Administrator'})) {
+                if (userEntity && userEntity.userAdminUserGroup && !hasUserGroup(userToUpdate, userEntity.userAdminUserGroup)) {
+                    userGroups.push(userEntity.userAdminUserGroup);
+                }
+            } else {
+                userGroups = userGroups.filter(function (userGroup) {
+                    return userGroup.name !== userAdminGroupName;
+                });
+            }
+
+            addedUserGroupPromises = getUserGroupsToAdd(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
+                return addUserGroup(userGroup.id, userToUpdate.id);
+            });
+            removedUserGroupPromises = getUserGroupsToRemove(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
+                return removeUserGroup(userGroup.id, userToUpdate.id);
+            });
+
+            return $q.all([addedUserGroupPromises, removedUserGroupPromises, userToUpdate.save()])
+                .then(function () {
+                    if (hasUserRole(userToUpdate, {name: 'User Administrator'})) {
+                        if (!hasUserGroup(userToUpdate, userEntity.userAdminUserGroup)) {
+                            userToUpdate.userGroups.push(userEntity.userAdminUserGroup);
+                        }
+                    } else {
+                        userToUpdate.userGroups = (userToUpdate.userGroups || []).filter(function (userGroup) {
+                            return userGroup.name !== userAdminGroupName;
+                        });
+                    }
+                });
+        });
     }
 
     function getUserGroupsToAdd(oldUserGroups, newUserGroups) {
@@ -335,5 +365,42 @@ function userService($q, Restangular, _) {
         return Restangular
             .one(['userGroups', userGroupId, 'users', userId].join('/'))
             .remove();
+    }
+
+    function getUserEntity(user) {
+        var organisationUnit = user && Array.isArray(user.organisationUnits) && user.organisationUnits[0] || undefined;
+
+        return $q.all([
+                partnersService.getPartners(organisationUnit),
+                agenciesService.getAgencies(organisationUnit),
+                interAgencyService.getUserGroups(organisationUnit)
+            ])
+            .then(function (responses) {
+                return (responses[0] || [])
+                    .concat(responses[1] || [])
+                    .concat([responses[2]]);
+            })
+            .then(function (partnersAndAgencies) {
+                return partnersAndAgencies.reduce(function (current, partnerAgency) {
+                    if (partnerAgency && partnerAgency.userUserGroup && partnerAgency.userAdminUserGroup &&
+                        partnerAgency.userUserGroup.name && partnerAgency.userAdminUserGroup.id &&
+                        hasUserGroup(user, partnerAgency.userUserGroup)) {
+                        return partnerAgency;
+                    }
+                    return current;
+                }, undefined);
+            });
+    }
+
+    function hasUserGroup(user, userGroupToCheck) {
+        return (user.userGroups || []).reduce(function (current, userGroup) {
+            return current || (userGroup.name === userGroupToCheck.name);
+        }, false);
+    }
+
+    function hasUserRole(user, userRoleToCheck) {
+        return (user && user.userCredentials && user.userCredentials.userRoles || []).reduce(function (current, userRole) {
+            return current || (userRole.name === userRoleToCheck.name);
+        }, false);
     }
 }

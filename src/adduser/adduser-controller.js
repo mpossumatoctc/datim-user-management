@@ -66,11 +66,18 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function initialize() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
+            errorHandler.debug('This user is not a user administrator');
+            errorHandler.debug('All authority returned: ', currentUser.hasAllAuthority());
+            errorHandler.debug('User administrator role returned: ', currentUser.isUserAdministrator());
             $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
+            return;
         }
 
         if (vm.dataGroups.length <= 0) {
+            errorHandler.debug('This user does not seem to have access to any data streams');
+            errorHandler.debug('User data streams', vm.dataGroups, dataGroups);
             $state.go('noaccess', {message: 'Your user account does not seem to have access to any of the data streams.'});
+            return;
         }
 
         vm.dataGroups.reduce(function (dataGroups, dataGroup) {
@@ -133,10 +140,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         //TODO: Clean this up
         userService.inviteUser(vm.userInviteObject)
             .then(function (newUser) {
-                if (newUser.userCredentials && angular.isString(newUser.userCredentials.code) && $scope.user.locale && $scope.user.locale.name) {
-                    userService.saveUserLocale(newUser.userCredentials.code, $scope.user.locale.name)
+                if (newUser.userCredentials && angular.isString(newUser.userCredentials.username) && $scope.user.locale && $scope.user.locale.name) {
+                    userService.saveUserLocale(newUser.userCredentials.username, $scope.user.locale.name)
                         .then(function () {
-                            notify.success('User added successfully');
+                            notify.success('User invitation sent');
                             $scope.user = userService.getUserObject();
                             vm.isProcessingAddUser = false;
                             $state.go('add', {}, {reload: true});

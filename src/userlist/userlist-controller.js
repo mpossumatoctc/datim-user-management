@@ -56,7 +56,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             return $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
         }
-
+        reloadFilters();
         loadList();
     }
 
@@ -122,15 +122,28 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         return (vm.processing[id] && vm.processing[id] === true) ? true : false;
     }
 
+    //TODO: Move the jQuery stuff out of the controller as it's considered bad practice.
+    //      Very nice solution provided by Paul but we should move it into a directive.
+    //TODO: Perhaps it would also be nice to never have it be out of sight if it is available?
+    var detailsBlock = jQuery('.user-details-view');
     function showDetails(user) {
-        //window.console.log(user);
+        var detailsRow = jQuery('.user-list li[user-id=' + user.id + ']');
+        var detailsWrap = detailsRow.parent();
+        var parentHeight = detailsWrap.innerHeight();
+        var position = detailsRow.position() || {};
+        var detailsBlockHeight = detailsBlock.innerHeight() || 400; //TODO: Remove this static 400 in favour of some jQuery actual height calculation
+
+        if (parentHeight > detailsBlockHeight && (detailsBlockHeight + position.top >= parentHeight)) {
+            position.top = parentHeight - detailsBlockHeight;
+        }
+
+        if (!vm.detailsOpen) {
+            detailsBlock.offset({top: position.top, right: 0}); //jshint ignore:line
+        } else {
+            detailsBlock.css('top', position.top); //jshint ignore:line
+        }
 
         if (user !== vm.detailsUser) {
-            //jscs:disable
-            var position = $('.user-list li[user-id=' + user.id + ']').position() || {}; //jshint ignore:line
-            $('.user-details-view').offset({top: position.top, right: 0}); //jshint ignore:line
-            //window.console.log(position);
-			//jscs:enable
             vm.detailsUser = user;
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
@@ -183,7 +196,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     function doSearch() {
         var fieldNames = {
             name: 'name',
-            username: 'userCredentials.code',
+            username: 'userCredentials.username',
             'e-mail': 'email',
             roles: 'userCredentials.userRoles.name',
             'user groups': 'userGroups.name',
@@ -237,15 +250,35 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         }
     }
 
+    function reloadFilters() {
+        if (vm.search.filters && vm.search.filters.length > 0) {
+            vm.search.filters.forEach(function (item) {
+                var temp = {
+                    id: new Date().toString(),
+                    type: undefined,
+                    value: undefined,
+                    comparator: 'like'
+                };
+
+                temp.type = item.type || 'Name';
+                temp.value = item.value;
+                vm.search.activeFilters.push(temp);
+            });
+        } else {
+            addFilter();
+        }
+    }
+
     function resetFilters() {
         vm.search.activeFilters = [];
         userListService.resetFilters();
         doSearch();
+        addFilter();
     }
 
     function editUser(user) {
-        if (user && user.id && user.userCredentials && user.userCredentials.code) {
-            $state.go('edit', {userId: user.id, username: user.userCredentials.code});
+        if (user && user.id && user.userCredentials && user.userCredentials.username) {
+            $state.go('edit', {userId: user.id, username: user.userCredentials.username});
         }
     }
 
@@ -263,7 +296,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function buildCSV() {
-        var header = 'Name, Email, Last Login, Access Level, Groups\r\n';
+        var header = 'Name, Email, Access Level, Groups\r\n';
         var localUsers = vm.users;
         var finalCSV = [];
 
@@ -281,8 +314,12 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             );
 
         } catch (e) {
+
             window.console.error(e);
             return;
+
+            //FIXME: Logging of the error disabled because Lars wanted a clean console for Mike Gehron
+            //window.console.error(e);
         }
 
         vm.search.fileDownload.download = getFileName();
@@ -296,7 +333,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         tempObj.push(row.name);
         tempObj.push(row.email || '');
         tempObj.push(buildList(row.userCredentials.userRoles) || '');
-        tempObj.push(row.userCredentials.userRoles[0].lastUpdated || '');
+        //tempObj.push(row.userCredentials.userRoles[0].lastUpdated || '');
         tempObj.push(buildList(row.userGroups) || '');
         tempObj.push(buildList(row.organisationUnits) || '');
 
@@ -309,8 +346,10 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         fileName.push(res.substring(0, 16).replace(/:/g, ''));
         fileName.push(currentUser.name);
+        fileName.push('Page');
+        fileName.push(vm.currentPage);
 
-        window.console.log(res.substring(0, 16));
+        //window.console.log(res.substring(0, 16));
 
         return fileName.join('-') + '.csv';
     }

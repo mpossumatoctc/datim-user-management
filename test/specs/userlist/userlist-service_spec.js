@@ -30,7 +30,8 @@ describe('Userlist service', function () {
             spyOn(errorHandler, 'errorFn');
 
             userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
-                    'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups&page=1&pageSize=25')
+                    'fields=id,name,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups' +
+                    '&manage=true&page=1&pageSize=50')
                 .respond(200, window.fixtures.get('usersPage1'));
         }));
 
@@ -85,13 +86,52 @@ describe('Userlist service', function () {
         it('should add a filter to the query', function () {
             $httpBackend.resetExpectations();
             userListRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/users?' +
-                    'fields=id,name,email,organisationUnits,userCredentials%5Bcode,disabled,userRoles%5D,userGroups&filter=name:like:Mark&page=1&pageSize=25')
+                    'fields=id,name,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups&filter=name:like:Mark' +
+                    '&manage=true&page=1&pageSize=50')
                 .respond(200, window.fixtures.get('usersPage1'));
 
             service.setFilter('name:like:Mark');
             service.getList();
 
             $httpBackend.flush();
+        });
+    });
+
+    describe('getFilters', function () {
+        it('should return the filters', function () {
+            expect(service.getFilters()).toEqual([]);
+        });
+    });
+
+    describe('setFilter', function () {
+        it('should set a filter', function () {
+            service.setFilter('name:like:Mark');
+
+            expect(service.getFilters()[0]).toBe('name:like:Mark');
+        });
+    });
+
+    describe('removeFilter', function () {
+        it('should remove filter with passed index', function () {
+            service.setFilter('name:like:Mark');
+            service.setFilter('email:like:mark@dhis2.org');
+            service.setFilter('role:like:Admin');
+
+            service.removeFilter(1);
+
+            expect(service.getFilters()).toEqual(['name:like:Mark', 'role:like:Admin']);
+        });
+    });
+
+    describe('resetFilters', function () {
+        it('should reset the filter list to 0', function () {
+            service.setFilter('name:like:Mark');
+            service.setFilter('email:like:mark@dhis2.org');
+            service.setFilter('role:like:Admin');
+
+            service.resetFilters();
+
+            expect(service.getFilters()).toEqual([]);
         });
     });
 });

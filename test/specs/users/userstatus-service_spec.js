@@ -32,7 +32,7 @@ describe('UserStatus Service', function () {
 
             saveRequest = $httpBackend.whenPUT('http://localhost:8080/dhis/api/users/Qjr59ESpRy5')
                 .respond(200);
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/Qjr59ESpRy5')
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/Qjr59ESpRy5?fields=:owner,userCredentials%5B:owner%5D')
                 .respond(200, window.fixtures.get('userObjectEnabled'));
         });
 
@@ -92,7 +92,7 @@ describe('UserStatus Service', function () {
 
             saveRequest = $httpBackend.whenPUT('http://localhost:8080/dhis/api/users/Qjr59ESpRy5')
                 .respond(200);
-            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/Qjr59ESpRy5')
+            $httpBackend.expectGET('http://localhost:8080/dhis/api/users/Qjr59ESpRy5?fields=:owner,userCredentials%5B:owner%5D')
                 .respond(200, window.fixtures.get('userObjectDisabled'));
         });
 

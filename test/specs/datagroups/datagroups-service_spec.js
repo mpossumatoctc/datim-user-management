@@ -36,7 +36,7 @@ describe('DataGroupService', function () {
 
             beforeEach(inject(function ($injector) {
                 var currentUserResponse = fixtures.get('currentUser');
-                currentUserResponse.groups = [
+                currentUserResponse.userGroups = [
                     {id:'YbkldVOJMUl', name:'Data EA access'},
                     {id:'c6hGi8GEZot', name:'Data SI access'},
                     {id:'iuD8wUFz95X', name:'Data SIMS access'}
@@ -143,7 +143,7 @@ describe('DataGroupService', function () {
                     var expectedDataGroups;
                     var currentUserResponse = fixtures.get('currentUser');
 
-                    currentUserResponse.groups = [
+                    currentUserResponse.userGroups = [
                         {id: 'c6hGi8GEZot', name: 'Data SI access'}
                     ];
                     currentUserRequest.respond(200, currentUserResponse);
@@ -172,7 +172,7 @@ describe('DataGroupService', function () {
                     var expectedDataGroups;
                     var currentUserResponse = fixtures.get('currentUser');
 
-                    currentUserResponse.groups = [];
+                    currentUserResponse.userGroups = [];
                     currentUserRequest.respond(200, currentUserResponse);
                     currentUserAuthoritiesRequest
                         .respond(200, fixtures.get('currentUserAuthorities').concat(['ALL']));
@@ -235,7 +235,7 @@ describe('DataGroupService', function () {
 
             beforeEach(inject(function ($injector) {
                 var currentUserResponse = fixtures.get('currentUser');
-                currentUserResponse.groups = [
+                currentUserResponse.userGroups = [
                     {id:'YbkldVOJMUl', name:'Data EA access'},
                     {id:'c6hGi8GEZot', name:'Data SI access'},
                     {id:'iuD8wUFz95X', name:'Data SIMS access'}

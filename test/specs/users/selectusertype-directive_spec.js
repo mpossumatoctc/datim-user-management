@@ -1,6 +1,7 @@
 describe('Select usertype directive', function () {
     var scope;
     var element;
+    var innerScope;
 
     beforeEach(module('users/selectusertype.html'));
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
@@ -49,7 +50,6 @@ describe('Select usertype directive', function () {
         });
     }));
     beforeEach(inject(function ($injector) {
-        var innerScope;
         var $compile = $injector.get('$compile');
         var $rootScope = $injector.get('$rootScope');
         scope = $rootScope.$new();
@@ -61,11 +61,11 @@ describe('Select usertype directive', function () {
         ];
 
         scope.user = {};
-        scope.userType = '';
+        scope.user.userType = undefined;
 
         scope.userTypeChange = jasmine.createSpy();
 
-        element = angular.element('<select-usertype ng-model="user.userType" user-types="userTypes" user-type-change="userTypeChange"></select-usertype>');
+        element = angular.element('<select-usertype user="user" user-types="userTypes" user-type-change="userTypeChange"></select-usertype>');
 
         $compile(element)(scope);
         $rootScope.$digest();
@@ -96,5 +96,14 @@ describe('Select usertype directive', function () {
         expect(choices[0].querySelector('div').textContent).toBe('Inter-Agency');
         expect(choices[1].querySelector('div').textContent).toBe('Agency');
         expect(choices[2].querySelector('div').textContent).toBe('Partner');
+    });
+
+    it('should call getAgencies after an event is recieved', function () {
+        innerScope.selectbox.selected = {name: 'Partner'};
+        innerScope.user.userType = {name: 'Partner'};
+        scope.$broadcast('ORGUNITCHANGED', {name: 'Rwanda'});
+
+        expect(innerScope.selectbox.selected).not.toBeDefined();
+        expect(innerScope.user.userType).not.toBeDefined();
     });
 });

@@ -15,7 +15,7 @@ function agencySelectDirective(agenciesService, $translate, errorHandler) {
             loadValues(scope.userOrgUnit && scope.userOrgUnit.current);
 
             scope.$on('ORGUNITCHANGED', function (event, data) {
-                console.log('Reloading types for ', data.name); //jshint ignore:line
+                errorHandler.debug('Reloading types for ', data.name);
                 loadValues(data);
             });
 

@@ -111,7 +111,6 @@ describe('Agencies service', function () {
                     id: 'x47aP9pWYlu',
                     name: 'OU Rwanda Agency HHS/CDC user administrators'
                 }
-
             };
 
             userGroupRequest.respond(200, fixtures.get('rwandaUserGroup'));

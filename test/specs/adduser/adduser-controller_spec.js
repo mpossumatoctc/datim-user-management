@@ -56,7 +56,9 @@ describe('Add user controller', function () {
             controller = $controller('addUserController', {
                 $scope: scope,
                 userTypes: undefined,
-                dataGroups: undefined,
+                dataGroups: [
+                    {}
+                ],
                 dimensionConstraint: {},
                 userActionsService: {
                     getActionsForUserType: function () {
@@ -80,7 +82,7 @@ describe('Add user controller', function () {
         });
 
         it('should have an array for "data streams"', function () {
-            expect(controller.dataGroups).toEqual([]);
+            expect(controller.dataGroups).toEqual([{}]);
         });
 
         it('should have an array for actions', function () {
@@ -242,6 +244,43 @@ describe('Add user controller', function () {
             expect(interAgencyService.getUserGroups).toHaveBeenCalled();
             expect(scope.user.userEntity).toEqual({userGroup: 'interagency'});
         }));
+    });
+
+    describe('userOrgUnit.current watch', function () {
+        var controller;
+        var watcherSpy;
+
+        beforeEach(inject(function ($controller, $rootScope) {
+            scope = $rootScope.$new();
+            scope.user = {
+                userType: undefined
+            };
+
+            watcherSpy = jasmine.createSpy('watcherSpy');
+            scope.$on('ORGUNITCHANGED', watcherSpy);
+
+            controller = $controller('addUserController', {
+                $scope: scope,
+                userTypes: undefined,
+                dataGroups: [{name: 'EA'}],
+                dimensionConstraint: {},
+                currentUser: currentUserMock(),
+                $state: {} //Fake the state to not load the default
+            });
+            scope.$apply();
+        }));
+
+        it('should not broadcast the event on initial load', function () {
+            expect(watcherSpy).not.toHaveBeenCalled();
+        });
+
+        it('should broadcast the ORGUNITCHANGED event', function () {
+            scope.userOrgUnit.current = {
+                name: 'NewOrgUnitName'
+            };
+            scope.$apply();
+            expect(watcherSpy).toHaveBeenCalled();
+        });
     });
 
     describe('validation for', function () {
@@ -542,7 +581,7 @@ describe('Add user controller', function () {
                             success.call(undefined, {
                                 name: '(TBD), (TBD)',
                                 userCredentials: {
-                                    code: 'username'
+                                    username: 'username'
                                 }
                             });
                         }
@@ -561,7 +600,7 @@ describe('Add user controller', function () {
 
                 it('should call notify with success', function () {
                     expect(notify.success).toHaveBeenCalled();
-                    expect(notify.success).toHaveBeenCalledWith('User added successfully');
+                    expect(notify.success).toHaveBeenCalledWith('User invitation sent');
                 });
             });
 
@@ -597,7 +636,7 @@ describe('Add user controller', function () {
                             success.call(undefined, {
                                 name: '(TBD), (TBD)',
                                 userCredentials: {
-                                    code: 'username'
+                                    username: 'username'
                                 }
                             });
                         }
@@ -627,7 +666,7 @@ describe('Add user controller', function () {
                             success.call(undefined, {
                                 name: '(TBD), (TBD)',
                                 userCredentials: {
-                                    code: 'username'
+                                    username: 'username'
                                 }
                             });
                         }

@@ -458,4 +458,17 @@ describe('ngBootstrapper', function () {
             expect(ngBootstrapper.execute()).toBe(ngBootstrapper);
         });
     });
+
+    describe('basePathResolver', function () {
+        it('should return the base path', function () {
+            var injectables = {
+                webappManifest: {
+                    activities:{dhis: {href: 'http://localhost:8080/dhis'}}
+                }
+            };
+            var path = window.basePathResolver('api/users', injectables);
+
+            expect(path).toBe('http://localhost:8080/dhis/api/users');
+        });
+    });
 });

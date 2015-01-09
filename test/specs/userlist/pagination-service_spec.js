@@ -50,8 +50,8 @@ describe('Pagination service', function () {
         expect(service.getCurrentPage()).toBe(1);
     });
 
-    it('should have a page size method that returns 25', function () {
-        expect(service.getPageSize()).toBe(25);
+    it('should have a page size method that returns 50', function () {
+        expect(service.getPageSize()).toBe(50);
     });
 
     it('should have a setCurrentPage method', function () {
