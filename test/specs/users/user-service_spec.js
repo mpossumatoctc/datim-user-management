@@ -281,7 +281,7 @@ describe('User service', function () {
                 inviteRequest = $httpBackend.expectPOST('http://localhost:8080/dhis/api/users/invite', fixtures.get('sampleInviteObject'))
                     .respond(200, fixtures.get('successInvite'));
 
-                $httpBackend.whenGET('http://localhost:8080/dhis/api/users/b4H1KaR7YYa')
+                $httpBackend.whenGET('http://localhost:8080/dhis/api/users/b4H1KaR7YYa?fields=:owner,userCredentials%5B:owner%5D')
                     .respond(200, {});
             }));
 
@@ -347,7 +347,7 @@ describe('User service', function () {
             });
 
             it('should request the inserted user object on success', function () {
-                $httpBackend.expectGET('http://localhost:8080/dhis/api/users/b4H1KaR7YYa')
+                $httpBackend.expectGET('http://localhost:8080/dhis/api/users/b4H1KaR7YYa?fields=:owner,userCredentials%5B:owner%5D')
                     .respond(200, {});
 
                 service.inviteUser(fixtures.get('sampleInviteObject'));

@@ -208,7 +208,7 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
                 }
                 return Restangular
                     .all('users')
-                    .get(response.lastImported);
+                    .get(response.lastImported, {fields: ':owner,userCredentials[:owner]'});
             })
             .catch(function (error) {
                 if (angular.isString(error)) {
