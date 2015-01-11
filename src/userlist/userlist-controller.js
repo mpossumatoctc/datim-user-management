@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
 function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
-                            userStatusService, $state, $scope, errorHandler, userActions) {
+                            userStatusService, $state, $scope, errorHandler, userActions, _) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -251,8 +251,24 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function reloadFilters() {
-        if (vm.search.filters && vm.search.filters.length > 0) {
-            vm.search.filters.forEach(function (item) {
+        var fieldNames = {
+            name: 'name',
+            username: 'userCredentials.username',
+            'e-mail': 'email',
+            roles: 'userCredentials.userRoles.name',
+            'user groups': 'userGroups.name',
+            'organisation unit': 'organisationUnits.name',
+            types: 'userGroups.name'
+        };
+        fieldNames = _.invert(fieldNames);
+
+        window.console.log(fieldNames);
+        window.console.log(userListService.getFilters());
+
+        if (userListService.getFilters().length > 0) {
+            userListService.getFilters().forEach(function (item) {
+                var splitFilter = item.split(':');
+
                 var temp = {
                     id: new Date().toString(),
                     type: undefined,
@@ -260,9 +276,23 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                     comparator: 'like'
                 };
 
-                temp.type = item.type || 'Name';
-                temp.value = item.value;
-                vm.search.activeFilters.push(temp);
+                temp.type = userFilter.reduce(function (current, filter) {
+                    if (filter.name.toLowerCase() === fieldNames[splitFilter[0]]) {
+                        errorHandler.debug(splitFilter[0]);
+                        errorHandler.debug(fieldNames[splitFilter[0]]);
+                        errorHandler.debug(filter.name.toLowerCase());
+
+                        current = filter;
+                    }
+                    return current;
+                }, undefined);
+
+                temp.value = splitFilter[2];
+
+                if (isValidFilter(temp)) {
+                    errorHandler.debug('Restoring filter', temp);
+                    vm.search.activeFilters.push(temp);
+                }
             });
         } else {
             addFilter();
