@@ -548,6 +548,14 @@ describe('Userlist controller', function () { //jshint ignore:line
             controller.resetFilters();
             expect(controller.search.activeFilters.length).toBe(1);
         });
+
+        it('should add a default filter back to the list', function () {
+            controller.search.activeFilters = [];
+
+            controller.resetFilters();
+
+            expect(controller.search.activeFilters.length).toBe(1);
+        });
     });
 
     describe('removeFilter', function () {
@@ -577,6 +585,16 @@ describe('Userlist controller', function () { //jshint ignore:line
 
             expect(controller.search.activeFilters[0].type).toEqual('name');
             expect(controller.search.activeFilters[1].type).toEqual('email');
+        });
+    });
+
+    describe('default filter', function () {
+        it('should be set', function () {
+            expect(controller.search.activeFilters.length).toBe(1);
+        });
+
+        it('should be a name filter', function () {
+            expect(controller.search.activeFilters[0].type).toEqual({name: 'Name'});
         });
     });
 });
