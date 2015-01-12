@@ -7,6 +7,7 @@ describe('Add user controller', function () {
         $provide.factory('interAgencyService', function ($q) {
             return {getUserGroups: jasmine.createSpy().and.returnValue($q.when({userGroup: 'interagency'}))};
         });
+
         $provide.factory('userActions', function () {
             return {
                 actions: [
@@ -803,8 +804,12 @@ describe('Add user controller', function () {
 
     describe('updateDataEntry', function () {
         var controller;
+        var errorHandler;
 
-        beforeEach(inject(function ($controller, $rootScope, $httpBackend) {
+        beforeEach(inject(function ($controller, $rootScope, $httpBackend, $injector) {
+            errorHandler = $injector.get('errorHandler');
+            spyOn(errorHandler, 'debug');
+
             scope = $rootScope.$new();
             $httpBackend.whenGET()
                 .respond(200, {});
@@ -818,10 +823,11 @@ describe('Add user controller', function () {
                     {name: 'SIMS'}
                 ],
                 dimensionConstraint: {id: 'SomeID'},
-                currentUser: currentUserMock()
+                currentUser: currentUserMock(),
+                errorHandler: errorHandler
             });
 
-            scope.user.dataGroups.SI.access = true;
+            scope.user.dataGroups.SI.entry = true;
             scope.user.userType = {
                 name: 'Partner'
             };
@@ -832,20 +838,31 @@ describe('Add user controller', function () {
             expect(controller.updateDataEntry).toBeAFunction();
         });
 
-        it('should set data entry on SI to true', function () {
-            controller.updateDataEntry();
+        it('should set data access for SI to true', function () {
+            controller.updateDataEntry('SI');
             scope.$apply();
 
-            expect(scope.user.dataGroups.SI.entry).toBe(true);
+            expect(scope.user.dataGroups.SI.access).toBe(true);
         });
 
-        it('should only add dataEntry to the streams that belong to that type', function () {
-            controller.updateDataEntry();
+        it('should not set data entry if the usertype does not have that dataentry stream', function () {
+            scope.user.dataGroups.SIMS.entry = true;
+
+            controller.updateDataEntry('SIMS');
             scope.$apply();
 
-            expect(scope.user.dataGroups.SI.entry).toBe(true);
             expect(scope.user.dataGroups.SIMS.entry).toBe(false);
-            expect(scope.user.dataGroups.EA.entry).toBe(true);
+            expect(scope.user.dataGroups.SIMS.access).toBe(false);
+        });
+
+        it('should not disable the user access when the entry has been deselected', function () {
+            scope.user.dataGroups.SIMS.entry = true;
+
+            controller.updateDataEntry('SIMS');
+            scope.$apply();
+
+            expect(scope.user.dataGroups.SIMS.entry).toBe(false);
+            expect(scope.user.dataGroups.SIMS.access).toBe(false);
         });
 
         it('should call the actions with the correct parameter', function () {
@@ -855,15 +872,22 @@ describe('Add user controller', function () {
             expect(userActions.getDataEntryRestrictionDataGroups).toHaveBeenCalledWith('Partner');
         });
 
-        it('should set all the dataStreams entry to false when entry is de-selected', function () {
+        it('should log an error when no stream has been provided', function () {
             controller.updateDataEntry();
+            scope.$apply();
 
-            controller.dataEntryAction = false;
-            controller.updateDataEntry();
+            expect(errorHandler.debug).toHaveBeenCalled();
+        });
 
-            expect(scope.user.dataGroups.SI.entry).toBe(false);
-            expect(scope.user.dataGroups.SIMS.entry).toBe(false);
-            expect(scope.user.dataGroups.EA.entry).toBe(false);
+        it('should not add a dataStream if it does exist', function () {
+            scope.user.userType = {
+                name: 'Inter-Agency'
+            };
+
+            controller.updateDataEntry('EVAL');
+            scope.$apply();
+
+            expect(scope.user.dataGroups.EVAL).not.toBeDefined();
         });
     });
 

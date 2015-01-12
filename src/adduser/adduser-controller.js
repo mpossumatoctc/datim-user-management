@@ -19,7 +19,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.userInviteObject = {};
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.updateDataEntry = updateDataEntry;
-    vm.dataEntryAction = false;
     vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
     vm.dataEntryStreamNamesForUserType = [];
     vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
@@ -54,14 +53,29 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
     });
 
-    function updateDataEntry() {
+    function updateDataEntry(streamName) {
         var userType = getUserType();
         var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
 
-        Object.keys($scope.user.dataGroups)
-            .forEach(function (dataGroup) {
-                $scope.user.dataGroups[dataGroup].entry = vm.dataEntryAction && (userGroupsThatApplyForDataEntryForUserType.indexOf(dataGroup) >= 0);
-            });
+        if (!angular.isString(streamName)) {
+            errorHandler.debug('Update data entry the streamname given is invalid');
+            return;
+        }
+
+        if (userGroupsThatApplyForDataEntryForUserType.indexOf(streamName) >= 0) {
+            //If data entry is given, also give the stream access
+            if (streamName && $scope.user.dataGroups[streamName] && $scope.user.dataGroups[streamName].entry) {
+                if ($scope.user.dataGroups[streamName].access === false) {
+                    $scope.user.dataGroups[streamName].access = true;
+                }
+            }
+        } else {
+            //This is not a valid dataGroup for entry
+            if ($scope.user.dataGroups[streamName]) {
+                $scope.user.dataGroups[streamName].entry = false;
+            }
+        }
+        console.log($scope.user.dataGroups);
     }
 
     function initialize() {

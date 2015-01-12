@@ -24,10 +24,10 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                     userRole: 'Data Entry SI Country Team'
                 }, {
                     userRole: 'Tracker'
-                }],
+                }]/*,
             EVAL: [{
                     userRole: 'Data Entry EVAL'
-                }]
+                }]*/
         },
         Agency: {
             SIMS: [{
