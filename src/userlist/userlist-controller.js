@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
 function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
-                            userStatusService, $state, $scope, errorHandler, userActions) {
+                            userStatusService, $state, $scope, errorHandler, userActions, _) {
     var vm = this;
 
     vm.detailsOpen = false;
@@ -56,7 +56,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
             return $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
         }
-
+        reloadFilters();
         loadList();
     }
 
@@ -187,9 +187,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             outputStr = phText;
         }
 
-        window.console.log(vm.search.placeHolderText[$index]);
         vm.search.placeHolderText[$index] = outputStr + newVal.name;
-
     }
 
     //TODO: Move the search stuff to the filter service
@@ -250,10 +248,57 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         }
     }
 
+    function reloadFilters() {
+        var fieldNames = {
+            name: 'name',
+            username: 'userCredentials.username',
+            'e-mail': 'email',
+            roles: 'userCredentials.userRoles.name',
+            'user groups': 'userGroups.name',
+            'organisation unit': 'organisationUnits.name',
+            types: 'userGroups.name'
+        };
+        fieldNames = _.invert(fieldNames);
+
+        if (userListService.getFilters().length > 0) {
+            userListService.getFilters().forEach(function (item) {
+                var splitFilter = item.split(':');
+
+                var temp = {
+                    id: new Date().toString(),
+                    type: undefined,
+                    value: undefined,
+                    comparator: 'like'
+                };
+
+                temp.type = userFilter.reduce(function (current, filter) {
+                    if (filter.name.toLowerCase() === fieldNames[splitFilter[0]]) {
+                        errorHandler.debug(splitFilter[0]);
+                        errorHandler.debug(fieldNames[splitFilter[0]]);
+                        errorHandler.debug(filter.name.toLowerCase());
+
+                        current = filter;
+                    }
+                    return current;
+                }, undefined);
+
+                temp.value = splitFilter[2];
+
+                if (isValidFilter(temp)) {
+                    errorHandler.debug('Restoring filter', temp);
+                    vm.search.activeFilters.push(temp);
+                }
+            });
+        } else {
+            addFilter();
+        }
+    }
+
     function resetFilters() {
         vm.search.activeFilters = [];
         userListService.resetFilters();
         doSearch();
+        addFilter();
     }
 
     function editUser(user) {
@@ -276,7 +321,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function buildCSV() {
-        var header = 'Name, Email, Last Login, Access Level, Groups\n';
+        var header = 'Name, Email, Access Level, Groups\r\n';
         var localUsers = vm.users;
         var finalCSV = [];
 
@@ -289,11 +334,15 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                 finalCSV.push(buildRow(localUsers[i]));
             }
 
-            vm.search.fileDownload.url = 'data:text/csv;base64,' + window.btoa(
-                header + finalCSV.join('\n')
+            vm.search.fileDownload.url = 'data:text/csv;charset=utf-8,' + window.escape(
+                header + finalCSV.join('\r\n')
             );
 
         } catch (e) {
+
+            window.console.error(e);
+            return;
+
             //FIXME: Logging of the error disabled because Lars wanted a clean console for Mike Gehron
             //window.console.error(e);
         }
@@ -309,7 +358,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         tempObj.push(row.name);
         tempObj.push(row.email || '');
         tempObj.push(buildList(row.userCredentials.userRoles) || '');
-        tempObj.push(row.userCredentials.userRoles[0].lastUpdated);
+        //tempObj.push(row.userCredentials.userRoles[0].lastUpdated || '');
         tempObj.push(buildList(row.userGroups) || '');
         tempObj.push(buildList(row.organisationUnits) || '');
 
@@ -322,15 +371,17 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         fileName.push(res.substring(0, 16).replace(/:/g, ''));
         fileName.push(currentUser.name);
+        fileName.push('Page');
+        fileName.push(vm.currentPage);
 
-        return fileName.join('-') + '-Page1.csv';
+        return fileName.join('-') + '.csv';
     }
 
     function buildList(listArr) {
         var arr = [];
 
         for (var i = 0, len = listArr.length; i < len; i = i + 1) {
-            arr.push('"' + listArr[i].name + '"');
+            arr.push(listArr[i].name);
         }
 
         return '"' + arr.join(',') + '"';

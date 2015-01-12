@@ -45,12 +45,10 @@ function userListService(Restangular, paginationService, errorHandler) {
     }
 
     function getFilters() {
-        //window.console.log('ListService: Getting the filters' + filters);
         return filters;
     }
 
     function setFilter(filter) {
-        //window.console.log('ListService: pushing filter: "' + filter + '" length ' + filter.length);
         filters.push(filter);
     }
 

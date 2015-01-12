@@ -19,7 +19,7 @@
                         <div class="select-filters col-sm-6">
                             <div class="select-filtertype">
                                 <ui-select ng-required="true" ng-model="userList.search.activeFilters[$index].type">
-                                    <ui-select-match placeholder="Select filter type">{{$select.selected.name}}</ui-select-match>
+                                    <ui-select-match placeholder="Select filter type">{{$select.selected.name || $select.selected}}</ui-select-match>
                                     <ui-select-choices repeat="item in userList.search.options | filter: $select.search">
                                         <div>{{item.name}}</div>
                                     </ui-select-choices>
@@ -34,14 +34,14 @@
                                            ng-change="userList.search.doSearch($index)"
                                            placeholder="{{ filter.type ? 'Search for users by ' + (filter.type.name | lowercase) : 'Search for users' }}"
                                            type="text"
-                                           ng-hide="!!userList.search.filterType[$index].secondary"
+                                           ng-hide="!!userList.search.activeFilters[$index].secondary"
                                            ng-disabled="!userList.search.activeFilters[$index].type"
                                            typeahead-loading="loadingLocations">
                                     <i ng-show="loadingLocations" class="fa fa-refresh fa-spin"></i>
                                 </div>
                                 <div class="select-filtertype-secondary" ng-show="userList.search.hasSecondaryFilter($index)">
                                     <ui-select ng-model="userList.search.activeFilters[$index].value" on-select="userList.search.doSearch($item, $model)">
-                                        <ui-select-match placeholder="Please pick an option here">{{$select.selected.name}}</ui-select-match>
+                                        <ui-select-match placeholder="Please pick an option here">{{$select.selected.name || $select.selected}}</ui-select-match>
                                         <ui-select-choices repeat="item in userList.search.getSecondaryFilter($index) | filter: $select.search">
                                             <div>{{item.name}}</div>
                                         </ui-select-choices>
@@ -136,7 +136,7 @@
                     <div class="row user-details-main user-details-additional" ng-class="{'user-details-open': userList.detailsOpen}">
                         <div class="col-sm-6">
                             <div class="email"><i class="fa fa-envelope"></i>&nbsp;<span ng-bind="::user.email"></span></div>
-                            <div class="username"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.username"></span></div>
+                            <div class="username"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.code"></span></div>
                         </div>
                     </div>
 		    	</div>

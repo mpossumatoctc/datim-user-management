@@ -97,3 +97,16 @@ The following directories might show up in the root of the project. The short ex
   - Directory used by coveralls to store the test coverage output from karma
 + .sass-cache
   - Directory used by sass to store cashed sass output
+
+
+####dhis.json
+To run this project locally a dhis.json file will need to be included. This file will need to live in the root directory as it is part of
+the build tasks. It is necessary for copying the directory structure to the application folder.
+
+```javascript
+
+{
+    "dhisDeployDirectory": "/usr/local/apache-tomcat-8.0.5/webapps/dhis/apps/user-management/"
+}
+
+```

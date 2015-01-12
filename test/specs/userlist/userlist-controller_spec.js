@@ -58,7 +58,8 @@ describe('Userlist controller', function () { //jshint ignore:line
                     this.getList = jasmine.createSpy().and.returnValue(failure);
                 },
                 removeFilter: jasmine.createSpy('removeFilter'),
-                resetFilters: jasmine.createSpy('resetFilters')
+                resetFilters: jasmine.createSpy('resetFilters'),
+                getFilters: jasmine.createSpy('getFilters').and.returnValue([])
             };
         });
         $provide.factory('userActions', function ($q) {
@@ -536,7 +537,7 @@ describe('Userlist controller', function () { //jshint ignore:line
 
     describe('resetFilters', function () {
 
-        it('should reset a filter the filter list', function () {
+        it('should reset  the filter list', function () {
             controller.search.activeFilters = [];
 
             controller.addFilter();
@@ -544,7 +545,7 @@ describe('Userlist controller', function () { //jshint ignore:line
             controller.addFilter();
 
             controller.resetFilters();
-            expect(controller.search.activeFilters.length).toBe(0);
+            expect(controller.search.activeFilters.length).toBe(1);
         });
     });
 
