@@ -3,6 +3,15 @@ angular.module('PEPFAR.usermanagement').controller('userListController', userLis
 function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
                             userStatusService, $state, $scope, errorHandler, userActions, _) {
     var vm = this;
+    var searchFieldNames = {
+        name: 'name',
+        username: 'userCredentials.username',
+        'e-mail': 'email',
+        roles: 'userCredentials.userRoles.name',
+        'user groups': 'userGroups.name',
+        'organisation unit': 'organisationUnits.name',
+        types: 'userGroups.name'
+    };
 
     vm.detailsOpen = false;
     vm.users = [];
@@ -192,15 +201,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     //TODO: Move the search stuff to the filter service
     function doSearch() {
-        var fieldNames = {
-            name: 'name',
-            username: 'userCredentials.username',
-            'e-mail': 'email',
-            roles: 'userCredentials.userRoles.name',
-            'user groups': 'userGroups.name',
-            'organisation unit': 'organisationUnits.name',
-            types: 'userGroups.name'
-        };
+        var fieldNames = searchFieldNames;
         resetFileDownload();
 
         userListService.resetFilters();
@@ -249,16 +250,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function reloadFilters() {
-        var fieldNames = {
-            name: 'name',
-            username: 'userCredentials.username',
-            'e-mail': 'email',
-            roles: 'userCredentials.userRoles.name',
-            'user groups': 'userGroups.name',
-            'organisation unit': 'organisationUnits.name',
-            types: 'userGroups.name'
-        };
-        fieldNames = _.invert(fieldNames);
+        var fieldNames = _.invert(searchFieldNames);
 
         if (userListService.getFilters().length > 0) {
             userListService.getFilters().forEach(function (item) {
@@ -290,7 +282,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                 }
             });
         } else {
-            addFilter();
+            addNameFilter();
         }
     }
 
@@ -298,7 +290,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         vm.search.activeFilters = [];
         userListService.resetFilters();
         doSearch();
+
+        addNameFilter();
+    }
+
+    function addNameFilter() {
         addFilter();
+        vm.search.activeFilters[0].type = {name: 'Name'};
     }
 
     function editUser(user) {
