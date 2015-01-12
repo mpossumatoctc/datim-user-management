@@ -50,7 +50,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             url: '',
             download: ''
         },
-        getFilters: getFilters,
         activeFilters: [],
         addFilter: addFilter,
         placeHolderText: [],
@@ -303,10 +302,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (user && user.id && user.userCredentials && user.userCredentials.username) {
             $state.go('edit', {userId: user.id, username: user.userCredentials.username});
         }
-    }
-
-    function getFilters() {
-        vm.search.filters = userListService.getFilters();
     }
 
     //TODO: Refactor to factory if CSV functionality is needed elsewhere
