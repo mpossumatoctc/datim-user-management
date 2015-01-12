@@ -522,8 +522,9 @@ describe('Userlist controller', function () { //jshint ignore:line
             expect(controller.search.activeFilters.length).toBe(1);
         });
 
-        it('should add a filter with empty properties to the', function () {
+        it('should add a filter with empty properties to the filter list', function () {
             var addedFilter;
+            controller.search.activeFilters = [];
 
             controller.addFilter();
             addedFilter = controller.search.activeFilters[0];
