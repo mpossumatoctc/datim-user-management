@@ -187,9 +187,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             outputStr = phText;
         }
 
-        window.console.log(vm.search.placeHolderText[$index]);
         vm.search.placeHolderText[$index] = outputStr + newVal.name;
-
     }
 
     //TODO: Move the search stuff to the filter service
@@ -261,9 +259,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             types: 'userGroups.name'
         };
         fieldNames = _.invert(fieldNames);
-
-        window.console.log(fieldNames);
-        window.console.log(userListService.getFilters());
 
         if (userListService.getFilters().length > 0) {
             userListService.getFilters().forEach(function (item) {
@@ -378,8 +373,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         fileName.push(currentUser.name);
         fileName.push('Page');
         fileName.push(vm.currentPage);
-
-        //window.console.log(res.substring(0, 16));
 
         return fileName.join('-') + '.csv';
     }
