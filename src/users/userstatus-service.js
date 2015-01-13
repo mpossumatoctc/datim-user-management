@@ -45,7 +45,7 @@ function userStatusService(Restangular, $q) {
     function getUser(userId) {
         return Restangular.all('users')
             .get(userId, {
-                fields: ':owner,userCredentials[:owner]'
+                fields: ':owner,userCredentials[:owner],userGroups'
             });
     }
 }
