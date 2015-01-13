@@ -121,7 +121,7 @@
                                     <span ng-hide="userList.isProcessing(user.id)">Active</span>
                                     <span ng-show="userList.isProcessing(user.id)"><i class="fa fa-circle-o-notch fa-spin"></i></span>
                                 </span>
-                                <div class="button-group">
+                                <div class="button-group" ng-show="userList.canEditUser(user.id)">
                                     <button class="btn btn-default btn-edit-user" ng-click="userList.editUser(user)"><i class="fa fa-pencil-square-o"></i> Edit</button>
                                     <button class="btn btn-danger" ng-disabled="userList.isProcessing(user.id)" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user); $event.stopPropagation();">
                                         <i class="fa fa-times"></i>

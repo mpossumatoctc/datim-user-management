@@ -35,6 +35,11 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             return;
         }
 
+        if (currentUser.id && userToEdit.id && currentUser.id === userToEdit.id) {
+            $state.go('noaccess', {message: 'Editing your own account would only allow you to restrict it further, therefore it has been disabled.'});
+            return;
+        }
+
         vm.userToEdit = userToEdit;
         vm.user.locale = userLocale;
 
@@ -174,6 +179,10 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }
     }
 
+    /**
+     * Following function is only used for debugging information
+     * TODO: When going into production, call to this method can be removed.
+     */
     function debugWatch() {
         $scope.$watch('user.locale', logUserLocaleChange);
 

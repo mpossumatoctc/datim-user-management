@@ -159,6 +159,17 @@ describe('Edit user controller', function () {
         expect($state.go).toHaveBeenCalled();
     }));
 
+    it('should redirect when user attempts to edit him/herself', inject(function ($controller, currentUser, userToEdit, $state) {
+        currentUser.id = 'dd234dshh2';
+        userToEdit.id = 'dd234dshh2';
+
+        $controller('editUserController', {
+            $scope: scope
+        });
+
+        expect($state.go).toHaveBeenCalled();
+    }));
+
     describe('validations', function () {
         var userFormService;
 
