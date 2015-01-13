@@ -39,8 +39,19 @@ describe('Edit user controller', function () {
                 getActionsForUser: jasmine.createSpy('getActionsForUser')
                     .and.returnValue($q.when([
                         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: false},
-                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr', hasAction: false},
-                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true, hasAction: true}
+                        {
+                            name: 'Manage users',
+                            userRole: 'User Administrator',
+                            userRoleId: 'KagqnetfxMr',
+                            hasAction: false
+                        },
+                        {
+                            name: 'Read data',
+                            userRole: 'Read Only',
+                            userRoleId: 'b2uHwX9YLhu',
+                            default: true,
+                            hasAction: true
+                        }
                     ])),
                 getUserRolesForUser: jasmine.createSpy('getUserRolesForUser'),
                 combineSelectedUserRolesWithExisting: jasmine.createSpy('combineSelectedUserRolesWithExisting'),
@@ -65,9 +76,31 @@ describe('Edit user controller', function () {
             };
         });
         $provide.factory('userService', function ($q) {
+            var userEntity = {
+                id: 'FPUgmtt8HRi',
+                name: 'HHS/CDC',
+                code: 'Agency_HHS/CDC',
+                created: '2014-05-09T23:23:06.953+0000',
+                lastUpdated: '2014-10-05T13:07:55.940+0000',
+                href: 'http://localhost:8080/dhis/api/categoryOptionGroups/FPUgmtt8HRi',
+                mechUserGroup: {
+                    id: 'kX5ppDWUxOn',
+                    name: 'OU Botswana Agency HHS/CDC all mechanisms'
+                },
+                userAdminUserGroup: {
+                    id: 'zkxcQagTNx4',
+                    name: 'OU Botswana Agency HHS/CDC user administrators'
+                },
+                userUserGroup: {
+                    id: 'Eo2DzeGaK9j',
+                    name: 'OU Botswana Agency HHS/CDC users'
+                }
+            };
+
             return {
                 updateUser: jasmine.createSpy('updateUser').and.returnValue($q.when(true)),
                 saveUserLocale: jasmine.createSpy('saveUserLocale').and.returnValue($q.when(true)),
+                getUserEntity: jasmine.createSpy('getUserEntity').and.returnValue($q.when(userEntity)),
                 SETTOFAIL: function () {
                     if (Array.prototype.indexOf.call(arguments, 'updateUser') >= 0) {
                         this.updateUser = jasmine.createSpy('updateUser').and.returnValue($q.reject(true));
@@ -134,7 +167,7 @@ describe('Edit user controller', function () {
     });
 
     it('should set injected userLocale onto the controller', function () {
-        expect(controller.user.locale).toEqual({name:'fr', code: 'fr'});
+        expect(controller.user.locale).toEqual({name: 'fr', code: 'fr'});
     });
 
     it('should ask for the datagroups for a user', function () {
@@ -147,6 +180,10 @@ describe('Edit user controller', function () {
 
     it('should return userType when calling getUserType', function () {
         expect(controller.getUserType()).toBe('Partner');
+    });
+
+    it('should have a userEntity', function () {
+        expect(controller.userEntityName).toBe('');
     });
 
     it('should redirect on no access', inject(function ($controller, currentUser, $state) {
@@ -441,5 +478,71 @@ describe('Edit user controller', function () {
 
             expect(controller.dataEntryAction).toBe(false);
         }));
+    });
+
+    describe('userEntityName', function () {
+        var userService;
+        var $q;
+        var $controller;
+
+        beforeEach(inject(function ($injector) {
+            $controller = $injector.get('$controller');
+            $rootScope = $injector.get('$rootScope');
+
+            userService = $injector.get('userService');
+            $q = $injector.get('$q');
+        }));
+
+        it('should set the user entity name', function () {
+            controller = $controller('editUserController', {
+                $scope: scope
+            });
+            $rootScope.$apply();
+
+            expect(controller.userEntityName).toBe('HHS/CDC');
+        });
+
+        it('should set the userEntityName to the org userUserGroup minus the OU prefix', function () {
+            var countryTeamEntity = {
+                userUserGroup: {id: 'LqrnY1CgnCv', name: 'OU Rwanda Country team'},
+                userAdminUserGroup: {id: 'sJSLgsi6KjY', name: 'OU Rwanda User administrators'},
+                mechUserGroup: {id: 'OGAFubEVJK0', name: 'OU Rwanda All mechanisms'}
+            };
+            userService.getUserEntity = jasmine.createSpy('getUserEntity').and.returnValue($q.when(countryTeamEntity));
+
+            controller = $controller('editUserController', {
+                $scope: scope
+            });
+            $rootScope.$apply();
+
+            expect(controller.userEntityName).toBe('Rwanda Country team');
+        });
+
+        it('should not set if the userEntity can not be found', function () {
+            userService.getUserEntity = jasmine.createSpy('getUserEntity').and.returnValue($q.when(undefined));
+
+            controller = $controller('editUserController', {
+                $scope: scope
+            });
+            $rootScope.$apply();
+
+            expect(controller.userEntityName).toBe('');
+        });
+
+        it('should not set if the usergroup does not have a name', function () {
+            var countryTeamEntity = {
+                userUserGroup: {id: 'LqrnY1CgnCv'},
+                userAdminUserGroup: {id: 'sJSLgsi6KjY', name: 'OU Rwanda User administrators'},
+                mechUserGroup: {id: 'OGAFubEVJK0', name: 'OU Rwanda All mechanisms'}
+            };
+            userService.getUserEntity = jasmine.createSpy('getUserEntity').and.returnValue($q.when(countryTeamEntity));
+
+            controller = $controller('editUserController', {
+                $scope: scope
+            });
+            $rootScope.$apply();
+
+            expect(controller.userEntityName).toBe('');
+        });
     });
 });

@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 36
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 38
                             userLocale, userFormService, userActions,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
@@ -20,6 +20,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.editUser = editUser;
     vm.isProcessingEditUser = false;
     vm.getUserType = getUserType;
+    vm.userEntityName = '';
     vm.changeUserStatus = changeUserStatus;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryStreamNamesForUserType = [];
@@ -52,6 +53,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
         userActions.getActionsForUser(userToEdit)
             .then(setUserActionsForThisUser);
+
+        userService.getUserEntity(userToEdit)
+            .then(setUserEntityName);
     }
 
     function correctUserRolesForType(response) {
@@ -176,6 +180,16 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     function changeUserStatus() {
         if (vm.userToEdit && vm.userToEdit.userCredentials) {
             vm.userToEdit.userCredentials.disabled = vm.userToEdit.userCredentials.disabled ? false : true;
+        }
+    }
+
+    function setUserEntityName(userEntity) {
+        if (userEntity && userEntity.userUserGroup) {
+            if (userEntity.name) {
+                vm.userEntityName = userEntity.name;
+            } else {
+                vm.userEntityName = String.prototype.replace.apply(userEntity.userUserGroup.name || '', [/^OU /, '']);
+            }
         }
     }
 

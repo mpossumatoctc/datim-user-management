@@ -1,7 +1,7 @@
 <div>
     <div class="user-edit-header">
         <div class="row user-name">
-            <h3 ng-bind="::editUser.userToEdit.name"></h3><span class="user-type" ng-bind="::editUser.getUserType()"></span>
+            <h3 ng-bind="::editUser.userToEdit.name"></h3><span class="user-type"><span ng-bind="::editUser.getUserType()"></span> <span ng-bind="editUser.userEntityName"></span></span>
         </div>
         <div class="row email" ng-show="editUser.userToEdit.email">
             <i class="fa fa-envelope"></i> <span ng-bind="::editUser.userToEdit.email"></span>
