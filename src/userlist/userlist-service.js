@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').factory('userListService', userListService);
 
 function userListService(Restangular, paginationService, errorHandler) {
-    var fields = ['id', 'name', 'email', 'organisationUnits', 'userCredentials[username,disabled,userRoles]', 'userGroups'];
+    var fields = ['id', 'firstName', 'surname', 'email', 'organisationUnits', 'userCredentials[username,disabled,userRoles]', 'userGroups'];
     var filters = [];
 
     return {
