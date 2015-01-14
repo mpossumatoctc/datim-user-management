@@ -1001,6 +1001,4 @@ describe('Add user controller', function () {
             expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI', 'EVAL']);
         });
     });
-
-
 });
