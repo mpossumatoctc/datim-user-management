@@ -25,10 +25,6 @@ describe('Add user controller', function () {
                     .and.returnValue(['SI', 'EA'])
             };
         });
-
-        $provide.factory('currentUser', function () {
-            return {};
-        });
     }));
 
     beforeEach(inject(function ($injector) {
