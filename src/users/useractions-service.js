@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, $q, userTypesService, dataGroupsService, userService,
-                            errorHandler) {
+function userActionsService(Restangular, $q, userTypesService, userService,
+                            currentUser, errorHandler) {
     var availableAgencyActions = [
         'Accept data', 'Submit data', 'Manage users'
     ];
@@ -75,6 +75,14 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
     function getActions() {
         return $q.when(actionRolesLoaded)
             .then(function () {
+                var userRoles = currentUser.userCredentials.userRoles || [];
+
+                actions = _.filter(actions, function (action) {
+                    return _.filter(userRoles, function (userRole) {
+                        return action.userRoleId === userRole.id;
+                    }).length;
+                });
+
                 return {
                     actions: actions,
                     dataEntryRestrictions: dataEntryRestrictions,
