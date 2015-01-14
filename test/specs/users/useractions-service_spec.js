@@ -41,6 +41,29 @@ describe('User actions', function () {
                 ]))
             };
         });
+
+        $provide.factory('currentUserService', function ($q) {
+            var userServiceObject = {
+                returnValue: {
+                    userCredentials: {
+                        userRoles: [
+                            {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'},
+                            {name: 'Data Submitter', id: 'n777lf1THwQ'},
+                            {name: 'Read Only', id: 'b2uHwX9YLhu'},
+                            {name: 'User Administrator', id: 'KagqnetfxMr'},
+                            {name: 'Data Accepter', id: 'QbxXEPw9xlf'}
+                        ]
+                    },
+                    hasAllAuthority: jasmine.createSpy('hasAllAuthority')
+                        .and.returnValue(false)
+                }
+            };
+
+            userServiceObject.getCurrentUser = jasmine.createSpy('getCurrentUser')
+                .and.returnValue($q.when(userServiceObject.returnValue));
+
+            return userServiceObject;
+        });
     }));
 
     beforeEach(inject(function ($injector) {
@@ -69,6 +92,89 @@ describe('User actions', function () {
     it('should have a getActions method', function () {
         $httpBackend.flush();
         expect(userActionsService.getActions).toBeAFunction();
+    });
+
+    describe('actions', function () {
+        var userActions;
+        var userActionsService;
+        var injector;
+        var currentUserServiceMock;
+
+        beforeEach(inject(function ($injector) {
+            injector = $injector;
+            userActionsService = injector.get('userActionsService');
+            currentUserServiceMock = $injector.get('currentUserService');
+        }));
+
+        it('should return all the user actions', function () {
+            var expectedActions = [
+                {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+            ];
+
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
+                });
+            $httpBackend.flush();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should filter the actions based on the current users actions', function () {
+            var expectedActions = [
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+            ];
+
+            currentUserServiceMock.returnValue.userCredentials.userRoles = [
+                {name: 'Data Submitter', id: 'n777lf1THwQ'},
+                {name: 'Read Only', id: 'b2uHwX9YLhu'}
+            ];
+
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
+                });
+            $httpBackend.flush();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should not return any actions', function () {
+            var expectedActions = [];
+
+            currentUserServiceMock.returnValue.userCredentials.userRoles = [];
+
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
+                });
+            $httpBackend.flush();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should return all actions for a user with all authorities no matter if the roles are available', function () {
+            var expectedActions = [
+                {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+            ];
+
+            currentUserServiceMock.returnValue.hasAllAuthority.and.returnValue(true);
+
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
+                });
+            $httpBackend.flush();
+
+            expect(userActions).toEqual(expectedActions);
+        });
     });
 
     describe('getActionsForUserType', function () {

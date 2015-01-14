@@ -102,6 +102,7 @@ describe('Userlist controller', function () { //jshint ignore:line
 
         $provide.factory('currentUser', function () {
             return {
+                id: 'd234fsdfss',
                 hasAllAuthority: jasmine.createSpy('hasAllAuthority').and.returnValue(false),
                 isUserAdministrator: jasmine.createSpy('isUserAdministrator').and.returnValue(true)
             };
@@ -595,6 +596,20 @@ describe('Userlist controller', function () { //jshint ignore:line
 
         it('should be a name filter', function () {
             expect(controller.search.activeFilters[0].type).toEqual({name: 'Name'});
+        });
+    });
+
+    describe('canEditUser', function () {
+        it('should return true for any user not the current user', function () {
+            expect(controller.canEditUser('df33fssss')).toBe(true);
+        });
+
+        it('should return false when the user is the currentuser', function () {
+            expect(controller.canEditUser('d234fsdfss')).toBe(false);
+        });
+
+        it('should not be able to edit when no id is passed', function () {
+            expect(controller.canEditUser()).toBe(false);
         });
     });
 });

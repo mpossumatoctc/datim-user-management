@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('agenciesService', agenciesService);
 
-function agenciesService($q, Restangular, errorHandler) {
+function agenciesService($q, Restangular, errorHandler, _) {
 
     return {
         getAgencies: getAgencies
@@ -66,7 +66,7 @@ function agenciesService($q, Restangular, errorHandler) {
 
                 errorHandler.debug(errorHandler.message(['Of the accessible agencies', agenciesWithCodes.length, 'has/have a code']), agenciesWithCodes);
 
-                return agenciesWithCodes;
+                return _.sortBy(agenciesWithCodes, 'name');
             });
     }
 

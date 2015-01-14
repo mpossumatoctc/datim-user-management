@@ -41,7 +41,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     $scope.$watch('user.userType', function (newVal, oldVal) {
         if (newVal !== oldVal && newVal && newVal.name) {
             $scope.user.userActions = {};
-            vm.actions = userActions.getActionsForUserType(newVal.name);
+            vm.actions = userActions.filterActionsForCurrentUser(userActions.getActionsForUserType(newVal.name));
 
             if (newVal.name === 'Inter-Agency') {
                 interAgencyService.getUserGroups(getCurrentOrgUnit()).then(function (interAgencyUserGroups) {

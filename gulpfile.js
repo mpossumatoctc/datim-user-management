@@ -183,30 +183,30 @@ gulp.task('package', function () {
 });
 
 gulp.task('min', ['sass'], function () {
-    var usemin = require('gulp-usemin');
-    var minifyCss = require('gulp-minify-css');
-    var minifyHtml = require('gulp-minify-html');
+    var mangleJS = false;
+
+    var useref = require('gulp-useref');
+    var gulpif = require('gulp-if');
     var ngAnnotate = require('gulp-ng-annotate');
     var uglify = require('gulp-uglify');
-    var rev = require('gulp-rev');
+    var minifyCss = require('gulp-minify-css');
 
-    return gulp.src([
-            'src/**/*.html'
-        ])
-        .pipe(usemin({
-            css: [minifyCss()],
-            html: [minifyHtml({empty: true, quotes: true })],
-            vendor: [
-                /*uglify()*/,
-                rev()
-            ],
-            js: [ngAnnotate({
-                add: true,
-                remove: true,
-                single_quotes: true,
-                stats: true
-            }), /*uglify(),*/ rev()]
-        }))
+    var assets = useref.assets();
+
+    return gulp.src('src/*.html')
+        .pipe(assets)
+        .pipe(assets.restore())
+        .pipe(useref())
+        .pipe(gulpif('*.css', minifyCss()))
+        .pipe(gulpif('**/app.js', ngAnnotate({
+            add: true,
+            remove: true,
+            single_quotes: true,
+            stats: true
+        })))
+        .pipe(gulpif('*.js', uglify({
+            mangle: mangleJS
+        })))
         .pipe(gulp.dest(buildDirectory));
 });
 

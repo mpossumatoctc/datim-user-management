@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
 function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
-                            userStatusService, $state, $scope, errorHandler, userActions, _) {
+                            userStatusService, $state, errorHandler, userActions, _) {
     var vm = this;
     var searchFieldNames = {
         name: 'name',
@@ -39,6 +39,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.removeFilter = removeFilter;
     vm.addFilter = addFilter;
     vm.resetFilters = resetFilters;
+    vm.canEditUser = canEditUser;
 
     vm.search = {
         options: userFilter,
@@ -302,6 +303,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         if (user && user.id && user.userCredentials && user.userCredentials.username) {
             $state.go('edit', {userId: user.id, username: user.userCredentials.username});
         }
+    }
+
+    function canEditUser(userId) {
+        if (!userId || userId === currentUser.id) {
+            return false;
+        }
+        return true;
     }
 
     //TODO: Refactor to factory if CSV functionality is needed elsewhere

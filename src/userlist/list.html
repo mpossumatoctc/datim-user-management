@@ -109,7 +109,7 @@
 		    	<div class="result">
 		    		<div class="row user-details-main">
 		    			<div class="col-sm-7">
-		    				<div class="user-name" ng-bind="::user.name"></div>
+		    				<div class="user-name"><span ng-bind="::user.surname"></span>, <span ng-bind="::user.firstName"></span></div>
 		    			</div>
                         <div class="col-sm-5">
                             <div class="deactivate">
@@ -121,7 +121,7 @@
                                     <span ng-hide="userList.isProcessing(user.id)">Active</span>
                                     <span ng-show="userList.isProcessing(user.id)"><i class="fa fa-circle-o-notch fa-spin"></i></span>
                                 </span>
-                                <div class="button-group">
+                                <div class="button-group" ng-show="userList.canEditUser(user.id)">
                                     <button class="btn btn-default btn-edit-user" ng-click="userList.editUser(user)"><i class="fa fa-pencil-square-o"></i> Edit</button>
                                     <button class="btn btn-danger" ng-disabled="userList.isProcessing(user.id)" ng-hide="user.userCredentials.disabled" ng-click="userList.deactivateUser(user); $event.stopPropagation();">
                                         <i class="fa fa-times"></i>
@@ -136,7 +136,7 @@
                     <div class="row user-details-main user-details-additional" ng-class="{'user-details-open': userList.detailsOpen}">
                         <div class="col-sm-6">
                             <div class="email"><i class="fa fa-envelope"></i>&nbsp;<span ng-bind="::user.email"></span></div>
-                            <div class="username"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.code"></span></div>
+                            <div class="username"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.username"></span></div>
                         </div>
                     </div>
 		    	</div>
@@ -146,7 +146,7 @@
             <div>
                 <button type="button" class="close user-details-close" ng-click="userList.closeDetails()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <div class="user-details-title">
-                    <span class="user-name" ng-bind="userList.detailsUser.name"></span>&nbsp;is&nbsp;a<span ng-show="userList.detailsUserUserType[0] === 'A' || userList.detailsUserUserType[0] === 'I'">n</span>&nbsp;<span class="details-user-type" ng-bind="userList.detailsUserUserType"></span>&nbsp;user
+                    <span class="user-name" ng-bind="userList.detailsUser.firstName + ' ' + userList.detailsUser.surname"></span>&nbsp;is&nbsp;a<span ng-show="userList.detailsUserUserType[0] === 'A' || userList.detailsUserUserType[0] === 'I'">n</span>&nbsp;<span class="details-user-type" ng-bind="userList.detailsUserUserType"></span>&nbsp;user
                 </div>
                 <div class="data-group">
                     <h3>Data streams</h3>

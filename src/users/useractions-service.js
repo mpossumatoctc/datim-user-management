@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, $q, userTypesService, dataGroupsService, userService,
-                            errorHandler) {
+function userActionsService(Restangular, $q, userTypesService, userService,
+                            currentUserService, errorHandler) {
     var availableAgencyActions = [
         'Accept data', 'Submit data', 'Manage users'
     ];
@@ -46,6 +46,9 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
 
     var actionRolesLoaded;
 
+    var currentUser;
+    var currentUserUserRoles;
+
     initialise();
     return {
         getActions: getActions
@@ -73,8 +76,12 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
     }
 
     function getActions() {
-        return $q.when(actionRolesLoaded)
-            .then(function () {
+        return $q.all([actionRolesLoaded, currentUserService.getCurrentUser()])
+            .then(function (responses) {
+                currentUser = responses[1];
+                currentUserUserRoles = (currentUser && currentUser.userCredentials.userRoles) || [];
+                actions = actions;
+
                 return {
                     actions: actions,
                     dataEntryRestrictions: dataEntryRestrictions,
@@ -82,9 +89,22 @@ function userActionsService(Restangular, $q, userTypesService, dataGroupsService
                     getActionsForUserType: getActionsForUserType,
                     getActionsForUser: getActionsForUser,
                     getUserRolesForUser: getUserRolesForUser,
-                    combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting
+                    combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting,
+                    filterActionsForCurrentUser: filterActionsForCurrentUser
                 };
             });
+    }
+
+    function filterActionsForCurrentUser(actions) {
+        if (currentUser.hasAllAuthority()) {
+            return actions;
+        }
+
+        return _.filter(actions, function (action) {
+            return _.filter(currentUserUserRoles, function (userRole) {
+                return action.userRoleId === userRole.id;
+            }).length;
+        });
     }
 
     function addUserRolesForDataEntry(userRoles) {

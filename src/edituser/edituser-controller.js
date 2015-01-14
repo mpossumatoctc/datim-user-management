@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 36
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 38
                             userLocale, userFormService, userActions,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
@@ -20,6 +20,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.editUser = editUser;
     vm.isProcessingEditUser = false;
     vm.getUserType = getUserType;
+    vm.userEntityName = '';
     vm.changeUserStatus = changeUserStatus;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryStreamNamesForUserType = [];
@@ -35,6 +36,11 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             return;
         }
 
+        if (currentUser.id && userToEdit.id && currentUser.id === userToEdit.id) {
+            $state.go('noaccess', {message: 'Editing your own account would only allow you to restrict it further, therefore it has been disabled.'});
+            return;
+        }
+
         vm.userToEdit = userToEdit;
         vm.user.locale = userLocale;
 
@@ -47,6 +53,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
         userActions.getActionsForUser(userToEdit)
             .then(setUserActionsForThisUser);
+
+        userService.getUserEntity(userToEdit)
+            .then(setUserEntityName);
     }
 
     function correctUserRolesForType(response) {
@@ -79,7 +88,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function setUserActionsForThisUser(actions) {
-        vm.actions = actions;
+        vm.actions = userActions.filterActionsForCurrentUser(actions);
 
         vm.actions.map(function (action) {
             if (action.hasAction === true) {
@@ -174,6 +183,20 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }
     }
 
+    function setUserEntityName(userEntity) {
+        if (userEntity && userEntity.userUserGroup) {
+            if (userEntity.name) {
+                vm.userEntityName = userEntity.name;
+            } else {
+                vm.userEntityName = String.prototype.replace.apply(userEntity.userUserGroup.name || '', [/^OU /, '']);
+            }
+        }
+    }
+
+    /**
+     * Following function is only used for debugging information
+     * TODO: When going into production, call to this method can be removed.
+     */
     function debugWatch() {
         $scope.$watch('user.locale', logUserLocaleChange);
 

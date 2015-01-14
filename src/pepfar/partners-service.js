@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('partnersService', partnersService);
 
-function partnersService($q, Restangular, errorHandler) {
+function partnersService($q, Restangular, errorHandler, _) {
 
     return {
         getPartners: getPartners
@@ -107,7 +107,7 @@ function partnersService($q, Restangular, errorHandler) {
 
                 errorHandler.debug(errorHandler.message(['Of the accessible partners', partnersWithCode.length, 'has/have a code']), partnersWithCode);
 
-                return partnersWithCode;
+                return _.sortBy(partnersWithCode, 'name');
             });
     }
 
