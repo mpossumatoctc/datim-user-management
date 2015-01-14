@@ -88,7 +88,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function setUserActionsForThisUser(actions) {
-        vm.actions = actions;
+        vm.actions = userActions.filterActionsForCurrentUser(actions);
 
         vm.actions.map(function (action) {
             if (action.hasAction === true) {

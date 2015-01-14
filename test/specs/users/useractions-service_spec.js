@@ -42,18 +42,27 @@ describe('User actions', function () {
             };
         });
 
-        $provide.factory('currentUser', function () {
-            return {
-                userCredentials: {
-                    userRoles: [
-                        {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'},
-                        {name: 'Data Submitter', id: 'n777lf1THwQ'},
-                        {name: 'Read Only', id: 'b2uHwX9YLhu'},
-                        {name: 'User Administrator', id: 'KagqnetfxMr'},
-                        {name: 'Data Accepter', id: 'QbxXEPw9xlf'}
-                    ]
+        $provide.factory('currentUserService', function ($q) {
+            var userServiceObject = {
+                returnValue: {
+                    userCredentials: {
+                        userRoles: [
+                            {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'},
+                            {name: 'Data Submitter', id: 'n777lf1THwQ'},
+                            {name: 'Read Only', id: 'b2uHwX9YLhu'},
+                            {name: 'User Administrator', id: 'KagqnetfxMr'},
+                            {name: 'Data Accepter', id: 'QbxXEPw9xlf'}
+                        ]
+                    },
+                    hasAllAuthority: jasmine.createSpy('hasAllAuthority')
+                        .and.returnValue(false)
                 }
             };
+
+            userServiceObject.getCurrentUser = jasmine.createSpy('getCurrentUser')
+                .and.returnValue($q.when(userServiceObject.returnValue));
+
+            return userServiceObject;
         });
     }));
 
@@ -89,12 +98,12 @@ describe('User actions', function () {
         var userActions;
         var userActionsService;
         var injector;
-        var currentUser;
+        var currentUserServiceMock;
 
         beforeEach(inject(function ($injector) {
             injector = $injector;
             userActionsService = injector.get('userActionsService');
-            currentUser = $injector.get('currentUser');
+            currentUserServiceMock = $injector.get('currentUserService');
         }));
 
         it('should return all the user actions', function () {
@@ -107,7 +116,7 @@ describe('User actions', function () {
 
             userActionsService.getActions()
                 .then(function (actions) {
-                    userActions = actions.getActionsForUserType('agency');
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
                 });
             $httpBackend.flush();
 
@@ -120,14 +129,14 @@ describe('User actions', function () {
                 {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
             ];
 
-            currentUser.userCredentials.userRoles = [
+            currentUserServiceMock.returnValue.userCredentials.userRoles = [
                 {name: 'Data Submitter', id: 'n777lf1THwQ'},
                 {name: 'Read Only', id: 'b2uHwX9YLhu'}
             ];
 
             userActionsService.getActions()
                 .then(function (actions) {
-                    userActions = actions.getActionsForUserType('agency');
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
                 });
             $httpBackend.flush();
 
@@ -137,11 +146,30 @@ describe('User actions', function () {
         it('should not return any actions', function () {
             var expectedActions = [];
 
-            currentUser.userCredentials.userRoles = [];
+            currentUserServiceMock.returnValue.userCredentials.userRoles = [];
 
             userActionsService.getActions()
                 .then(function (actions) {
-                    userActions = actions.getActionsForUserType('agency');
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
+                });
+            $httpBackend.flush();
+
+            expect(userActions).toEqual(expectedActions);
+        });
+
+        it('should return all actions for a user with all authorities no matter if the roles are available', function () {
+            var expectedActions = [
+                {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr'},
+                {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+            ];
+
+            currentUserServiceMock.returnValue.hasAllAuthority.and.returnValue(true);
+
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions.filterActionsForCurrentUser(actions.getActionsForUserType('agency'));
                 });
             $httpBackend.flush();
 

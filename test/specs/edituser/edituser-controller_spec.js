@@ -56,7 +56,10 @@ describe('Edit user controller', function () {
                 getUserRolesForUser: jasmine.createSpy('getUserRolesForUser'),
                 combineSelectedUserRolesWithExisting: jasmine.createSpy('combineSelectedUserRolesWithExisting'),
                 getDataEntryRestrictionDataGroups: jasmine.createSpy('getDataEntryRestrictionDataGroups')
-                    .and.returnValue(['SI', 'EA'])
+                    .and.returnValue(['SI', 'EA']),
+                filterActionsForCurrentUser: function (actions) {
+                    return actions;
+                }
             };
         });
         $provide.factory('userFormService', function () {
