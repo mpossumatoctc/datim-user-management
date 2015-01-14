@@ -104,20 +104,27 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     //TODO: This is partial duplicate code with the add controller and should be refactored
-    function updateDataEntry() {
+    function updateDataEntry(streamName) {
         var userType = getUserType(userToEdit);
         var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
 
-        if (vm.dataEntryAction === true) {
-            Object.keys($scope.user.dataGroups)
-                .forEach(function (dataGroup) {
-                    $scope.user.dataGroups[dataGroup].entry = userGroupsThatApplyForDataEntryForUserType.indexOf(dataGroup) >= 0;
-                });
+        if (!angular.isString(streamName)) {
+            errorHandler.debug('Update data entry the streamname given is invalid');
+            return;
+        }
+
+        if (userGroupsThatApplyForDataEntryForUserType.indexOf(streamName) >= 0) {
+            //If data entry is given, also give the stream access
+            if (streamName && $scope.user.dataGroups[streamName] && $scope.user.dataGroups[streamName].entry) {
+                if ($scope.user.dataGroups[streamName].access === false) {
+                    $scope.user.dataGroups[streamName].access = true;
+                }
+            }
         } else {
-            Object.keys($scope.user.dataGroups)
-                .forEach(function (dataGroup) {
-                    $scope.user.dataGroups[dataGroup].entry = false;
-                });
+            //This is not a valid dataGroup for entry
+            if ($scope.user.dataGroups[streamName]) {
+                $scope.user.dataGroups[streamName].entry = false;
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+/* globals hasAll */
 angular.module('PEPFAR.usermanagement').factory('dataGroupsService', dataGroupsService);
 
 function dataGroupsService($q, Restangular, currentUserService, _, errorHandler) {

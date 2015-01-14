@@ -44,5 +44,4 @@ function flatten() {
         return (current || []).concat(items);
     };
 }
-
 /* jshint unused:true */

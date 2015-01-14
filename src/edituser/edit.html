@@ -26,7 +26,7 @@
                         <legend>Data streams<i class="fa fa-check valid-icon" ng-show="editUser.validateDataGroups()"></i></legend>
                         <ul class="checkbox-group">
                             <li ng-repeat="(name, value) in user.dataGroups">
-                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name].access" ng-change="editUser.updateDataEntry()" type="checkbox">
+                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-disabled="user.dataGroups[name].entry" ng-model="user.dataGroups[name].access" ng-change="editUser.updateDataEntry()" type="checkbox">
                                 <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                             </li>
                         </ul>
@@ -41,13 +41,14 @@
                     <fieldset name="User actions">
                         <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                         <ul class="checkbox-group">
-                            <li ng-show="editUser.dataEntryStreamNamesForUserType.length > 0">
-                                <input type="checkbox" id="dataEntry" name="dataEntry" ng-model="editUser.dataEntryAction" ng-change="editUser.updateDataEntry()">
-                                <label for="dataEntry">
-                                    <span translate>Data entry</span>
-                                    <span class="data-entry-streams">
-                                        <span ng-repeat="streamName in editUser.dataEntryStreamNamesForUserType" ng-bind="streamName" translate></span>
-                                    </span>
+                            <li ng-repeat="streamName in editUser.dataEntryStreamNamesForUserType">
+                                <input id="dataEntry[{{::streamName}}]"
+                                       name="dataEntry[{{::streamName}}]"
+                                       type="checkbox"
+                                       ng-model="user.dataGroups[streamName].entry"
+                                       ng-change="editUser.updateDataEntry(streamName);" />
+                                <label for="dataEntry[{{::streamName}}]">
+                                    <span translate>Data Entry</span> <span ng-bind="streamName" translate></span>
                                 </label>
                             </li>
                             <li ng-repeat="action in editUser.actions">
