@@ -630,7 +630,7 @@ describe('User actions', function () {
 
         it('should return the correct data groups for inter-agency', function () {
             expect(userActions.getDataEntryRestrictionDataGroups('Inter-Agency'))
-                .toEqual(['SI', 'EVAL']);
+                .toEqual(['SI']); /*'EVAL' is also here but is merge into SI*/
         });
     });
 

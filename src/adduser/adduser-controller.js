@@ -50,6 +50,12 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             }
 
             vm.dataEntryStreamNamesForUserType = vm.getDataEntryStreamNamesForUserType();
+
+            vm.dataGroups.forEach(function (stream) {
+                if (stream.name && (vm.dataEntryStreamNamesForUserType.indexOf(stream.name) < 0)) {
+                    $scope.user.dataGroups[stream.name].entry = false;
+                }
+            });
         }
     });
 
@@ -75,7 +81,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                 $scope.user.dataGroups[streamName].entry = false;
             }
         }
-        console.log($scope.user.dataGroups);
     }
 
     function initialize() {

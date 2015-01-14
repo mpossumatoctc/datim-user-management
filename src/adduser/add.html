@@ -19,13 +19,13 @@
     <div class="form-controls-wrap">
         <locale-select user="user" required="true"></locale-select>
     </div>
-    <div class="form-controls-wrap">
-        <div class="half">
+    <div class="form-controls-wrap row">
+        <div class="col-sm-6">
             <fieldset name="Data streams">
                 <legend>Data streams<i class="fa fa-check valid-icon" ng-show="addUser.validateDataGroups()"></i></legend>
                 <ul class="checkbox-group">
                     <li ng-repeat="(name, value) in user.dataGroups">
-                        <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name].access" ng-change="addUser.updateDataEntry(name)" type="checkbox">
+                        <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name].access" ng-disabled="user.dataGroups[name].entry" ng-change="addUser.updateDataEntry(name)" type="checkbox">
                         <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                     </li>
                 </ul>
@@ -34,7 +34,7 @@
                 <div>Please select one or more data streams</div>
             </div>
         </div>
-        <div class="half">
+        <div class="col-sm-6">
             <fieldset name="User actions">
                 <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
                 <ul class="checkbox-group">

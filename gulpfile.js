@@ -193,7 +193,7 @@ gulp.task('min', ['sass'], function () {
 
     var assets = useref.assets();
 
-    return gulp.src('src/*.html')
+    return gulp.src('src/**/*.html')
         .pipe(assets)
         .pipe(assets.restore())
         .pipe(useref())

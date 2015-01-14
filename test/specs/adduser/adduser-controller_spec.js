@@ -207,8 +207,16 @@ describe('Add user controller', function () {
 
             controller = $controller('addUserController', {
                 $scope: scope,
-                userTypes: undefined,
-                dataGroups: [{name: 'EA'}],
+                userTypes: [
+                    {name: 'Inter-Agency'},
+                    {name: 'Agency'},
+                    {name: 'Partner'}
+                ],
+                dataGroups: [
+                    {name: 'SI'},
+                    {name: 'EA'},
+                    {name: 'SIMS'}
+                ],
                 dimensionConstraint: {},
                 currentUser: currentUserMock(),
                 $state: {} //Fake the state to not load the default
@@ -252,6 +260,56 @@ describe('Add user controller', function () {
             expect(interAgencyService.getUserGroups).toHaveBeenCalled();
             expect(scope.user.userEntity).toEqual({userGroup: 'interagency'});
         }));
+
+        describe('data entry reset', function () {
+            var userActions;
+
+            beforeEach(inject(function ($injector) {
+                userActions = $injector.get('userActions');
+            }));
+
+            it('should reset SIMS data entry to false', function () {
+                scope.user.userType = {name: 'Agency'};
+                scope.$apply();
+
+                scope.user.dataGroups.SIMS.entry = true;
+                scope.user.userType = {name: 'Partner'};
+                scope.$apply();
+
+                expect(scope.user.dataGroups.SIMS.entry).toBe(false);
+            });
+
+            it('should not change MER data entry', function () {
+                scope.user.userType = {name: 'Partner'};
+                scope.$apply();
+
+                userActions.getDataEntryRestrictionDataGroups
+                    .and.returnValue(['SI']);
+
+                scope.user.dataGroups.SI.entry = true;
+                scope.user.userType = {name: 'Inter-Agency'};
+                scope.$apply();
+
+                expect(scope.user.dataGroups.SI.entry).toBe(true);
+            });
+
+            it('should not change MER but should change EA', function () {
+                scope.user.userType = {name: 'Partner'};
+                scope.$apply();
+
+                userActions.getDataEntryRestrictionDataGroups
+                    .and.returnValue(['SI']);
+
+                scope.user.dataGroups.SI.entry = true;
+                scope.user.dataGroups.EA.entry = true;
+
+                scope.user.userType = {name: 'Inter-Agency'};
+                scope.$apply();
+
+                expect(scope.user.dataGroups.SI.entry).toBe(true);
+                expect(scope.user.dataGroups.EA.entry).toBe(false);
+            });
+        });
     });
 
     describe('userOrgUnit.current watch', function () {
@@ -943,4 +1001,6 @@ describe('Add user controller', function () {
             expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI', 'EVAL']);
         });
     });
+
+
 });
