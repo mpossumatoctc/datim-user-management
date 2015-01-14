@@ -8,6 +8,17 @@ function has(property) {
     };
 }
 
+function hasAll(checkFor, against) {
+    var remaining = checkFor.filter(function (userGroup) {
+        if (against.indexOf(userGroup.id) >= 0) {
+            return true;
+        }
+        return false;
+    });
+
+    return checkFor.length === remaining.length;
+}
+
 function pick(property) {
     var properties = Array.prototype.filter.apply(arguments, [angular.isString]);
 

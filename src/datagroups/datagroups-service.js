@@ -160,17 +160,6 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
         };
     }
 
-    function hasAll(checkFor, against) {
-        var remaining = checkFor.filter(function (userGroup) {
-            if (against.indexOf(userGroup.id) >= 0) {
-                return true;
-            }
-            return false;
-        });
-
-        return checkFor.length === remaining.length;
-    }
-
     function getUserGroups(userToEdit, dataGroups, userStreams) {
         var userGroupIds = _.values(_.pluck(_.flatten(_.pluck(dataGroups, 'userGroups')), 'id'));
         var baseGroups = _.filter(userToEdit.userGroups, function (userGroup) {
