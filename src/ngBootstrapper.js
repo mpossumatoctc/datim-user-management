@@ -228,6 +228,9 @@
                 });
                 angular.resumeBootstrap([self.appName + '.injectables']);
             } catch (e) {
+                if (window.console && window.console.info) {
+                    window.console.info('Waiting for scripts to be loaded! Re-attempting bootstrap in 10 miliseconds');
+                }
                 window.setTimeout(resumeBootstrapWhenLoaded.bind(this), 10);
             }
         }
