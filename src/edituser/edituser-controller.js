@@ -139,10 +139,11 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     function editUser() {
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
+        userToEdit.userGroups = userGroups;
 
         setProcessingTo(true);
 
-        userService.updateUser(userToEdit, userGroups)
+        userService.updateUser(userToEdit)
             .then(function () {
                 if ($scope.user.locale && $scope.user.locale.name) {
                     saveUserLocale()

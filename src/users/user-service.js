@@ -299,72 +299,24 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
             });
     }
 
-    function updateUser(userToUpdate, userGroups) {
+    function updateUser(userToUpdate) {
         return getUserEntity(userToUpdate).then(function (userEntity) {
-            var removedUserGroupPromises;
-            var addedUserGroupPromises;
             var userAdminGroupName = userEntity && userEntity.userAdminUserGroup && userEntity.userAdminUserGroup.name;
 
             userEntity = userEntity || {};
 
             if (hasUserRole(userToUpdate, {name: 'User Administrator'})) {
                 if (userEntity && userEntity.userAdminUserGroup && !hasUserGroup(userToUpdate, userEntity.userAdminUserGroup)) {
-                    userGroups.push(userEntity.userAdminUserGroup);
+                    userToUpdate.userGroups.push(userEntity.userAdminUserGroup);
                 }
             } else {
-                userGroups = userGroups.filter(function (userGroup) {
+                userToUpdate.userGroups = userToUpdate.userGroups.filter(function (userGroup) {
                     return userGroup.name !== userAdminGroupName;
                 });
             }
 
-            addedUserGroupPromises = getUserGroupsToAdd(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
-                return addUserGroup(userGroup.id, userToUpdate.id);
-            });
-            removedUserGroupPromises = getUserGroupsToRemove(userToUpdate.userGroups || [], userGroups).map(function (userGroup) {
-                return removeUserGroup(userGroup.id, userToUpdate.id);
-            });
-
-            return $q.all([addedUserGroupPromises, removedUserGroupPromises, userToUpdate.save()])
-                .then(function () {
-                    if (hasUserRole(userToUpdate, {name: 'User Administrator'})) {
-                        if (!hasUserGroup(userToUpdate, userEntity.userAdminUserGroup)) {
-                            userToUpdate.userGroups.push(userEntity.userAdminUserGroup);
-                        }
-                    } else {
-                        userToUpdate.userGroups = (userToUpdate.userGroups || []).filter(function (userGroup) {
-                            return userGroup.name !== userAdminGroupName;
-                        });
-                    }
-                });
+            return userToUpdate.save();
         });
-    }
-
-    function getUserGroupsToAdd(oldUserGroups, newUserGroups) {
-        var oldUserGroupIds = _.pluck(oldUserGroups, 'id');
-
-        return (newUserGroups || []).filter(function (userGroup) {
-            return oldUserGroupIds.indexOf(userGroup.id) === -1;
-        });
-    }
-
-    function getUserGroupsToRemove(oldUserGroups, newUserGroups) {
-        var newUserGroupIds = _.pluck(newUserGroups, 'id');
-
-        return (oldUserGroups || []).filter(function (userGroup) {
-            return newUserGroupIds.indexOf(userGroup.id) === -1;
-        });
-    }
-
-    function addUserGroup(userGroupId, userId) {
-        return Restangular
-            .one(['userGroups', userGroupId, 'users'].join('/'))
-            .post(userId);
-    }
-
-    function removeUserGroup(userGroupId, userId) {
-        return Restangular
-            .one(['userGroups', userGroupId, 'users', userId].join('/'))
-            .remove();
     }
 
     function getUserEntity(user) {

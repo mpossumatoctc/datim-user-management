@@ -26,7 +26,7 @@
                         <legend>Data streams<i class="fa fa-check valid-icon" ng-show="editUser.validateDataGroups()"></i></legend>
                         <ul class="checkbox-group">
                             <li ng-repeat="(name, value) in user.dataGroups">
-                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-disabled="user.dataGroups[name].entry" ng-model="user.dataGroups[name].access" ng-change="editUser.updateDataEntry()" type="checkbox">
+                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-disabled="user.dataGroups[name].entry" ng-model="user.dataGroups[name].access" ng-change="editUser.updateDataEntry(name)" type="checkbox">
                                 <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                             </li>
                         </ul>
