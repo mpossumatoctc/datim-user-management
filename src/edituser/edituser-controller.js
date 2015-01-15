@@ -182,6 +182,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         return userTypesService.getUserType(userToEdit);
     }
 
+    //TODO: Duplicate code with the add controller
     function getDataEntryStreamNamesForUserType() {
         if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
             return [];

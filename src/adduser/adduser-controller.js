@@ -187,6 +187,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         return validations.isRequiredDataStreamSelected(dataGroupNames, $scope.user, vm.dataGroups);
     }
 
+    //TODO: Duplicate code with the edit controller
     function getDataEntryStreamNamesForUserType() {
         if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
             return [];
