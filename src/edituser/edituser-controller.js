@@ -1,7 +1,7 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 38
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 40
                             userLocale, userFormService, userActions,
                             notify, userService, userTypesService, errorHandler) {
     var vm = this;
@@ -25,6 +25,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.changeUserStatus = changeUserStatus;
     vm.updateDataEntry = updateDataEntry;
     vm.dataEntryStreamNamesForUserType = [];
+    vm.getOrganisationUnitForUserToEdit = getOrganisationUnitForUserToEdit;
 
     $scope.user = vm.user;
 
@@ -212,6 +213,13 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
                 vm.userEntityName = String.prototype.replace.apply(userEntity.userUserGroup.name || '', [/^OU /, '']);
             }
         }
+    }
+
+    function getOrganisationUnitForUserToEdit() {
+        if (userToEdit.organisationUnits && userToEdit.organisationUnits[0] && userToEdit.organisationUnits[0].name) {
+            return userToEdit.organisationUnits[0].name;
+        }
+        return 'Unknown';
     }
 
     /**

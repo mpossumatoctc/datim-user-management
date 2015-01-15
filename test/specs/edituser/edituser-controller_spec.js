@@ -75,7 +75,10 @@ describe('Edit user controller', function () {
                 userCredentials: {
                     disabled: false
                 },
-                userGroups: window.fixtures.get('userGroupsRoles').userGroups
+                userGroups: window.fixtures.get('userGroupsRoles').userGroups,
+                organisationUnits: [
+                    {name: 'Rwanda'}
+                ]
             };
         });
         $provide.factory('userService', function ($q) {
@@ -547,5 +550,20 @@ describe('Edit user controller', function () {
 
             expect(controller.userEntityName).toBe('');
         });
+    });
+
+    describe('getOrganisationUnitForUserToEdit', function () {
+        it('should return Rwanda', function () {
+            $rootScope.$apply();
+
+            expect(controller.getOrganisationUnitForUserToEdit()).toBe('Rwanda');
+        });
+
+        it('should return unknown when there is no org unit', inject(function (userToEdit) {
+            userToEdit.organisationUnits = [];
+            $rootScope.$apply();
+
+            expect(controller.getOrganisationUnitForUserToEdit()).toBe('Unknown');
+        }));
     });
 });

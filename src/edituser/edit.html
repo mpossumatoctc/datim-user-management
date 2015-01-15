@@ -9,6 +9,9 @@
         <div class="row username">
             <i class="fa fa-user"></i> <span ng-bind="::editUser.userToEdit.userCredentials.username"></span>
         </div>
+        <div class="row country">
+            <i class="fa fa-globe"></i> <span ng-bind="::editUser.getOrganisationUnitForUserToEdit()"></span>
+        </div>
         <user-status user="editUser.userToEdit.userCredentials" ng-click="editUser.changeUserStatus()"></user-status>
     </div>
     <div class="user-edit-form">
