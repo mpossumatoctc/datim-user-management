@@ -1,6 +1,7 @@
 #PEPFAR User management app
 [![Build Status](https://travis-ci.org/dhis2/user-management-pepfar.svg)](https://travis-ci.org/dhis2/user-management-pepfar)
 [![Coverage Status](https://img.shields.io/coveralls/dhis2/user-management-pepfar.svg)](https://coveralls.io/r/dhis2/user-management-pepfar)
+[![Code Climate](https://codeclimate.com/github/dhis2/user-management-pepfar/badges/gpa.svg)](https://codeclimate.com/github/dhis2/user-management-pepfar)
 
 ####Dependency statuses
 [![Dependency Status](https://www.versioneye.com/user/projects/54595f4b2b4804e10b0000c1/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54595f4b2b4804e10b0000c1)
