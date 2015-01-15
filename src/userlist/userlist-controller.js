@@ -34,23 +34,18 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.editUser = editUser;
     vm.placeHolder = 'Search for user';
     vm.updatePlaceholder = updatePlaceholder;
-    vm.checkDownload = checkDownload;
     vm.closeDetails = closeDetails;
     vm.removeFilter = removeFilter;
     vm.addFilter = addFilter;
     vm.resetFilters = resetFilters;
     vm.canEditUser = canEditUser;
+    vm.getCSVUrl = getCSVUrl;
 
     vm.search = {
         options: userFilter,
         filterType: undefined,
         searchWord: '',
         doSearch: _.debounce(vm.doSearch, 500),
-        fileCreated: false,
-        fileDownload: {
-            url: '',
-            download: ''
-        },
         activeFilters: [],
         addFilter: addFilter,
         placeHolderText: [],
@@ -93,7 +88,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         vm.listIsLoading = true;
         userListService.getList()
             .then(setUserList)
-            .then(buildCSV)
             .catch(function () {
                 vm.listIsLoading = false;
             });
@@ -202,7 +196,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     //TODO: Move the search stuff to the filter service
     function doSearch() {
         var fieldNames = searchFieldNames;
-        resetFileDownload();
 
         userListService.resetFilters();
 
@@ -312,79 +305,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         return true;
     }
 
-    //TODO: Refactor to factory if CSV functionality is needed elsewhere
-    function checkDownload() {
-        return !window.externalHost && 'download' in document.createElement('a'); //jshint ignore:line
-    }
-
-    function resetFileDownload() {
-        vm.search.fileCreated = false;
-    }
-
-    function buildCSV() {
-        var header = 'Name, Email, Access Level, Groups\r\n';
-        var localUsers = vm.users;
-        var finalCSV = [];
-
-        if (!vm.checkDownload()) {
-            return;
-        }
-
-        try {
-            for (var i = 0, len = localUsers.length; i < len; i = i + 1) {
-                finalCSV.push(buildRow(localUsers[i]));
-            }
-
-            vm.search.fileDownload.url = 'data:text/csv;charset=utf-8,' + window.escape(
-                header + finalCSV.join('\r\n')
-            );
-
-        } catch (e) {
-
-            window.console.error(e);
-            return;
-
-            //FIXME: Logging of the error disabled because Lars wanted a clean console for Mike Gehron
-            //window.console.error(e);
-        }
-
-        vm.search.fileDownload.download = getFileName();
-        vm.search.fileCreated = true;
-
-    }
-
-    function buildRow(row) {
-        var tempObj = [];
-
-        tempObj.push(row.name);
-        tempObj.push(row.email || '');
-        tempObj.push(buildList(row.userCredentials.userRoles) || '');
-        //tempObj.push(row.userCredentials.userRoles[0].lastUpdated || '');
-        tempObj.push(buildList(row.userGroups) || '');
-        tempObj.push(buildList(row.organisationUnits) || '');
-
-        return tempObj.join(',');
-    }
-
-    function getFileName() {
-        var res = new Date().toISOString();
-        var fileName = [];
-
-        fileName.push(res.substring(0, 16).replace(/:/g, ''));
-        fileName.push(currentUser.name);
-        fileName.push('Page');
-        fileName.push(vm.currentPage);
-
-        return fileName.join('-') + '.csv';
-    }
-
-    function buildList(listArr) {
-        var arr = [];
-
-        for (var i = 0, len = listArr.length; i < len; i = i + 1) {
-            arr.push(listArr[i].name);
-        }
-
-        return '"' + arr.join(',') + '"';
+    function getCSVUrl() {
+        return userListService.getCSVUrl();
     }
 }

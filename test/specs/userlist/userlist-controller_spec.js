@@ -59,7 +59,8 @@ describe('Userlist controller', function () { //jshint ignore:line
                 },
                 removeFilter: jasmine.createSpy('removeFilter'),
                 resetFilters: jasmine.createSpy('resetFilters'),
-                getFilters: jasmine.createSpy('getFilters').and.returnValue([])
+                getFilters: jasmine.createSpy('getFilters').and.returnValue([]),
+                getCSVUrl: jasmine.createSpy('getCSVUrl').and.returnValue('')
             };
         });
         $provide.factory('userActions', function ($q) {
@@ -610,6 +611,14 @@ describe('Userlist controller', function () { //jshint ignore:line
 
         it('should not be able to edit when no id is passed', function () {
             expect(controller.canEditUser()).toBe(false);
+        });
+    });
+
+    describe('getCSVUrl', function () {
+        it('should call the userListService for the csv url', function () {
+            controller.getCSVUrl();
+
+            expect(userListService.getCSVUrl).toHaveBeenCalled();
         });
     });
 });

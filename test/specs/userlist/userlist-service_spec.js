@@ -134,4 +134,41 @@ describe('Userlist service', function () {
             expect(service.getFilters()).toEqual([]);
         });
     });
+
+    describe('getCSVUrl', function () {
+        it('should be a method', function () {
+            expect(service.getCSVUrl).toBeAFunction();
+        });
+
+        it('should return a url to download all users', function () {
+            expect(service.getCSVUrl())
+                .toBe('http://localhost:8080/dhis/api/users.csv?' +
+                'fields=id,firstName,surname,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups,created,lastUpdated' +
+                '&manage=true&paging=false');
+        });
+
+        it('should add the filters to the url', function () {
+            service.setFilter('name:like:Mark');
+            service.setFilter('email:like:mark@dhis2.org');
+            service.setFilter('role:like:Admin');
+
+            expect(service.getCSVUrl())
+                .toBe('http://localhost:8080/dhis/api/users.csv?' +
+                'fields=id,firstName,surname,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups,created,lastUpdated' +
+                '&filter=name:like:Mark&filter=email:like:mark@dhis2.org&filter=role:like:Admin' +
+                '&manage=true' +
+                '&paging=false');
+        });
+
+        it('should still generate the correct url for only one filter', function () {
+            service.setFilter('name:like:Mark');
+
+            expect(service.getCSVUrl())
+                .toBe('http://localhost:8080/dhis/api/users.csv?' +
+                'fields=id,firstName,surname,email,organisationUnits,userCredentials%5Busername,disabled,userRoles%5D,userGroups,created,lastUpdated' +
+                '&filter=name:like:Mark' +
+                '&manage=true' +
+                '&paging=false');
+        });
+    });
 });

@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userListService', userListService);
 
-function userListService(Restangular, paginationService, errorHandler) {
+function userListService(Restangular, paginationService, errorHandler, webappManifest) {
     var fields = ['id', 'firstName', 'surname', 'email', 'organisationUnits', 'userCredentials[username,disabled,userRoles]', 'userGroups'];
     var filters = [];
 
@@ -11,7 +11,8 @@ function userListService(Restangular, paginationService, errorHandler) {
         getFilters: getFilters,
         resetFilters: resetFilters,
         removeFilter: removeFilter,
-        filters: filters
+        filters: filters,
+        getCSVUrl: getCSVUrl
     };
 
     function getList() {
@@ -68,5 +69,66 @@ function userListService(Restangular, paginationService, errorHandler) {
             }
         }
         filters = arr;
+    }
+
+    function getCSVUrl() {
+        var userEndPointUrl = [webappManifest.activities.dhis.href, 'api', 'users.csv'].join('/');
+        return [userEndPointUrl, getHrefQuery()].join('?');
+    }
+
+    function getHrefQuery() {
+        var queryParameters = removePagingParameters(getRequestParams());
+
+        var queryParams =  Object.keys(queryParameters)
+            .filter(function (queryVariableKey) {
+                return (angular.isString(queryParameters[queryVariableKey]) ||
+                    Array.isArray(queryParameters[queryVariableKey])) &&
+                    queryParameters[queryVariableKey].length !== 0;
+            })
+            .map(addExtraFieldsForCSV(queryParameters))
+            .map(function (queryVariableKey) {
+                if (angular.isString(queryParameters[queryVariableKey])) {
+                    return [
+                        encodeURIComponent(queryVariableKey),
+                        encodeSingleQueryParameterValue(queryParameters[queryVariableKey])
+                    ].join('=');
+                }
+                return [
+                    encodeMultipleQueryParameterValues(queryParameters[queryVariableKey], queryVariableKey)
+                ].join('=');
+            });
+        queryParams.push('paging=false');
+
+        return queryParams.join('&');
+    }
+
+    function addExtraFieldsForCSV(queryParameters) {
+        return function (key) {
+            if (key === 'fields') {
+                queryParameters[key] = [
+                    queryParameters[key], 'created', 'lastUpdated'
+                ].join(',');
+            }
+            return key;
+        };
+    }
+
+    function removePagingParameters(queryParametersObject) {
+        delete queryParametersObject.page;
+        delete queryParametersObject.pageSize;
+
+        return queryParametersObject;
+    }
+
+    function encodeSingleQueryParameterValue(value) {
+        return value.split(',').map(function (value) {
+            return encodeURIComponent(value);
+        }).join(',');
+    }
+
+    function encodeMultipleQueryParameterValues(values, key) {
+        return values.map(function (value) {
+            return [key, value].join('=');
+        }).join('&');
     }
 }
