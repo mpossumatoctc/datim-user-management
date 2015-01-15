@@ -1,3 +1,4 @@
+/* global pick */
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
@@ -187,7 +188,18 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     }
 
     function getDataEntryStreamNamesForUserType() {
-        return userActions.getDataEntryRestrictionDataGroups(getUserType());
+        if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
+            return [];
+        }
+
+        return userActions.getDataEntryRestrictionDataGroups(getUserType())
+            .filter(function (steamName) {
+                return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
+                    .map(pick('name'))
+                    .some(function (roleName) {
+                        return roleName === ['Data Entry', steamName].join(' ');
+                    });
+            });
     }
 
     function getUserType() {

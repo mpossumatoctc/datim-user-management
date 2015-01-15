@@ -858,24 +858,6 @@ describe('User service', function () {
             expect(userToUpdate.save).toHaveBeenCalled();
         });
 
-        it('should do a request for each userGroup that needs to be added', function () {
-            $httpBackend.expectPOST('http://localhost:8080/dhis/api/userGroups/U0lbV8pGhgB/users/myUserId')
-                .respond(200);
-
-            service.updateUser(userToUpdate, userGroups);
-            $httpBackend.flush();
-        });
-
-        it('should do a request for each userGroup that needs to be deleted', function () {
-            userGroups = [
-                {id: 'YbkldVOJMUl', name: 'Data EA access'},
-                {id: 'iuD8wUFz95X', name: 'Data SIMS access'}
-            ];
-            $httpBackend.expectDELETE('http://localhost:8080/dhis/api/userGroups/ckBmsHSkJ9I/users/myUserId')
-                .respond(200);
-
-            service.updateUser(userToUpdate, userGroups);
-            $httpBackend.flush();
-        });
+        //TODO: Add tests to test the usergroups are saved correctly
     });
 });

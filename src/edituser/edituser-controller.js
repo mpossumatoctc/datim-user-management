@@ -1,3 +1,4 @@
+/* global pick */
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
 function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 38
@@ -182,7 +183,18 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function getDataEntryStreamNamesForUserType() {
-        return userActions.getDataEntryRestrictionDataGroups(getUserType());
+        if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
+            return [];
+        }
+
+        return userActions.getDataEntryRestrictionDataGroups(getUserType())
+            .filter(function (steamName) {
+                return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
+                    .map(pick('name'))
+                    .some(function (roleName) {
+                        return roleName === ['Data Entry', steamName].join(' ');
+                    });
+            });
     }
 
     function changeUserStatus() {

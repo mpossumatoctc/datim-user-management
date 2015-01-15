@@ -31,7 +31,19 @@ describe('Add user controller', function () {
         });
 
         $provide.factory('currentUser', function () {
-            return {};
+            return {
+                hasAllAuthority: jasmine.createSpy('hasAllAuthority')
+                    .and.returnValue(false),
+                isUserAdministrator: jasmine.createSpy('isUserAdministrator')
+                    .and.returnValue(true),
+                userCredentials: {
+                    userRoles: [
+                        {id: 'dsfsdfsss', name: 'Data Entry EA'},
+                        {id: 'dfdsfswww', name: 'Data Entry SI'},
+                        {id: 'dfdssswww', name: 'Data Entry SIMS'}
+                    ]
+                }
+            };
         });
     }));
 
@@ -218,7 +230,6 @@ describe('Add user controller', function () {
                     {name: 'SIMS'}
                 ],
                 dimensionConstraint: {},
-                currentUser: currentUserMock(),
                 $state: {} //Fake the state to not load the default
             });
             scope.$apply();
@@ -959,10 +970,13 @@ describe('Add user controller', function () {
     describe('getDataEntryStreamNamesForUserType', function () {
         var controller;
         var userActionsMock;
+        var currentUserMock;
 
-        beforeEach(inject(function ($controller, $rootScope, $httpBackend, userActions) {
-            userActionsMock = userActions;
-            scope = $rootScope.$new();
+        beforeEach(inject(function ($controller, $httpBackend, $injector) {
+            userActionsMock = $injector.get('userActions');
+            currentUserMock = $injector.get('currentUser');
+
+            scope = $injector.get('$rootScope').$new();
             $httpBackend.whenGET()
                 .respond(200, {});
 
@@ -974,8 +988,8 @@ describe('Add user controller', function () {
                     {name: 'EA'},
                     {name: 'SIMS'}
                 ],
-                dimensionConstraint: {id: 'SomeID'},
-                currentUser: currentUserMock()
+                dimensionConstraint: {id: 'SomeID'}
+                /*currentUser: currentUserMock()*/
             });
 
             scope.user.dataGroups.SI.access = true;
@@ -995,10 +1009,25 @@ describe('Add user controller', function () {
             expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SIMS']);
         });
 
-        it('should return SI, EVAL for Inter-Agency', function () {
-            userActionsMock.getDataEntryRestrictionDataGroups.and.returnValue(['SI', 'EVAL']);
+        it('should return SI for Inter-Agency', function () {
+            userActionsMock.getDataEntryRestrictionDataGroups.and.returnValue(['SI']);
 
-            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI', 'EVAL']);
+            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI']);
+        });
+
+        it('should restrict data entry based on the current user his/her user roles', function () {
+            currentUserMock.userCredentials.userRoles = [
+                {id: 'dsfsdfsss', name: 'Data Entry EA'}
+            ];
+
+            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['EA']);
+        });
+
+        it('should not restrict the data entry if the user has allAuthorities', function () {
+            currentUserMock.userCredentials.userRoles = [];
+            currentUserMock.hasAllAuthority.and.returnValue(true);
+
+            expect(controller.getDataEntryStreamNamesForUserType()).toEqual(['SI', 'EA']);
         });
     });
 });
