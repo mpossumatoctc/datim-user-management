@@ -222,7 +222,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         $scope.$watch('user.locale', logUserLocaleChange);
 
         $scope.$watch('user.dataGroups', function (newVal, oldVal) {
-            if (newVal !== oldVal)  {
+            if (newVal !== oldVal) {
                 Object.keys(newVal || {}).map(function (key) {
                     if (!(oldVal[key] && oldVal[key].access === newVal[key].access)) {
                         if (newVal[key].access === true) {
@@ -236,7 +236,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }, true);
 
         $scope.$watch('user.userActions', function (newVal, oldVal) {
-            if (newVal !== oldVal)  {
+            if (newVal !== oldVal) {
                 Object.keys(newVal || {}).map(function (key) {
                     if (!(oldVal[key] && oldVal[key] === newVal[key])) {
                         if (newVal[key] === true) {
@@ -250,7 +250,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }, true);
 
         function logUserLocaleChange(newVal, oldVal) {
-            if (newVal !== oldVal)  {
+            if (newVal !== oldVal) {
                 errorHandler.debug('Changed locale from:', oldVal, ' to ', newVal); //jshint ignore:line
             }
         }
