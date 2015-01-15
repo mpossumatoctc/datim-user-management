@@ -12,7 +12,7 @@
   "authors": [
     "Mark Polak"
   ],
-  "license": "MIT",
+  "license": "BSD",
   "homepage": "http://www.dhis2.org",
   "ignore": [
     "**/.*",
