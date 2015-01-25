@@ -27,7 +27,9 @@ function currentUserService($q, Restangular, errorHandler) {
     }
 
     function requestCurrentUser() {
-        return Restangular.one('me').withHttpConfig({cache: true}).get();
+        return Restangular.one('me').withHttpConfig({cache: true}).get({
+            fields: ':all,userCredentials[:owner,!userGroupAccesses],!userGroupAccesses'
+        });
     }
 
     function requestUserAuthorities() {

@@ -190,10 +190,11 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     //TODO: Duplicate code with the edit controller
     function getDataEntryStreamNamesForUserType() {
         if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
+            errorHandler.debug('currentUser.userCredentials.userRoles was not found on the currentUser object');
             return [];
         }
 
-        return userActions.getDataEntryRestrictionDataGroups(getUserType())
+        var userEntryDataEntryStreams = userActions.getDataEntryRestrictionDataGroups(getUserType())
             .filter(function (steamName) {
                 return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
                     .map(pick('name'))
@@ -201,6 +202,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                         return roleName === ['Data Entry', steamName].join(' ');
                     });
             });
+
+        errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);g 
+
+        return userEntryDataEntryStreams;
     }
 
     function getUserType() {

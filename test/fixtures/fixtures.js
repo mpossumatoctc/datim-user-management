@@ -98,7 +98,8 @@
         {"id": "iXkZzRKD0i4", "name": "Data Entry SIMS"}
     ]};
 
-    fixtures.currentUser = {"name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:06:25.617+0000", "surname": "Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "firstName": "kp1001ea", "userCredentials": {"code": "kp1001ea", "name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:26:48.495+0000", "username": "kp1001ea", "passwordLastUpdated": "2014-11-20T11:06:25.617+0000", "userRoles": [
+    fixtures.currentUser = {"name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:06:25.617+0000", "surname": "Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "firstName": "kp1001ea",
+        "userCredentials": {"code": "kp1001ea", "name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:26:48.495+0000", "username": "kp1001ea", "passwordLastUpdated": "2014-11-20T11:06:25.617+0000", "userRoles": [
         {"name": "Read Only", "created": "2014-02-20T02:47:44.417+0000", "lastUpdated": "2014-10-20T13:39:20.109+0000", "id": "b2uHwX9YLhu"},
         {"name": "Data Entry EA", "created": "2014-09-13T21:11:15.686+0000", "lastUpdated": "2014-10-20T13:39:20.120+0000", "id": "OKKx4bf4ueV"}
     ], "catDimensionConstraints": [
