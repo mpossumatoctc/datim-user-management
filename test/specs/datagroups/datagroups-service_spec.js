@@ -50,7 +50,7 @@ describe('DataGroupService', function () {
                         'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')
                     .respond(200, fixtures.get('userRoles'));
 
-                currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
+                currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me?fields=:all,userCredentials%5B:owner,!userGroupAccesses%5D,!userGroupAccesses')
                     .respond(200, currentUserResponse);
                 currentUserAuthoritiesRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
                     .respond(200, fixtures.get('currentUserAuthorities'));
@@ -249,7 +249,7 @@ describe('DataGroupService', function () {
                         'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')
                     .respond(200, fixtures.get('userRoles'));
 
-                currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me')
+                currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me?fields=:all,userCredentials%5B:owner,!userGroupAccesses%5D,!userGroupAccesses')
                     .respond(200, currentUserResponse);
                 currentUserAuthoritiesRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me/authorization')
                     .respond(200, fixtures.get('currentUserAuthorities'));

@@ -22,7 +22,7 @@ describe('Current user', function () {
             expectedUser = fixtures.get('currentUser');
 
             $httpBackend = $injector.get('$httpBackend');
-            userResponse = $httpBackend.expectGET('http://localhost:8080/dhis/api/me')
+            userResponse = $httpBackend.expectGET('http://localhost:8080/dhis/api/me?fields=:all,userCredentials%5B:owner,!userGroupAccesses%5D,!userGroupAccesses')
                 .respond(200, fixtures.get('currentUser'));
             authorizationResponse = $httpBackend.expectGET('http://localhost:8080/dhis/api/me/authorization')
                 .respond(200, fixtures.get('currentUserAuthorities'));

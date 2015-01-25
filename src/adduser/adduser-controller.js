@@ -203,7 +203,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                     });
             });
 
-        errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);g 
+        errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);
 
         return userEntryDataEntryStreams;
     }
