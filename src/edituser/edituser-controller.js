@@ -190,11 +190,12 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }
 
         return userActions.getDataEntryRestrictionDataGroups(getUserType())
-            .filter(function (steamName) {
+            .filter(function (streamName) {
                 return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
                     .map(pick('name'))
                     .some(function (roleName) {
-                        return roleName === ['Data Entry', steamName].join(' ');
+                        return roleName === ['Data Entry', streamName].join(' ') ||
+                            (streamName === 'SI' && /^Data Entry SI(?: Country Team)?$/.test(roleName));
                     });
             });
     }
