@@ -26,6 +26,53 @@ describe('Add user controller', function () {
                     .and.returnValue(['SI', 'EA']),
                 filterActionsForCurrentUser: function (actions) {
                     return actions;
+                },
+                dataEntryRestrictionsUserManager: {
+                    'Inter-Agency': {
+                        SI: [{
+                            userRole: 'Data Entry SI Country Team'
+                        }, {
+                            userRole: 'Tracker',
+                            userRoleId:  'trackerid'
+                        }, {
+                            userRole: 'Data Entry SI',
+                            userRoleId:  'k7BWFXkG6zt'
+                        }],
+                        SIMS: [{
+                            userRole: 'Data Entry SIMS',
+                            userRoleId:  'iXkZzRKD0i4'
+
+                        }],
+                        EA: [{
+                            userRole: 'Data Entry EA',
+                            userRoleId:  'OKKx4bf4ueV'
+                        }]/*,
+                         EVAL: [{
+                         userRole: 'Data Entry EVAL'
+                         }]*/
+                    },
+                    Agency: {
+                        SI: [{
+                            userRole: 'Data Entry SI',
+                            userRoleId:  'k7BWFXkG6zt'
+                        }],
+                        SIMS: [{
+                            userRole: 'Data Entry SIMS',
+                            userRoleId:  'iXkZzRKD0i4'
+                        }],
+                        EA: [{
+                            userRole: 'Data Entry EA',
+                            userRoleId:  'OKKx4bf4ueV'
+                        }]
+                    },
+                    Partner: {
+                        SI: [{
+                            userRole: 'Data Entry SI'
+                        }],
+                        EA: [{
+                            userRole: 'Data Entry EA'
+                        }]
+                    }
                 }
             };
         });
@@ -575,12 +622,6 @@ describe('Add user controller', function () {
                 };
             });
 
-            it('should add the user manager group when the user manager role is present', function () {
-                controller.addUser();
-
-                expect(controller.userInviteObject.userGroups[2]).toEqual({id: 'userAdminUserGroup'});
-            });
-
             it('should not add the user manager group when the user manager role is present but false', function () {
                 scope.user.userActions['Manage users'] = false;
 
@@ -761,6 +802,145 @@ describe('Add user controller', function () {
                 });
             });
         });
+
+        describe('user manager', function () {
+            var controller;
+
+            beforeEach(inject(function ($controller) {
+                controller = $controller('addUserController', {
+                    $scope: scope,
+                    userTypes: [
+                        {name: 'Inter-Agency'},
+                        {name: 'Agency'},
+                        {name: 'Partner'}
+                    ],
+                    dataGroups: [
+                        {
+                            name: 'SI',
+                            access: false,
+                            entry: false,
+                            userGroups: [
+                                {name: 'Data SI access', id: 'c6hGi8GEZot'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
+                            ]
+                        }, {
+                            name: 'EA',
+                            access: false,
+                            entry: false,
+                            userGroups: [
+                                {name: 'Data EA access', id: 'YbkldVOJMUl'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
+                            ]
+                        }, {
+                            name: 'SIMS',
+                            access: false,
+                            entry: false,
+                            userGroups: [
+                                {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
+                            ],
+                            userRoles: [
+                                {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
+                            ]
+                        }
+                    ],
+                    dimensionConstraint: {id: 'SomeID'},
+                    currentUser: currentUserMock()
+                });
+
+                controller.isUserManager = true;
+
+                scope.user.userEntity = {
+                    mechUserGroup: {
+                        id: 'agencyGroupIdMech'
+                    },
+                    userUserGroup: {
+                        id: 'agencyGroupIdUsers'
+                    },
+                    userAdminUserGroup: {
+                        id: 'agencyGroupIdUserAdmin'
+                    }
+                };
+                scope.user.userType = {name: 'Agency'};
+                scope.user.dataGroups = {
+                    SI: {
+                        entry: false,
+                        access: false
+                    },
+                    EA: {
+                        entry: false,
+                        access: false
+                    },
+                    SIMS: {
+                        entry: false,
+                        access: false
+                    }
+                };
+
+                var userActionsForManager = [
+                    {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                    {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                    {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                ];
+
+                userActions.getActionsForUserType.and.returnValue(userActionsForManager);
+
+                controller.actions = userActionsForManager;
+            }));
+
+            it('should add the dimension constraint to the invite object', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.userCredentials.catDimensionConstraints).toEqual([{id: 'SomeID'}]);
+            });
+
+            it('should add the mechanismsUserGroup to the invite object', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.userGroups[3]).toEqual({id: 'agencyGroupIdMech'});
+            });
+
+            it('should add the usersUserGroup to the invite object', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.userGroups[4]).toEqual({id: 'agencyGroupIdUsers'});
+            });
+
+            it('should add the userAdminUserGroup to the invite object', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.userGroups[5]).toEqual({id: 'agencyGroupIdUserAdmin'});
+            });
+
+            it('should notify the user when the user admin group is not available', function () {
+                delete scope.user.userEntity.userAdminUserGroup;
+
+                controller.addUser();
+
+                expect(notify.error).toHaveBeenCalledWith('User admin group can not be found');
+                expect(notify.error).toHaveBeenCalledWith('Unable to invite user manager');
+            });
+
+            it('should set the roles onto the invite object', function () {
+                controller.addUser();
+
+                expect(controller.userInviteObject.userCredentials.userRoles)
+                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'},
+                        {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
+            });
+
+            it('should set the roles onto the invite object only once', function () {
+                controller.addUser();
+                controller.addUser();
+
+                expect(controller.userInviteObject.userCredentials.userRoles)
+                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'},
+                        {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
+            });
+        });
     });
 
     describe('isRequiredDataStreamSelected', function () {
@@ -907,7 +1087,6 @@ describe('Add user controller', function () {
             scope.user.userType = {
                 name: 'Partner'
             };
-            controller.dataEntryAction = true;
         }));
 
         it('should be a function', function () {
@@ -996,7 +1175,6 @@ describe('Add user controller', function () {
             scope.user.userType = {
                 name: 'Partner'
             };
-            controller.dataEntryAction = true;
         }));
 
         it('should return EA, SI for partner', function () {

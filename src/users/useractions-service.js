@@ -4,13 +4,13 @@ angular.module('PEPFAR.usermanagement').factory('userActionsService', userAction
 function userActionsService(Restangular, $q, userTypesService, userService,
                             currentUserService, errorHandler) {
     var availableAgencyActions = [
-        'Accept data', 'Submit data', 'Manage users'
+        'Accept data', 'Submit data'
     ];
     var availableInterAgencyActions = [
-        'Accept data', 'Submit data', 'Manage users'
+        'Accept data', 'Submit data'
     ];
     var availablePartnerActions =  [
-        'Submit data', 'Manage users'
+        'Submit data'
     ];
     var actions = [
         {name: 'Accept data', userRole: 'Data Accepter'},
@@ -34,6 +34,46 @@ function userActionsService(Restangular, $q, userTypesService, userService,
             SIMS: [{
                     userRole: 'Data Entry SIMS'
                 }]
+        },
+        Partner: {
+            SI: [{
+                userRole: 'Data Entry SI'
+            }],
+            EA: [{
+                userRole: 'Data Entry EA'
+            }]
+        }
+    };
+
+    var dataEntryRestrictionsUserManager = {
+        'Inter-Agency': {
+            SI: [{
+                userRole: 'Data Entry SI Country Team'
+            }, {
+                userRole: 'Tracker'
+            }, {
+                userRole: 'Data Entry SI'
+            }],
+            SIMS: [{
+                userRole: 'Data Entry SIMS'
+            }],
+            EA: [{
+                userRole: 'Data Entry EA'
+            }]/*,
+             EVAL: [{
+             userRole: 'Data Entry EVAL'
+             }]*/
+        },
+        Agency: {
+            SI: [{
+                userRole: 'Data Entry SI'
+            }],
+            SIMS: [{
+                userRole: 'Data Entry SIMS'
+            }],
+            EA: [{
+                userRole: 'Data Entry EA'
+            }]
         },
         Partner: {
             SI: [{
@@ -86,6 +126,7 @@ function userActionsService(Restangular, $q, userTypesService, userService,
                 return {
                     actions: actions,
                     dataEntryRestrictions: dataEntryRestrictions,
+                    dataEntryRestrictionsUserManager: dataEntryRestrictionsUserManager,
                     getDataEntryRestrictionDataGroups: getDataEntryRestrictionDataGroups,
                     getActionsForUserType: getActionsForUserType,
                     getActionsForUser: getActionsForUser,
@@ -110,10 +151,14 @@ function userActionsService(Restangular, $q, userTypesService, userService,
 
     function addUserRolesForDataEntry(userRoles) {
         Object.keys(dataEntryRestrictions).forEach(function (userType) {
-            Object.keys(dataEntryRestrictions[userType]).forEach(matchUserRolesWithDataGroups(userRoles, userType));
+            Object.keys(dataEntryRestrictions[userType]).forEach(matchUserRolesWithDataGroups(userRoles, userType, dataEntryRestrictions));
         });
 
-        function matchUserRolesWithDataGroups(userRoles, userType) {
+        Object.keys(dataEntryRestrictionsUserManager).forEach(function (userType) {
+            Object.keys(dataEntryRestrictionsUserManager[userType]).forEach(matchUserRolesWithDataGroups(userRoles, userType, dataEntryRestrictionsUserManager));
+        });
+
+        function matchUserRolesWithDataGroups(userRoles, userType, dataEntryRestrictions) {
             return function (dataStream) {
                 userRoles.forEach(function (userRole) {
                     var dataStreamRoleList = dataEntryRestrictions[userType][dataStream];

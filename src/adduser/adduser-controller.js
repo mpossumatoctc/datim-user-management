@@ -1,7 +1,7 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint,
+function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 46
                            userActions, userService, $state, notify, interAgencyService,
                            userFormService, errorHandler) {
     var vm = this;
@@ -23,6 +23,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
     vm.dataEntryStreamNamesForUserType = [];
     vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
+
+    vm.isUserManager = undefined;
 
     errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
     $scope.userOrgUnit = {
@@ -92,7 +94,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
             return;
         }
-
         if (vm.dataGroups.length <= 0) {
             errorHandler.debug('This user does not seem to have access to any data streams');
             errorHandler.debug('User data streams', vm.dataGroups, dataGroups);
@@ -118,45 +119,45 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     }
 
     function addUser() {
-        var managerRole = 'Manage users';
+        if (vm.isUserManager) {
+            addUserManager();
+        } else {
+            addNormalUser();
+        }
+    }
 
+    function addUserManager() {
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = userService.getUserInviteObject(
-            $scope.user,
-            vm.dataGroups,
-            vm.actions,
-            [getCurrentOrgUnit()],
-            userActions.dataEntryRestrictions
-        );
+        vm.userInviteObject = getAdminInviteObject();
+        addDimensionConstraintForType();
+        addUserManagerUserRoles();
+        addAllAvailableDataStreams();
 
-        if (getUserType() !== 'Inter-Agency') {
-            vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+        if (verifyUserInviteObject() &&
+            addUserGroupsForMechanismsAndUsers() &&
+            addUserGroupForUserAdmin()) {
+
+            sendInvite();
+        } else {
+            notify.error('Unable to invite user manager');
         }
+    }
 
-        if (!userService.verifyInviteData(vm.userInviteObject)) {
-            notify.error('Invite did not pass basic validation');
+    function addNormalUser() {
+        vm.isProcessingAddUser = true;
+
+        vm.userInviteObject = getInviteObject();
+        addDimensionConstraintForType();
+
+        if (!verifyUserInviteObject() || !addUserGroupsForMechanismsAndUsers()) {
             return;
         }
 
-        //Add the all mechanisms group from the user entity
-        if ($scope.user.userEntity &&
-            $scope.user.userEntity.mechUserGroup &&
-            $scope.user.userEntity.userUserGroup &&
-            $scope.user.userEntity.mechUserGroup.id &&
-            $scope.user.userEntity.userUserGroup.id) {
-            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
-            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
-        } else {
-            notify.error('User groups for mechanism and users not found on selected entity');
-            return false;
-        }
+        sendInvite();
+    }
 
-        //TODO: Perhaps this logic should be moved to the userService?
-        if ($scope.user.userActions && $scope.user.userActions[managerRole] === true && $scope.user.userEntity.userAdminUserGroup) {
-            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
-        }
-
+    function sendInvite() {
         //TODO: Clean this up
         userService.inviteUser(vm.userInviteObject)
             .then(function (newUser) {
@@ -177,6 +178,104 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                 notify.error('Request to add the user failed');
                 vm.isProcessingAddUser = false;
             });
+    }
+
+    function getInviteObject() {
+        return userService.getUserInviteObject(
+            $scope.user,
+            vm.dataGroups,
+            vm.actions,
+            [getCurrentOrgUnit()],
+            userActions.dataEntryRestrictions
+        );
+    }
+
+    function getAdminInviteObject() {
+        return userService.getUserInviteObject(
+            $scope.user,
+            [],
+            [],
+            [getCurrentOrgUnit()],
+            userActions.dataEntryRestrictionsUserManager
+        );
+    }
+
+    function addDimensionConstraintForType() {
+        if (getUserType() !== 'Inter-Agency') {
+            vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
+        }
+    }
+
+    function verifyUserInviteObject() {
+        if (!userService.verifyInviteData(vm.userInviteObject)) {
+            notify.error('Invite did not pass basic validation');
+            vm.isProcessingAddUser = true;
+            return false;
+        }
+        return true;
+    }
+
+    function addUserGroupsForMechanismsAndUsers() {
+        //Add the all mechanisms group from the user entity
+        if (userEntityHasValidUserGroups()) {
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
+
+            return true;
+        }
+
+        notify.error('User groups for mechanism and users not found on selected entity');
+        return false;
+    }
+
+    function addUserGroupForUserAdmin() {
+        if ($scope.user.userEntity.userAdminUserGroup) {
+            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
+            return true;
+        }
+        notify.error('User admin group can not be found');
+        return false;
+    }
+
+    function userEntityHasValidUserGroups() {
+        return $scope.user.userEntity &&
+            $scope.user.userEntity.mechUserGroup &&
+            $scope.user.userEntity.userUserGroup &&
+            $scope.user.userEntity.mechUserGroup.id &&
+            $scope.user.userEntity.userUserGroup.id;
+    }
+
+    function addUserManagerUserRoles() {
+        var hasUserRoleId = _.compose(_.size, _.values, _.partialRight(_.pick, ['userRoleId']));
+
+        var adminActions = _.chain(vm.actions)
+            .filter(hasUserRoleId)
+            .map(function (userAction) {
+                return {id: userAction.userRoleId};
+            })
+            .value();
+
+        vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(adminActions);
+    }
+
+    function addAllAvailableDataStreams() {
+        var dataAccessGroups = _.chain(vm.dataGroups)
+            .map('userGroups')
+            .flatten()
+            .map(_.partialRight(_.pick, ['id']))
+            .value();
+
+        vm.userInviteObject.userGroups = vm.userInviteObject.userGroups.concat(dataAccessGroups);
+
+        var dataEntryRoles = _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
+            .values()
+            .flatten()
+            .map(function (userAction) {
+                return {id: userAction.userRoleId};
+            })
+            .value();
+
+        vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(dataEntryRoles);
     }
 
     function validateDataGroups() {

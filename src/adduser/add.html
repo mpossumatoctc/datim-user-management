@@ -19,7 +19,26 @@
     <div class="form-controls-wrap">
         <locale-select user="user" required="true"></locale-select>
     </div>
+
     <div class="form-controls-wrap row">
+        <div class="col-sm-6">
+            <label class="btn btn-default user-type-selection" ng-class="{'btn-success': addUser.isUserManager}">
+                <input type="radio" ng-value="true" ng-model="addUser.isUserManager" ng-required="addUser.isUserManager == undefined">
+                <span translate>User manager</span>
+            </label>
+        </div>
+        <div class="col-sm-6">
+            <label class="btn btn-default user-type-selection" ng-class="{'btn-success': !addUser.isUserManager && addUser.isUserManager != undefined}">
+                <input type="radio" ng-value="false" ng-model="addUser.isUserManager" ng-required="addUser.isUserManager == undefined">
+                <span translate>User</span>
+            </label>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+
+    <div class="form-controls-wrap row" ng-if="!addUser.isUserManager && addUser.isUserManager != undefined">
         <div class="col-sm-6">
             <fieldset name="Data streams">
                 <legend>Data streams<i class="fa fa-check valid-icon" ng-show="addUser.validateDataGroups()"></i></legend>

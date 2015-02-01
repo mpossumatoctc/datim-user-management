@@ -157,7 +157,6 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
                 if (action.typeDependent === true) {
                     action.userRole = action.userRole.replace(/{{.+}}/, dataGroup.name);
                 }
-
                 dataGroup.userRoles.forEach(function (userRole) {
                     if (action.userRole === userRole.name) {
                         action.userRoleId = userRole.id;
