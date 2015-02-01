@@ -928,7 +928,7 @@ describe('Add user controller', function () {
                 controller.addUser();
 
                 expect(controller.userInviteObject.userCredentials.userRoles)
-                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'},
+                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'KagqnetfxMr'}, {id: 'b2uHwX9YLhu'},
                         {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
             });
 
@@ -937,7 +937,7 @@ describe('Add user controller', function () {
                 controller.addUser();
 
                 expect(controller.userInviteObject.userCredentials.userRoles)
-                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'},
+                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'KagqnetfxMr'}, {id: 'b2uHwX9YLhu'},
                         {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
             });
         });
