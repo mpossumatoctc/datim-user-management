@@ -959,9 +959,9 @@ describe('Add user controller', function () {
             describe('getUserManagerDataEntryRoles', function () {
                 it('should get the data entry roles for the the user type', function () {
                     var expectedRoles = [
-                        { userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt' },
-                        { userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4' },
-                        { userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV' }
+                        {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
+                        {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
+                        {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
                     ];
 
                     expect(controller.getUserManagerDataEntryRoles()).toEqual(expectedRoles);
@@ -969,11 +969,11 @@ describe('Add user controller', function () {
 
                 it('should give the inter-agency data entry roles', function () {
                     var expectedRoles = [
-                        { userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID' },
-                        { userRole: 'Tracker', userRoleId: 'trackerid' },
-                        { userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt' },
-                        { userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4' },
-                        { userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV' }
+                        {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
+                        {userRole: 'Tracker', userRoleId: 'trackerid'},
+                        {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
+                        {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
+                        {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
                     ];
                     scope.user.userType = {name: 'Inter-Agency'};
 
@@ -984,9 +984,9 @@ describe('Add user controller', function () {
             describe('getUserManagerDataAccessGroups', function () {
                 it('should return all data stream groups', function () {
                     var expectedGroups = [
-                        { name: 'Data SI access', id: 'c6hGi8GEZot' },
-                        { name: 'Data EA access', id: 'YbkldVOJMUl' },
-                        { name: 'Data SIMS access', id: 'iuD8wUFz95X' }
+                        {name: 'Data SI access', id: 'c6hGi8GEZot'},
+                        {name: 'Data EA access', id: 'YbkldVOJMUl'},
+                        {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
                     ];
 
                     expect(controller.getUserManagerDataAccessGroups()).toEqual(expectedGroups);

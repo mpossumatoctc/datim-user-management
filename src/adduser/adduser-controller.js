@@ -1,7 +1,7 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 51
+function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 52
                            userActions, userService, $state, notify, interAgencyService,
                            userFormService, errorHandler) {
 
@@ -33,7 +33,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.getUserManagerRoles = getUserManagerRoles;
     vm.getUserManagerDataEntryRoles = getUserManagerDataEntryRoles;
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
-
 
     //Scope properties
     $scope.userOrgUnit = {
@@ -254,7 +253,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     }
 
     function addUserManagerUserRoles() {
-        var adminActions = _.map(getUserManagerRoles(),function (userAction) {
+        var adminActions = _.map(getUserManagerRoles(), function (userAction) {
             return {id: userAction.userRoleId};
         });
 

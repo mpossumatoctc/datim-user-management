@@ -34,8 +34,30 @@
             </label>
         </div>
     </div>
-    <div class="row">
-
+    <div class="form-controls-wrap row" ng-if="addUser.isUserManager">
+        <div class="col-sm-6">
+            <fieldset name="The following steams will be assigned">
+                <legend>The following steams will be assigned</legend>
+                <ul class="user-manager-items">
+                    <li ng-repeat="dataGroup in addUser.getUserManagerDataAccessGroups()">
+                       <i class="fa fa-caret-right"></i><span ng-bind="::dataGroup.name" translate></span>
+                    </li>
+                </ul>
+            </fieldset>
+        </div>
+        <div class="col-sm-6">
+            <fieldset name="The following actions will be assigned">
+                <legend>The following actions will be assigned</legend>
+                <ul class="user-manager-items">
+                    <li ng-repeat="dataEntryRole in addUser.getUserManagerDataEntryRoles()">
+                        <i class="fa fa-caret-right"></i><span ng-bind="::dataEntryRole.userRole" translate></span>
+                    </li>
+                    <li ng-repeat="actionRole in addUser.getUserManagerRoles()">
+                        <i class="fa fa-caret-right"></i><span ng-bind="::actionRole.name" translate></span>
+                    </li>
+                </ul>
+            </fieldset>
+        </div>
     </div>
 
     <div class="form-controls-wrap row" ng-if="!addUser.isUserManager && addUser.isUserManager != undefined">
