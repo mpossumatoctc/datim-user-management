@@ -40,6 +40,7 @@ h2.sub-title
   margin-top: 75px
   max-width: 1200px
   width: 60%
+
 form
   .form-control.ng-valid,
   .ui-select-bootstrap.ng-valid button
@@ -267,3 +268,10 @@ legend
     border-top: 1px dotted #FFFFFF
     margin-top: 5px
     padding-top: 5px
+
+/**
+ * Overwrite for css stylesheets that mess with the bootstrap padding
+ * TODO: Can be removed when stylesheets regarding color scheme only influence colors
+ */
+input[type=text].form-control
+  padding: 6px 12px
