@@ -223,7 +223,7 @@
         }
 
         function resumeBootstrapWhenLoaded() {
-            var limit = 50;
+            var limit = 200;
             try {
                 this.modules.forEach(function (moduleName) {
                     angular.module(moduleName);

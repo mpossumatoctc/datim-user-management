@@ -118,7 +118,6 @@ angular.module('PEPFAR.usermanagement', [
     'ui.bootstrap',
     'ui.validate',
     'ngMessages',
-    'd2Menu',
     'd2HeaderBar',
     'ngAnimate'
 ]);
@@ -159,7 +158,6 @@ window.getBootstrapper('PEPFAR.usermanagement', document)
     })
     .loadStylesheet('/dhis-web-commons/css/menu.css')
     .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.translate.js')
-    .loadModule('/dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2Menu')
-    .loadModule('/dhis-web-commons/javascripts/dhis2/dhis2.menu.js', 'd2HeaderBar')
-    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js')
+    .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.menu.js')
+    .loadModule('/dhis-web-commons/javascripts/dhis2/dhis2.menu.ui.js', 'd2HeaderBar')
     .bootstrap();
