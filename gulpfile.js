@@ -220,7 +220,7 @@ gulp.task('copy-fonts', function () {
 });
 
 gulp.task('build', function () {
-    runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts');
+    return runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts');
 });
 
 gulp.task('build-prod', function () {

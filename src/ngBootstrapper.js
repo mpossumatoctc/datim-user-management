@@ -1,3 +1,4 @@
+/* global toastr */
 (function (window, angular) {
 
     /**
@@ -222,18 +223,39 @@
         }
 
         function resumeBootstrapWhenLoaded() {
+            var limit = 50;
             try {
                 this.modules.forEach(function (moduleName) {
                     angular.module(moduleName);
                 });
                 angular.resumeBootstrap([self.appName + '.injectables']);
             } catch (e) {
-                if (window.console && window.console.info) {
+                if (window.console && window.console.info && resumeBootstrapWhenLoaded.attempts < limit) {
+                    resumeBootstrapWhenLoaded.attempts += 1;
                     window.console.info('Waiting for scripts to be loaded! Re-attempting bootstrap in 10 miliseconds');
+                    window.setTimeout(resumeBootstrapWhenLoaded.bind(this), 10);
+                } else {
+                    if (toastr) {
+                        toastr.error('Gave up to load module after ' + limit + ' attempts: ' + extractMessageFromAngularError(e), undefined, {
+                            positionClass: 'toast-top-right',
+                            timeOut: 0,
+                            extendedTimeOut: 0,
+                            closeButton: true,
+                            tapToDismiss: false
+                        });
+                    }
                 }
-                window.setTimeout(resumeBootstrapWhenLoaded.bind(this), 10);
+            }
+
+            function extractMessageFromAngularError(e) {
+                var regExp = /Module '\w+' is not available!/;
+                if (angular.isString(e.message) && regExp.test(e.message)) {
+                    return e.message.match(regExp)[0];
+                }
+                return 'A required module could not be found';
             }
         }
+        resumeBootstrapWhenLoaded.attempts = 0;
 
         return this;
     };
