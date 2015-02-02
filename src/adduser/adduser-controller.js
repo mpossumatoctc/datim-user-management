@@ -1,38 +1,48 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 46
+function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 51
                            userActions, userService, $state, notify, interAgencyService,
                            userFormService, errorHandler) {
+
+    errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
+
     var vm = this;
     var validations = userFormService.getValidations();
 
+    //Properties
     vm.title = 'Add or delete user';
     vm.dataGroups = dataGroups || [];
     vm.actions = [];
     vm.languages = [];
     vm.isProcessingAddUser = false;
-    vm.addUser = addUser;
-    vm.validateDataGroups = validateDataGroups;
     vm.dataGroupsInteractedWith = validations.dataGroupsInteractedWith;
     vm.allowUserAdd = false;
     vm.dimensionConstraint = dimensionConstraint;
     vm.userInviteObject = {};
-    vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
-    vm.updateDataEntry = updateDataEntry;
     vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
     vm.dataEntryStreamNamesForUserType = [];
-    vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
-
     vm.isUserManager = undefined;
 
-    errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
+    //Methods
+    vm.addUser = addUser;
+    vm.validateDataGroups = validateDataGroups;
+    vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
+    vm.updateDataEntry = updateDataEntry;
+    vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
+    vm.getUserManagerRoles = getUserManagerRoles;
+    vm.getUserManagerDataEntryRoles = getUserManagerDataEntryRoles;
+    vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
+
+
+    //Scope properties
     $scope.userOrgUnit = {
         current:  vm.activeOrgUnit = (currentUser && currentUser.organisationUnits && currentUser.organisationUnits[0]) || undefined
     };
     $scope.userTypes = userTypes || [];
     $scope.user = userService.getUserObject();
 
+    //Scope watchers
     $scope.$watch('userOrgUnit.current', function (newVal, oldVal) {
         if (newVal !== oldVal && newVal && newVal.name) {
             $scope.$broadcast('ORGUNITCHANGED', newVal);
@@ -235,37 +245,51 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             $scope.user.userEntity.userUserGroup.id;
     }
 
-    function addUserManagerUserRoles() {
+    function getUserManagerRoles() {
         var hasUserRoleId = _.compose(_.size, _.values, _.partialRight(_.pick, ['userRoleId']));
 
-        var adminActions = _.chain(userActions.actions)
+        return _.chain(userActions.actions)
             .filter(hasUserRoleId)
-            .map(function (userAction) {
-                return {id: userAction.userRoleId};
-            })
             .value();
+    }
+
+    function addUserManagerUserRoles() {
+        var adminActions = _.map(getUserManagerRoles(),function (userAction) {
+            return {id: userAction.userRoleId};
+        });
 
         vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(adminActions);
     }
 
     function addAllAvailableDataStreams() {
-        var dataAccessGroups = _.chain(vm.dataGroups)
-            .map('userGroups')
-            .flatten()
-            .map(_.partialRight(_.pick, ['id']))
-            .value();
-
+        var dataAccessGroups = _.map(getUserManagerDataAccessGroups(), _.partialRight(_.pick, ['id']));
         vm.userInviteObject.userGroups = vm.userInviteObject.userGroups.concat(dataAccessGroups);
 
-        var dataEntryRoles = _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
+        var dataEntryRoles = _.map(getUserManagerDataEntryRoles(), _.compose(renameProperty('userRoleId', 'id'), _.partialRight(_.pick, ['userRoleId'])));
+        vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(dataEntryRoles);
+    }
+
+    function renameProperty(from, to) {
+        return function (item) {
+            item[to] = item[from];
+            delete item[from];
+            return item;
+        };
+    }
+
+    function getUserManagerDataAccessGroups() {
+        return _.chain(vm.dataGroups)
+            .map('userGroups')
+            .flatten()
+            .value();
+    }
+
+    function getUserManagerDataEntryRoles() {
+        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
             .values()
             .flatten()
-            .map(function (userAction) {
-                return {id: userAction.userRoleId};
-            })
+            .filter('userRoleId')
             .value();
-
-        vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(dataEntryRoles);
     }
 
     function validateDataGroups() {

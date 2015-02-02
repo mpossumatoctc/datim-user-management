@@ -30,7 +30,8 @@ describe('Add user controller', function () {
                 dataEntryRestrictionsUserManager: {
                     'Inter-Agency': {
                         SI: [{
-                            userRole: 'Data Entry SI Country Team'
+                            userRole: 'Data Entry SI Country Team',
+                            userRoleId: 'dataEntryCountryTeamID'
                         }, {
                             userRole: 'Tracker',
                             userRoleId:  'trackerid'
@@ -606,6 +607,7 @@ describe('Add user controller', function () {
             expect(notify.error).toHaveBeenCalled();
         });
 
+        //TODO: These tests might be obsolete as this functionality is no longer supported.
         describe('user manager usergroup', function () {
             beforeEach(function () {
                 scope.user.userActions['Manage users'] = true;
@@ -939,6 +941,56 @@ describe('Add user controller', function () {
                 expect(controller.userInviteObject.userCredentials.userRoles)
                     .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'KagqnetfxMr'}, {id: 'b2uHwX9YLhu'},
                         {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
+            });
+
+            describe('getUserManagerRoles', function () {
+                it('should get the user actions', function () {
+                    var expectedRoles = [
+                        {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                        {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
+                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                    ];
+
+                    expect(controller.getUserManagerRoles()).toEqual(expectedRoles);
+                });
+            });
+
+            describe('getUserManagerDataEntryRoles', function () {
+                it('should get the data entry roles for the the user type', function () {
+                    var expectedRoles = [
+                        { userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt' },
+                        { userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4' },
+                        { userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV' }
+                    ];
+
+                    expect(controller.getUserManagerDataEntryRoles()).toEqual(expectedRoles);
+                });
+
+                it('should give the inter-agency data entry roles', function () {
+                    var expectedRoles = [
+                        { userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID' },
+                        { userRole: 'Tracker', userRoleId: 'trackerid' },
+                        { userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt' },
+                        { userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4' },
+                        { userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV' }
+                    ];
+                    scope.user.userType = {name: 'Inter-Agency'};
+
+                    expect(controller.getUserManagerDataEntryRoles()).toEqual(expectedRoles);
+                });
+            });
+
+            describe('getUserManagerDataAccessGroups', function () {
+                it('should return all data stream groups', function () {
+                    var expectedGroups = [
+                        { name: 'Data SI access', id: 'c6hGi8GEZot' },
+                        { name: 'Data EA access', id: 'YbkldVOJMUl' },
+                        { name: 'Data SIMS access', id: 'iuD8wUFz95X' }
+                    ];
+
+                    expect(controller.getUserManagerDataAccessGroups()).toEqual(expectedGroups);
+                });
             });
         });
     });
