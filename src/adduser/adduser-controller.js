@@ -129,7 +129,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     function addUserManager() {
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = getAdminInviteObject();
+        vm.userInviteObject = getInviteObject([], []);
         addDimensionConstraintForType();
         addUserManagerUserRoles();
         addAllAvailableDataStreams();
@@ -147,7 +147,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     function addNormalUser() {
         vm.isProcessingAddUser = true;
 
-        vm.userInviteObject = getInviteObject();
+        vm.userInviteObject = getInviteObject(vm.dataGroups, vm.actions);
         addDimensionConstraintForType();
 
         if (!verifyUserInviteObject() || !addUserGroupsForMechanismsAndUsers()) {
@@ -180,23 +180,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             });
     }
 
-    function getInviteObject() {
+    function getInviteObject(dataGroups, actions) {
         return userService.getUserInviteObject(
             $scope.user,
-            vm.dataGroups,
-            vm.actions,
+            dataGroups,
+            actions,
             [getCurrentOrgUnit()],
             userActions.dataEntryRestrictions
-        );
-    }
-
-    function getAdminInviteObject() {
-        return userService.getUserInviteObject(
-            $scope.user,
-            [],
-            [],
-            [getCurrentOrgUnit()],
-            userActions.dataEntryRestrictionsUserManager
         );
     }
 
