@@ -98,6 +98,74 @@ ul.checkbox-group, ul.user-manager-items
   li
     list-style: none
 
+  li
+    position: relative
+
+    &.ng-enter
+      -webkit-animation: fadeInLeft 400ms
+      animation: fadeInLeft 400ms
+      animation-delay: 200ms
+      -webkit-animation-delay: 200ms
+      -moz-animation-delay: 200ms
+
+    &.ng-leave
+      -webkit-animation: fadeOutRight 400ms
+      animation: fadeOutRight 400ms
+
+@-webkit-keyframes fadeInLeft
+  0%
+    opacity: 0
+    height: 0
+    -webkit-transform: translate3d(-20%, 0, 0)
+    transform: translate3d(-20%, 0, 0)
+
+
+  100%
+    opacity: 1
+    height: 1.5em
+    -webkit-transform: none
+    transform: none
+
+@keyframes fadeInLeft
+  0%
+    opacity: 0
+    height: 0
+    -webkit-transform: translate3d(-20%, 0, 0)
+    transform: translate3d(-20%, 0, 0)
+
+  100%
+    opacity: 1
+    height: 1.5em
+    -webkit-transform: none
+    transform: none
+
+@-webkit-keyframes fadeOutRight
+  0%
+    opacity: 1
+    height: 1.5em
+    -webkit-transform: none
+    transform: none
+
+  100%
+    opacity: 0
+    height: 0
+    -webkit-transform: translate3d(10%, 0, 0)
+    transform: translate3d(10%, 0, 0)
+
+
+@keyframes fadeOutRight
+  0%
+    opacity: 1
+    height: 1.5em
+    -webkit-transform: none
+    transform: none
+
+  100%
+    opacity: 0
+    line-height: 0
+    -webkit-transform: translate3d(10%, 0, 0)
+    transform: translate3d(10%, 0, 0)
+
 ul.user-manager-items
   i
     color: #5CB85C

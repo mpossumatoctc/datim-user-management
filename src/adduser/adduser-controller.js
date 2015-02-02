@@ -246,10 +246,14 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function getUserManagerRoles() {
         var hasUserRoleId = _.compose(_.size, _.values, _.partialRight(_.pick, ['userRoleId']));
+        var actionsForUserType = userActions.getActionsForUserType(getUserType());
+        var userManagerRole = userActions.actions.filter(function (action) {
+            return action.name === 'Manage users';
+        });
 
-        return _.chain(userActions.actions)
+        return _.chain(actionsForUserType)
             .filter(hasUserRoleId)
-            .value();
+            .value().concat(userManagerRole);
     }
 
     function addUserManagerUserRoles() {

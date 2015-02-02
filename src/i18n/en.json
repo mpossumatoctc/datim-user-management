@@ -11,6 +11,9 @@
     "SI,SIMS": "MER, SIMS",
     "SI,EA": "MER, EA",
 
+    "Data SI access": "Data MER access",
+    "Data Entry SI": "Data Entry MER",
+
     "ar": "Arabic",
     "ar_IQ": "Arabic (Iraq)",
     "ar_SD": "Arabic (Sudan)",

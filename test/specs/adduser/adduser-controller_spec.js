@@ -930,7 +930,7 @@ describe('Add user controller', function () {
                 controller.addUser();
 
                 expect(controller.userInviteObject.userCredentials.userRoles)
-                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'KagqnetfxMr'}, {id: 'b2uHwX9YLhu'},
+                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'}, {id: 'KagqnetfxMr'},
                         {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
             });
 
@@ -939,7 +939,7 @@ describe('Add user controller', function () {
                 controller.addUser();
 
                 expect(controller.userInviteObject.userCredentials.userRoles)
-                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'KagqnetfxMr'}, {id: 'b2uHwX9YLhu'},
+                    .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'}, {id: 'KagqnetfxMr'},
                         {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'OKKx4bf4ueV'}]);
             });
 
@@ -948,9 +948,21 @@ describe('Add user controller', function () {
                     var expectedRoles = [
                         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
                         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
-                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'},
-                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true}
+                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true},
+                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'}
                     ];
+
+                    expect(controller.getUserManagerRoles()).toEqual(expectedRoles);
+                });
+
+                it('should not return accept data for a partner user', function () {
+                    var expectedRoles = [
+                        {name: 'Accept data', userRole: 'Data Accepter', userRoleId: 'QbxXEPw9xlf'},
+                        {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ'},
+                        {name: 'Read data', userRole: 'Read Only', userRoleId: 'b2uHwX9YLhu', default: true},
+                        {name: 'Manage users', userRole: 'User Administrator', userRoleId: 'KagqnetfxMr'}
+                    ];
+                    scope.user.userType = {name: 'Partner'};
 
                     expect(controller.getUserManagerRoles()).toEqual(expectedRoles);
                 });
