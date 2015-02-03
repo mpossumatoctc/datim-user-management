@@ -22,14 +22,29 @@
                 </div>
             </div>
 
+            <div class="form-controls-wrap row">
+                <div class="col-sm-12">
+                    <label for="usermanager">
+                        <input id="usermanager" type="checkbox" ng-value="false" ng-model="editUser.isUserManager" ng-change="editUser.checkAllBoxesForUserManager()">
+                        <span translate>User manager</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="row form-controls-wrap">
                 <div class="col-sm-6">
-
                     <fieldset name="Data streams">
                         <legend>Data streams<i class="fa fa-check valid-icon" ng-show="editUser.validateDataGroups()"></i></legend>
                         <ul class="checkbox-group">
                             <li ng-repeat="(name, value) in user.dataGroups">
-                                <input ui-validate-watch="'editUser.validateDataGroups()'" ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-disabled="user.dataGroups[name].entry" ng-model="user.dataGroups[name].access" ng-change="editUser.updateDataEntry(name)" type="checkbox">
+                                <input ui-validate-watch="'editUser.validateDataGroups()'" 
+                                       ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" 
+                                       id="dataStream[{{::name}}]" 
+                                       name="dataStream[{{::name}}]"
+                                       ng-disabled="user.dataGroups[name].entry || editUser.isUserManager"
+                                       ng-model="user.dataGroups[name].access" 
+                                       ng-change="editUser.updateDataEntry(name)" 
+                                       type="checkbox">
                                 <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                             </li>
                         </ul>
@@ -49,7 +64,8 @@
                                        name="dataEntry[{{::streamName}}]"
                                        type="checkbox"
                                        ng-model="user.dataGroups[streamName].entry"
-                                       ng-change="editUser.updateDataEntry(streamName);" />
+                                       ng-change="editUser.updateDataEntry(streamName);"
+                                       ng-disabled="editUser.isUserManager" />
                                 <label for="dataEntry[{{::streamName}}]">
                                     <span translate>Data Entry</span> <span ng-bind="streamName" translate></span>
                                 </label>
@@ -57,7 +73,7 @@
                             <li ng-repeat="action in editUser.actions">
                                 <input ng-model="user.userActions[action.name]"
                                        ng-checked="action.hasAction"
-                                       ng-disabled="(action.default && action.hasAction)" id="userActions[{{::action.name}}]"
+                                       ng-disabled="(action.default && action.hasAction) || editUser.isUserManager" id="userActions[{{::action.name}}]"
                                        name="userActions[{{::action.name}}]"
                                        type="checkbox">
                                 <label for="userActions[{{::action.name}}]">

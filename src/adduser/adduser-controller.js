@@ -1,4 +1,3 @@
-/* global pick */
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 60
@@ -69,27 +68,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     });
 
     function updateDataEntry(streamName) {
-        var userType = getUserType();
-        var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
-
-        if (!angular.isString(streamName)) {
-            errorHandler.debug('Update data entry the streamname given is invalid');
-            return;
-        }
-
-        if (userGroupsThatApplyForDataEntryForUserType.indexOf(streamName) >= 0) {
-            //If data entry is given, also give the stream access
-            if (streamName && $scope.user.dataGroups[streamName] && $scope.user.dataGroups[streamName].entry) {
-                if ($scope.user.dataGroups[streamName].access === false) {
-                    $scope.user.dataGroups[streamName].access = true;
-                }
-            }
-        } else {
-            //This is not a valid dataGroup for entry
-            if ($scope.user.dataGroups[streamName]) {
-                $scope.user.dataGroups[streamName].entry = false;
-            }
-        }
+        userUtils.updateDataEntry(getUserType(), userActions, streamName, $scope);
     }
 
     function initialize() {
@@ -313,26 +292,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         return validations.validateDataGroups($scope.user.dataGroups);
     }
 
-    //TODO: Duplicate code with the edit controller
     function getDataEntryStreamNamesForUserType() {
-        if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
-            errorHandler.debug('currentUser.userCredentials.userRoles was not found on the currentUser object');
-            return [];
-        }
-
-        var userEntryDataEntryStreams = userActions.getDataEntryRestrictionDataGroups(getUserType())
-            .filter(function (streamName) {
-                return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
-                    .map(pick('name'))
-                    .some(function (roleName) {
-                        return roleName === ['Data Entry', streamName].join(' ') ||
-                            (streamName === 'SI' && /^Data Entry SI(?: Country Team)?$/.test(roleName));
-                    });
-            });
-
-        errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);
-
-        return userEntryDataEntryStreams;
+        return userUtils.getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType);
     }
 
     function getUserType() {

@@ -1,17 +1,67 @@
+/* global pick */
 angular.module('PEPFAR.usermanagement').factory('userUtils', userUtilsService);
 
-function userUtilsService() {
+function userUtilsService(errorHandler) {
     var previousDataGroups;
     var previousUserActions;
 
     return {
+        getDataEntryStreamNamesForUserType: getDataEntryStreamNamesForUserType,
+        updateDataEntry: updateDataEntry,
         setAllDataStreamsAndEntry: setAllDataStreamsAndEntry,
         storeDataStreamsAndEntry: storeDataStreamsAndEntry,
         restoreDataStreamsAndEntry: restoreDataStreamsAndEntry,
         setAllActions: setAllActions,
         storeUserActions: storeUserActions,
-        restoreUserActions: restoreUserActions
+        restoreUserActions: restoreUserActions,
+        hasUserAdminRights: hasUserAdminRights,
+        hasUserGroup: hasUserGroup,
+        hasUserRole: hasUserRole
     };
+
+    function getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType) {
+        if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
+            errorHandler.debug('currentUser.userCredentials.userRoles was not found on the currentUser object');
+            return [];
+        }
+
+        var userEntryDataEntryStreams = userActions.getDataEntryRestrictionDataGroups(getUserType())
+            .filter(function (streamName) {
+                return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
+                        .map(pick('name'))
+                        .some(function (roleName) {
+                            return roleName === ['Data Entry', streamName].join(' ') ||
+                                (streamName === 'SI' && /^Data Entry SI(?: Country Team)?$/.test(roleName));
+                        });
+            });
+
+        errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);
+
+        return userEntryDataEntryStreams;
+    }
+
+    function updateDataEntry(userType, userActions, streamName, $scope) {
+        var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
+
+        if (!angular.isString(streamName)) {
+            errorHandler.debug('Update data entry the streamname given is invalid');
+            return;
+        }
+
+        if (userGroupsThatApplyForDataEntryForUserType.indexOf(streamName) >= 0) {
+            //If data entry is given, also give the stream access
+            if (streamName && $scope.user.dataGroups[streamName] && $scope.user.dataGroups[streamName].entry) {
+                if ($scope.user.dataGroups[streamName].access === false) {
+                    $scope.user.dataGroups[streamName].access = true;
+                }
+            }
+        } else {
+            //This is not a valid dataGroup for entry
+            if ($scope.user.dataGroups[streamName]) {
+                $scope.user.dataGroups[streamName].entry = false;
+            }
+        }
+    }
 
     /**
      * Saves the passed object to be retrieved by `restoreDataStreamsAndEntry`. And returns a new Object with
@@ -61,16 +111,17 @@ function userUtilsService() {
      * Uses the action names as keys and sets the values to true.
      *
      * @param {Array} allActions
+     * @param {Boolean} includeDefaults When true returns actions marked as defaults too.
      * @returns {Object}
      *
      * @throws {Error} When `allActions` is not an array
      */
-    function setAllActions(allActions) {
+    function setAllActions(allActions, includeDefaults) {
         throwWhenNotArray(allActions, 'allActions');
 
         return _.chain(allActions)
             .filter(function (action) {
-                return action.default ? false : true;
+                return action.default && !includeDefaults ? false : true;
             })
             .map(function (value) {
                 return value.name;
@@ -109,6 +160,30 @@ function userUtilsService() {
         throwWhenNotObject(userActions, 'userActions');
 
         return previousUserActions || userActions;
+    }
+
+    function hasUserAdminRights(user) {
+        return hasUserRole(user, {name: 'User Administrator'}) && hasAdminUserGroup(user);
+    }
+
+    function hasAdminUserGroup(user) {
+        var adminUserGroupRegex = /user administrators/i;
+
+        return (user.userGroups || []).reduce(function (current, userGroup) {
+            return current || adminUserGroupRegex.test(userGroup.name);
+        }, false);
+    }
+
+    function hasUserGroup(user, userGroupToCheck) {
+        return (user.userGroups || []).reduce(function (current, userGroup) {
+            return current || (userGroup.name === userGroupToCheck.name);
+        }, false);
+    }
+
+    function hasUserRole(user, userRoleToCheck) {
+        return (user && user.userCredentials && user.userCredentials.userRoles || []).reduce(function (current, userRole) {
+            return current || (userRole.name === userRoleToCheck.name);
+        }, false);
     }
 
     function throwWhenNotObject(value, name) {

@@ -115,7 +115,7 @@ describe('User utils service', function () {
         });
 
         it('should expect two arguments', function () {
-            expect(userUtils.setAllActions.length).toBe(1);
+            expect(userUtils.setAllActions.length).toBe(2);
         });
 
         it('should throw if the argument is not an object', function () {
@@ -134,6 +134,17 @@ describe('User utils service', function () {
             };
 
             expect(userUtils.setAllActions(allActions)).toEqual(expectedUserActions);
+        });
+
+        it('should also set actions marked as default to true', function () {
+            var expectedUserActions = {
+                'Accept data': true,
+                'Submit data': true,
+                'Manage users': true,
+                'Read data': true
+            };
+
+            expect(userUtils.setAllActions(allActions, true)).toEqual(expectedUserActions);
         });
     });
 
@@ -181,6 +192,53 @@ describe('User utils service', function () {
             userActions = {'Submit data': true};
 
             expect(userUtils.restoreUserActions(userActions)).toEqual(expectedUserActions);
+        });
+    });
+
+    describe('hasUserAdminRights', function () {
+        var user;
+
+        beforeEach(function () {
+            user = {
+                userGroups: [
+                    {name: 'OU Burma Partner 9865 user administrators - FHI 360'}
+                ],
+                userCredentials: {
+                    userRoles: [
+                        {name: 'User Administrator'}
+                    ]
+                }
+            };
+        });
+
+        it('should be a function', function () {
+            expect(userUtils.hasUserAdminRights).toBeAFunction();
+        });
+
+        it('should return false', function () {
+            expect(userUtils.hasUserAdminRights()).toBe(false);
+        });
+
+        it('should return false for a user without groups', function () {
+            delete user.userGroups;
+
+            expect(userUtils.hasUserAdminRights(user)).toBe(false);
+        });
+
+        it('should return false for a user without userRoles', function () {
+            delete user.userCredentials.userRoles;
+
+            expect(userUtils.hasUserAdminRights(user)).toBe(false);
+        });
+
+        it('should return false for a user without userCredentials', function () {
+            delete user.userCredentials;
+
+            expect(userUtils.hasUserAdminRights(user)).toBe(false);
+        });
+
+        it('should return true for a user with user management rights', function () {
+            expect(userUtils.hasUserAdminRights(user)).toBe(true);
         });
     });
 });

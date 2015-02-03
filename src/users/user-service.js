@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular, _, partnersService, agenciesService, interAgencyService) {
+function userService($q, Restangular, userUtils, partnersService, agenciesService, interAgencyService) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -295,8 +295,8 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
 
             userEntity = userEntity || {};
 
-            if (hasUserRole(userToUpdate, {name: 'User Administrator'})) {
-                if (userEntity && userEntity.userAdminUserGroup && !hasUserGroup(userToUpdate, userEntity.userAdminUserGroup)) {
+            if (userUtils.hasUserRole(userToUpdate, {name: 'User Administrator'})) {
+                if (userEntity && userEntity.userAdminUserGroup && !userUtils.hasUserGroup(userToUpdate, userEntity.userAdminUserGroup)) {
                     userToUpdate.userGroups.push(userEntity.userAdminUserGroup);
                 }
             } else {
@@ -326,23 +326,11 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
                 return partnersAndAgencies.reduce(function (current, partnerAgency) {
                     if (partnerAgency && partnerAgency.userUserGroup && partnerAgency.userAdminUserGroup &&
                         partnerAgency.userUserGroup.name && partnerAgency.userAdminUserGroup.id &&
-                        hasUserGroup(user, partnerAgency.userUserGroup)) {
+                        userUtils.hasUserGroup(user, partnerAgency.userUserGroup)) {
                         return partnerAgency;
                     }
                     return current;
                 }, undefined);
             });
-    }
-
-    function hasUserGroup(user, userGroupToCheck) {
-        return (user.userGroups || []).reduce(function (current, userGroup) {
-            return current || (userGroup.name === userGroupToCheck.name);
-        }, false);
-    }
-
-    function hasUserRole(user, userRoleToCheck) {
-        return (user && user.userCredentials && user.userCredentials.userRoles || []).reduce(function (current, userRole) {
-            return current || (userRole.name === userRoleToCheck.name);
-        }, false);
     }
 }

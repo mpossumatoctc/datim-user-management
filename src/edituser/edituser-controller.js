@@ -1,31 +1,33 @@
-/* global pick */
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 40
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 50
                             userLocale, userFormService, userActions,
-                            notify, userService, userTypesService, errorHandler) {
+                            notify, userService, userTypesService, userUtils, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
 
-    vm.userToEdit = {};
+    vm.userToEdit = userToEdit;
     vm.user = {
-        locale: undefined,
+        locale: userLocale,
         dataGroups: {},
         userActions: {}
     };
     vm.actions = [];
     vm.dataGroups = dataGroups || [];
-    vm.validateDataGroups = validateDataGroups;
     vm.dataGroupsInteractedWith = validations.dataGroupsInteractedWith;
+    vm.isProcessingEditUser = false;
+    vm.userEntityName = '';
+    vm.dataEntryStreamNamesForUserType = [];
+    vm.isUserManager = userUtils.hasUserAdminRights(userToEdit);
+
+    vm.validateDataGroups = validateDataGroups;
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.editUser = editUser;
-    vm.isProcessingEditUser = false;
     vm.getUserType = getUserType;
-    vm.userEntityName = '';
     vm.changeUserStatus = changeUserStatus;
     vm.updateDataEntry = updateDataEntry;
-    vm.dataEntryStreamNamesForUserType = [];
     vm.getOrganisationUnitForUserToEdit = getOrganisationUnitForUserToEdit;
+    vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
 
     $scope.user = vm.user;
 
@@ -42,9 +44,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             $state.go('noaccess', {message: 'Editing your own account would only allow you to restrict it further, therefore it has been disabled.'});
             return;
         }
-
-        vm.userToEdit = userToEdit;
-        vm.user.locale = userLocale;
 
         vm.dataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType();
 
@@ -105,29 +104,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }, false);
     }
 
-    //TODO: This is partial duplicate code with the add controller and should be refactored
     function updateDataEntry(streamName) {
-        var userType = getUserType(userToEdit);
-        var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
-
-        if (!angular.isString(streamName)) {
-            errorHandler.debug('Update data entry the streamname given is invalid');
-            return;
-        }
-
-        if (userGroupsThatApplyForDataEntryForUserType.indexOf(streamName) >= 0) {
-            //If data entry is given, also give the stream access
-            if (streamName && $scope.user.dataGroups[streamName] && $scope.user.dataGroups[streamName].entry) {
-                if ($scope.user.dataGroups[streamName].access === false) {
-                    $scope.user.dataGroups[streamName].access = true;
-                }
-            }
-        } else {
-            //This is not a valid dataGroup for entry
-            if ($scope.user.dataGroups[streamName]) {
-                $scope.user.dataGroups[streamName].entry = false;
-            }
-        }
+        userUtils.updateDataEntry(getUserType(), userActions, streamName, $scope);
     }
 
     function validateDataGroups() {
@@ -143,6 +121,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
         userToEdit.userGroups = userGroups;
 
+        fixUserManagementRole();
+
         setProcessingTo(true);
 
         userService.updateUser(userToEdit)
@@ -157,6 +137,31 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             })
             .catch(errorHandler.errorFn('Failed to save user'))
             .finally(setProcessingToFalse);
+    }
+
+    function fixUserManagementRole() {
+        var userManagementRole = userActions.actions.reduce(function (current, action) {
+            if (action.userRole === 'User Administrator' && action.userRoleId) {
+                return {id: action.userRoleId, name: action.userRole};
+            }
+            return current;
+        }, undefined);
+
+        if (!userManagementRole) {return;}
+
+        if (vm.isUserManager && !userUtils.hasUserRole(vm.userToEdit, {name: 'User Administrator'})) {
+            userToEdit.userCredentials.userRoles.push(userManagementRole);
+
+            errorHandler.debug('Adding user management role to the user');
+        }
+
+        if (!vm.isUserManager && userUtils.hasUserRole(vm.userToEdit, {name: 'User Administrator'})) {
+            userToEdit.userCredentials.userRoles = (userToEdit.userCredentials.userRoles || []).filter(function (userRole) {
+                return userRole.id !== userManagementRole.id;
+            });
+
+            errorHandler.debug('Removing user management role from the user');
+        }
     }
 
     function notifyUserOfSuccessfullSave() {
@@ -183,21 +188,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         return userTypesService.getUserType(userToEdit);
     }
 
-    //TODO: Duplicate code with the add controller
     function getDataEntryStreamNamesForUserType() {
-        if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
-            return [];
-        }
-
-        return userActions.getDataEntryRestrictionDataGroups(getUserType())
-            .filter(function (streamName) {
-                return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
-                    .map(pick('name'))
-                    .some(function (roleName) {
-                        return roleName === ['Data Entry', streamName].join(' ') ||
-                            (streamName === 'SI' && /^Data Entry SI(?: Country Team)?$/.test(roleName));
-                    });
-            });
+        return userUtils.getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType);
     }
 
     function changeUserStatus() {
@@ -221,6 +213,28 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             return userToEdit.organisationUnits[0].name;
         }
         return 'Unknown';
+    }
+
+    function checkAllBoxesForUserManager() {
+        if (vm.isUserManager) {
+            userUtils.storeDataStreamsAndEntry($scope.user.dataGroups);
+            userUtils.storeUserActions($scope.user.userActions);
+
+            $scope.user.dataGroups = userUtils.setAllDataStreamsAndEntry($scope.user.dataGroups);
+            $scope.user.userActions = userUtils.setAllActions(vm.actions, true);
+        } else {
+            //TODO: Remove all the extra added fields that are not possible to be removed through the ui
+            //TODO: check if there is some data to be able to be restored, otherwise reset to empty
+            _.forEach(vm.actions, function (action) {
+                if ($scope.user.userActions[action.name] && !action.default) {
+                    $scope.user.userActions[action.name] = false;
+                }
+            });
+            _.forEach($scope.user.dataGroups, function (userGroup) {
+                userGroup.access = false;
+                userGroup.entry = false;
+            });
+        }
     }
 
     /**
