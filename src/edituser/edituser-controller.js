@@ -60,8 +60,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function correctUserRolesForType(response) {
         ((Array.isArray(vm.dataGroups) && vm.dataGroups) || []).forEach(function (dataGroup) {
-            window.console.log('logging groups');
-            window.console.log(dataGroup);
             var userRoles = userActions.dataEntryRestrictions && userActions.dataEntryRestrictions[getUserType()] && userActions.dataEntryRestrictions[getUserType()][dataGroup.name];
             dataGroup.userRoles = (userRoles || [])
                 .filter(function (userRole) {
@@ -116,11 +114,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         removeExtraUserManagementRoles();
 
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
-        window.console.log('initial roles');
-        window.console.log(userToEdit.userCredentials.userRoles);
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
-        window.console.log('adjusted roles');
-        window.console.log(userToEdit.userCredentials.userRoles);
         userToEdit.userGroups = userGroups;
 
         fixUserManagementRole();
@@ -284,28 +278,29 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             $scope.user.dataGroups = userUtils.setAllDataStreamsAndEntry($scope.user.dataGroups);
             $scope.user.userActions = userUtils.setAllActions(vm.actions, true);
         } else {
-            //TODO: Remove all the extra added fields that are not possible to be removed through the ui
-            //TODO: check if there is some data to be able to be restored, otherwise reset to empty
-            _.forEach(vm.actions, function (action) {
-                if ($scope.user.userActions[action.name] && !action.default) {
-                    $scope.user.userActions[action.name] = false;
-                }
-            });
-            _.forEach($scope.user.dataGroups, function (userGroup) {
-                userGroup.access = false;
-                userGroup.entry = false;
-            });
+            if (userUtils.hasStoredData()) {
+                $scope.user.dataGroups = userUtils.restoreDataStreamsAndEntry($scope.user.dataGroups);
+                $scope.user.userActions = userUtils.restoreUserActions($scope.user.userActions);
+            } else {
+                resetStreamsAndActions();
+            }
         }
     }
 
+    function resetStreamsAndActions() {
+        _.forEach(vm.actions, function (action) {
+            if ($scope.user.userActions[action.name] && !action.default) {
+                $scope.user.userActions[action.name] = false;
+            }
+        });
+        _.forEach($scope.user.dataGroups, function (userGroup) {
+            userGroup.access = false;
+            userGroup.entry = false;
+        });
+    }
+
     function getDataGroupsForUserType(dataGroups) {
-        if (getUserType() === 'Partner') {
-            errorHandler.debug('Partner type found remove sims as datagroup');
-            return _.chain(dataGroups)
-                .reject({name: 'SIMS'})
-                .value();
-        }
-        return dataGroups || [];
+        return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
     }
 
     /**

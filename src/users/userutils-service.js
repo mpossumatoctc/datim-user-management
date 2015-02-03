@@ -6,6 +6,7 @@ function userUtilsService(errorHandler) {
     var previousUserActions;
 
     return {
+        getDataGroupsForUserType: getDataGroupsForUserType,
         getDataEntryStreamNamesForUserType: getDataEntryStreamNamesForUserType,
         updateDataEntry: updateDataEntry,
         setAllDataStreamsAndEntry: setAllDataStreamsAndEntry,
@@ -16,8 +17,19 @@ function userUtilsService(errorHandler) {
         restoreUserActions: restoreUserActions,
         hasUserAdminRights: hasUserAdminRights,
         hasUserGroup: hasUserGroup,
-        hasUserRole: hasUserRole
+        hasUserRole: hasUserRole,
+        hasStoredData: hasStoredData
     };
+
+    function getDataGroupsForUserType(dataGroups, getUserType) {
+        if (getUserType() === 'Partner') {
+            errorHandler.debug('Partner type found remove sims as datagroup');
+            return _.chain(dataGroups)
+                .reject({name: 'SIMS'})
+                .value();
+        }
+        return dataGroups || [];
+    }
 
     function getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType) {
         if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
@@ -184,6 +196,10 @@ function userUtilsService(errorHandler) {
         return (user && user.userCredentials && user.userCredentials.userRoles || []).reduce(function (current, userRole) {
             return current || (userRole.name === userRoleToCheck.name);
         }, false);
+    }
+
+    function hasStoredData() {
+        return previousDataGroups && previousUserActions ? true : false;
     }
 
     function throwWhenNotObject(value, name) {

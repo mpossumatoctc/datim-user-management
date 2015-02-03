@@ -64,5 +64,20 @@ describe('userTypesService', function () {
 
             expect(userTypesService.getUserType(otherUserType)).toBe('Unknown type');
         });
+
+        it('should return the usertype Inter-Agency', function () {
+            var user = {
+                userGroups:[
+                    {id:'BqQxti8UBwt', name:'OU Asia Regional Program Country team'},
+                    {id:'x2GXjtJgeTN', name:'OU Asia Regional Program All mechanisms'},
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'noSSQlumMRz', name:'OU Asia Regional Program User administrators'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ]
+            };
+
+            expect(userTypesService.getUserType(user)).toBe('Inter-Agency');
+        });
     });
 });

@@ -301,12 +301,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     }
 
     function getDataGroupsForUserType(dataGroups) {
-        if (getUserType() === 'Partner') {
-            errorHandler.debug('Partner type found remove sims as datagroup');
-            return _.chain(dataGroups)
-                .reject({name: 'SIMS'})
-                .value();
-        }
-        return dataGroups || [];
+        return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
     }
 }

@@ -20,29 +20,30 @@ function userTypesService($q) {
     }
 
     function getUserType(user) {
-        var userTypesForMatches = userTypes.map(fixCountryType).reverse();
+        var userTypesForMatches = userTypes
+            .map(function (userType) {
+                return userType.name;
+            })
+            .reverse();
 
         return userTypesForMatches.reduce(function (currentType) {
             var userGroupRegex = new RegExp('OU .+? (.+?) ', 'i');
+            var interAgencyRegex = new RegExp('^OU .+? Country team$', 'i');
+
             (user && user.userGroups || []).forEach(function (userGroup) {
                 var matches = userGroupRegex.exec(userGroup.name);
 
                 if (matches && (userTypesForMatches.indexOf(matches[1]) >= 0)) {
-                    currentType = matches[1];
-
-                    if (currentType.toLowerCase() === 'country') {
+                    if (userTypesForMatches.indexOf(matches[1]) >= 0) {
+                        currentType = matches[1];
+                    }
+                } else {
+                    if (interAgencyRegex.test(userGroup.name)) {
                         currentType = 'Inter-Agency';
                     }
                 }
             });
             return currentType;
         }, 'Unknown type');
-
-        function fixCountryType(userType) {
-            if (userType.name === 'Inter-Agency') {
-                return 'Country';
-            }
-            return userType.name;
-        }
     }
 }

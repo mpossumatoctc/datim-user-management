@@ -241,4 +241,17 @@ describe('User utils service', function () {
             expect(userUtils.hasUserAdminRights(user)).toBe(true);
         });
     });
+
+    describe('hasStoredData', function () {
+        it('should return false if there is no data', function () {
+            expect(userUtils.hasStoredData()).toBe(false);
+        });
+
+        it('should return true if there is stored data available', function () {
+            userUtils.storeUserActions({});
+            userUtils.storeDataStreamsAndEntry({});
+
+            expect(userUtils.hasStoredData()).toBe(true);
+        });
+    });
 });
