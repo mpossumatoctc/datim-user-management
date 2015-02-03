@@ -83,7 +83,7 @@
     <div class="form-controls-wrap">
         <button class="btn btn-primary add-user-button" ng-class="{ 'processing': addUser.isProcessingAddUser }" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">
             <i class="fa fa-circle-o-notch fa-spin"></i>
-            <span>Invite user</span>
+            <span ng-bind="addUser.getErrorString(userForm) || 'Invite user'"></span>
         </button>
     </div>
 </form>

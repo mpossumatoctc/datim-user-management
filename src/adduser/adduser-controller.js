@@ -32,6 +32,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.getUserManagerDataEntryRoles = getUserManagerDataEntryRoles;
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
     vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
+    vm.getErrorString = getErrorString;
 
     //Scope properties
     $scope.userOrgUnit = {
@@ -302,5 +303,25 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function getDataGroupsForUserType(dataGroups) {
         return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
+    }
+
+    function getErrorString() {
+        if (!$scope.user.userType) {
+            return 'Please check if you selected a user type';
+        }
+        if (!$scope.user.userEntity) {
+            if (getUserType() === 'Partner') {
+                return 'Please check if you selected a ' + getUserType();
+            }
+            return 'Please check if you selected an ' + getUserType();
+        }
+        if (!$scope.user.email) {
+            return 'Please check if you entered an e-mail address';
+        }
+        if (!validateDataGroups()) {
+            return 'Make sure you selected a data stream';
+        }
+
+        return 'Invite user';
     }
 }
