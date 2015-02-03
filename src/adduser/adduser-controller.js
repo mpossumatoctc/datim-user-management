@@ -1,9 +1,9 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
-function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 52
+function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 60
                            userActions, userService, $state, notify, interAgencyService,
-                           userFormService, errorHandler) {
+                           userFormService, userUtils, errorHandler) {
 
     errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
 
@@ -12,7 +12,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     //Properties
     vm.title = 'Add or delete user';
-    vm.dataGroups = dataGroups || [];
+    vm.dataGroups = getDataGroupsForUserType(dataGroups);
     vm.actions = [];
     vm.languages = [];
     vm.isProcessingAddUser = false;
@@ -22,17 +22,17 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.userInviteObject = {};
     vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
     vm.dataEntryStreamNamesForUserType = [];
-    vm.isUserManager = undefined;
+    vm.isUserManager = false;
 
     //Methods
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
-    vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.updateDataEntry = updateDataEntry;
     vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
     vm.getUserManagerRoles = getUserManagerRoles;
     vm.getUserManagerDataEntryRoles = getUserManagerDataEntryRoles;
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
+    vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
 
     //Scope properties
     $scope.userOrgUnit = {
@@ -62,12 +62,9 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             }
 
             vm.dataEntryStreamNamesForUserType = vm.getDataEntryStreamNamesForUserType();
-
-            vm.dataGroups.forEach(function (stream) {
-                if (stream.name && (vm.dataEntryStreamNamesForUserType.indexOf(stream.name) < 0)) {
-                    $scope.user.dataGroups[stream.name].entry = false;
-                }
-            });
+            vm.dataGroups = getDataGroupsForUserType(dataGroups);
+            $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);
+            vm.isUserManager = false;
         }
     });
 
@@ -110,7 +107,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             return;
         }
 
-        vm.dataGroups.reduce(function (dataGroups, dataGroup) {
+        $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);
+
+        vm.actions = userActions.getActionsForUserType();
+    }
+
+    function createUserGroupsObjectFromDataGroups(dataGroups) {
+        return dataGroups.reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = {
                     access: false,
@@ -118,9 +121,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                 };
             }
             return dataGroups;
-        }, $scope.user.dataGroups);
-
-        vm.actions = userActions.getActionsForUserType();
+        }, {});
     }
 
     function getCurrentOrgUnit() {
@@ -197,6 +198,19 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             [getCurrentOrgUnit()],
             userActions.dataEntryRestrictions
         );
+    }
+
+    function checkAllBoxesForUserManager() {
+        if (vm.isUserManager) {
+            userUtils.storeDataStreamsAndEntry($scope.user.dataGroups);
+            userUtils.storeUserActions($scope.user.userActions);
+
+            $scope.user.dataGroups = userUtils.setAllDataStreamsAndEntry($scope.user.dataGroups);
+            $scope.user.userActions = userUtils.setAllActions(vm.actions);
+        } else {
+            $scope.user.dataGroups = userUtils.restoreDataStreamsAndEntry($scope.user.dataGroups);
+            $scope.user.userActions = userUtils.restoreUserActions($scope.user.userActions);
+        }
     }
 
     function addDimensionConstraintForType() {
@@ -299,10 +313,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         return validations.validateDataGroups($scope.user.dataGroups);
     }
 
-    function isRequiredDataStreamSelected(dataGroupNames) {
-        return validations.isRequiredDataStreamSelected(dataGroupNames, $scope.user, vm.dataGroups);
-    }
-
     //TODO: Duplicate code with the edit controller
     function getDataEntryStreamNamesForUserType() {
         if (!(currentUser && currentUser.userCredentials && Array.isArray(currentUser.userCredentials.userRoles))) {
@@ -327,5 +337,15 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function getUserType() {
         return $scope.user && $scope.user.userType && $scope.user.userType.name;
+    }
+
+    function getDataGroupsForUserType(dataGroups) {
+        if (getUserType() === 'Partner') {
+            errorHandler.debug('Partner type found remove sims as datagroup');
+            return _.chain(dataGroups)
+                .reject({name: 'SIMS'})
+                .value();
+        }
+        return dataGroups || [];
     }
 }

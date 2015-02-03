@@ -55,7 +55,11 @@
                                 </label>
                             </li>
                             <li ng-repeat="action in editUser.actions">
-                                <input ng-model="user.userActions[action.name]" ng-checked="action.hasAction" ng-disabled="(action.default && action.hasAction) || !editUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
+                                <input ng-model="user.userActions[action.name]"
+                                       ng-checked="action.hasAction"
+                                       ng-disabled="(action.default && action.hasAction)" id="userActions[{{::action.name}}]"
+                                       name="userActions[{{::action.name}}]"
+                                       type="checkbox">
                                 <label for="userActions[{{::action.name}}]">
                                     <span ng-bind="action.name" translate></span>
                                     <span class="action-datastream" ng-if="::action.dataStream" ng-bind="::action.dataStream" translate></span>

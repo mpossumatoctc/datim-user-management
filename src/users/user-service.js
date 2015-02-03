@@ -172,20 +172,11 @@ function userService($q, Restangular, _, partnersService, agenciesService, inter
             return actions.concat(current);
         }, actions)
         .filter(function (action) {
-            if (((selectedActions.indexOf(action.name) >= 0) || action.default === true) && isRequiredDataStreamSelected(action.dataStream, selectedDataGroups)) {
+            if (((selectedActions.indexOf(action.name) >= 0) || action.default === true)) {
                 return true;
             }
             return false;
         });
-    }
-
-    function isRequiredDataStreamSelected(dataGroupNames, selectedDataGroups) {
-        if (Array.isArray(dataGroupNames) && dataGroupNames.length > 0) {
-            return selectedDataGroups.reduce(function (curr, dataGroup) {
-                return dataGroupNames.indexOf(dataGroup.name) >= 0 || curr;
-            }, false);
-        }
-        return true;
     }
 
     function inviteUser(inviteData) {

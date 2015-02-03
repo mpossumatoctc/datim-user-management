@@ -21,59 +21,27 @@
     </div>
 
     <div class="form-controls-wrap row">
-        <div class="col-sm-6">
-            <label class="btn btn-default user-type-selection" ng-class="{'btn-success': addUser.isUserManager}">
-                <input type="radio" ng-value="true" ng-model="addUser.isUserManager" ng-required="addUser.isUserManager == undefined">
+        <div class="col-sm-12">
+            <label for="usermanager">
+                <input id="usermanager" type="checkbox" ng-value="false" ng-model="addUser.isUserManager" ng-change="addUser.checkAllBoxesForUserManager()">
                 <span translate>User manager</span>
             </label>
         </div>
-        <div class="col-sm-6">
-            <label class="btn btn-default user-type-selection" ng-class="{'btn-success': !addUser.isUserManager && addUser.isUserManager != undefined}">
-                <input type="radio" ng-value="false" ng-model="addUser.isUserManager" ng-required="addUser.isUserManager == undefined">
-                <span translate>User</span>
-            </label>
-        </div>
-    </div>
-    <div ng-if="addUser.isUserManager">
-        <div class="form-controls-wrap row">
-            <div class="col-sm-6">
-                <fieldset name="The following steams will be assigned">
-                    <legend>Data streams</legend>
-                    <ul class="user-manager-items">
-                        <li ng-repeat="dataGroup in addUser.getUserManagerDataAccessGroups()">
-                            <i class="fa fa-caret-right"></i><span ng-bind="::dataGroup.name" translate></span>
-                        </li>
-                    </ul>
-                </fieldset>
-            </div>
-            <div class="col-sm-6">
-                <fieldset name="The following actions will be assigned">
-                    <legend>User actions</legend>
-                    <ul class="user-manager-items">
-                        <li ng-repeat="dataEntryRole in addUser.getUserManagerDataEntryRoles()">
-                            <i class="fa fa-caret-right"></i><span ng-bind="::dataEntryRole.userRole" translate></span>
-                        </li>
-                        <li ng-repeat="actionRole in addUser.getUserManagerRoles()">
-                            <i class="fa fa-caret-right"></i><span ng-bind="::actionRole.name" translate></span>
-                        </li>
-                    </ul>
-                </fieldset>
-            </div>
-        </div>
-        <div class="form-controls-wrap row">
-            <div class="col-sm-12">
-                <div class="user-manager-note well"><i class="fa fa-exclamation-triangle"></i>The streams and actions above are predefined for the selected user-type and will be automatically assigned to the user manager.</div>
-            </div>
-        </div>
     </div>
 
-    <div class="form-controls-wrap row" ng-if="!addUser.isUserManager && addUser.isUserManager != undefined">
+    <div class="form-controls-wrap row">
         <div class="col-sm-6">
             <fieldset name="Data streams">
                 <legend>Data streams<i class="fa fa-check valid-icon" ng-show="addUser.validateDataGroups()"></i></legend>
                 <ul class="checkbox-group">
                     <li ng-repeat="(name, value) in user.dataGroups">
-                        <input ui-validate-watch="'addUser.validateDataGroups()'" ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}" id="dataStream[{{::name}}]" name="dataStream[{{::name}}]" ng-model="user.dataGroups[name].access" ng-disabled="user.dataGroups[name].entry" ng-change="addUser.updateDataEntry(name)" type="checkbox">
+                        <input ui-validate-watch="'addUser.validateDataGroups()'"
+                               ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}"
+                               id="dataStream[{{::name}}]" name="dataStream[{{::name}}]"
+                               ng-model="user.dataGroups[name].access"
+                               ng-disabled="user.dataGroups[name].entry"
+                               ng-change="addUser.updateDataEntry(name)"
+                               type="checkbox">
                         <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                     </li>
                 </ul>
@@ -91,13 +59,19 @@
                                name="dataEntry[{{::streamName}}]"
                                type="checkbox"
                                ng-model="user.dataGroups[streamName].entry"
-                               ng-change="addUser.updateDataEntry(streamName);" />
+                               ng-change="addUser.updateDataEntry(streamName);"
+                               ng-disabled="addUser.isUserManager" />
                         <label for="dataEntry[{{::streamName}}]">
                             <span translate>Data Entry</span> <span ng-bind="streamName" translate></span>
                         </label>
                     </li>
                     <li ng-repeat="action in addUser.actions">
-                        <input ng-model="user.userActions[action.name]" ng-checked="action.default" ng-disabled="action.default || !addUser.isRequiredDataStreamSelected(action.dataStream)" id="userActions[{{::action.name}}]" name="userActions[{{::action.name}}]" type="checkbox">
+                        <input ng-model="user.userActions[action.name]"
+                               ng-checked="action.default"
+                               ng-disabled="action.default || addUser.isUserManager"
+                               id="userActions[{{::action.name}}]"
+                               name="userActions[{{::action.name}}]"
+                               type="checkbox">
                         <label for="userActions[{{::action.name}}]">
                             <span ng-bind="action.name" translate></span>
                         </label>
