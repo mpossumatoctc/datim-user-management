@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
-function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 50
+function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 55
                             userLocale, userFormService, userActions,
                             notify, userService, userTypesService, userUtils, errorHandler) {
     var vm = this;
@@ -13,7 +13,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         userActions: {}
     };
     vm.actions = [];
-    vm.dataGroups = dataGroups || [];
+    vm.dataGroups = getDataGroupsForUserType(dataGroups);
     vm.dataGroupsInteractedWith = validations.dataGroupsInteractedWith;
     vm.isProcessingEditUser = false;
     vm.userEntityName = '';
@@ -49,8 +49,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
         dataGroupsService.getDataGroupsForUser(userToEdit)
             .then(correctUserRolesForType)
-            .then(createDataGroupsObject)
-            .then(setDataEntryModelValue);
+            .then(createDataGroupsObject);
 
         userActions.getActionsForUser(userToEdit)
             .then(setUserActionsForThisUser);
@@ -61,15 +60,18 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function correctUserRolesForType(response) {
         ((Array.isArray(vm.dataGroups) && vm.dataGroups) || []).forEach(function (dataGroup) {
+            window.console.log('logging groups');
+            window.console.log(dataGroup);
             var userRoles = userActions.dataEntryRestrictions && userActions.dataEntryRestrictions[getUserType()] && userActions.dataEntryRestrictions[getUserType()][dataGroup.name];
-            dataGroup.userRoles = (userRoles || []).filter(function (userRole) {
-                return userRole.userRole && userRole.userRoleId && userRole.userRoleId !== '';
-            }).map(function (userRole) {
-                return {
-                    id: userRole.userRoleId,
-                    name: userRole.userRole
-                };
-            });
+            dataGroup.userRoles = (userRoles || [])
+                .filter(function (userRole) {
+                    return userRole.userRole && userRole.userRoleId && userRole.userRoleId !== '';
+                }).map(function (userRole) {
+                    return {
+                        id: userRole.userRoleId,
+                        name: userRole.userRole
+                    };
+                });
             return dataGroup;
         });
 
@@ -77,7 +79,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function createDataGroupsObject(dataGroups) {
-        dataGroups.reduce(function (dataGroups, dataGroup) {
+        getDataGroupsForUserType(dataGroups).reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = {
                     access: dataGroup.access,
@@ -98,12 +100,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         });
     }
 
-    function setDataEntryModelValue() {
-        vm.dataEntryAction = Object.keys($scope.user.dataGroups).reduce(function (dataEntryStatus, dataGroup) {
-            return dataEntryStatus || $scope.user.dataGroups[dataGroup].entry;
-        }, false);
-    }
-
     function updateDataEntry(streamName) {
         userUtils.updateDataEntry(getUserType(), userActions, streamName, $scope);
     }
@@ -117,11 +113,18 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function editUser() {
+        removeExtraUserManagementRoles();
+
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
+        window.console.log('initial roles');
+        window.console.log(userToEdit.userCredentials.userRoles);
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
+        window.console.log('adjusted roles');
+        window.console.log(userToEdit.userCredentials.userRoles);
         userToEdit.userGroups = userGroups;
 
         fixUserManagementRole();
+        addExtraUserManagementRoles();
 
         setProcessingTo(true);
 
@@ -162,6 +165,64 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
             errorHandler.debug('Removing user management role from the user');
         }
+    }
+
+    function addExtraUserManagementRoles() {
+        if (vm.isUserManager) {
+            var extraUserRoles = getExtraUserManagementRoles(userToEdit.userCredentials.userRoles);
+
+            errorHandler.debug('Adding extra user management roles', extraUserRoles);
+
+            userToEdit.userCredentials.userRoles = userToEdit.userCredentials.userRoles.concat(extraUserRoles);
+        }
+    }
+
+    function getExtraUserManagementRoles() {
+        return getUserManagementRoles()
+            .filter(function (userRole) {
+                var currentUserRoleIds = getCurrentUserRoleIds();
+
+                return currentUserRoleIds.indexOf(userRole.id) === -1;
+            })
+            .value();
+    }
+
+    function getCurrentUserRoleIds() {
+        return userToEdit.userCredentials.userRoles
+            .map(function (item) {
+                return item.id;
+            });
+    }
+
+    function getUserManagementRoleIds() {
+        return getUserManagementRoles()
+            .map(function (userRole) {
+                return userRole.id;
+            });
+    }
+
+    function removeExtraUserManagementRoles() {
+        if (!vm.isUserManager) {
+            userToEdit.userCredentials.userRoles = (userToEdit.userCredentials.userRoles || [])
+                .filter(function (userRole) {
+                    var userManagementRoleIds = getUserManagementRoleIds();
+
+                    return userManagementRoleIds.indexOf(userRole.id) === -1;
+                });
+        }
+    }
+
+    function getUserManagementRoles() {
+        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
+            .values()
+            .flatten()
+            .unique('userRoleId')
+            .map(function (userAction) {
+                return {
+                    id: userAction.userRoleId,
+                    name: userAction.userRole
+                };
+            });
     }
 
     function notifyUserOfSuccessfullSave() {
@@ -235,6 +296,16 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
                 userGroup.entry = false;
             });
         }
+    }
+
+    function getDataGroupsForUserType(dataGroups) {
+        if (getUserType() === 'Partner') {
+            errorHandler.debug('Partner type found remove sims as datagroup');
+            return _.chain(dataGroups)
+                .reject({name: 'SIMS'})
+                .value();
+        }
+        return dataGroups || [];
     }
 
     /**

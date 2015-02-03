@@ -449,43 +449,6 @@ describe('Edit user controller', function () {
         });
     });
 
-    describe('dataEntrySetting', function () {
-        var $controller;
-
-        beforeEach(inject(function ($injector) {
-            $controller = $injector.get('$controller');
-            var dataGroupsService = $injector.get('dataGroupsService');
-
-            $rootScope = $injector.get('$rootScope');
-            scope = $rootScope.$new();
-
-            dataGroupsService = $injector.get('dataGroupsService');
-        }));
-
-        afterEach(function () {
-        });
-
-        it('should set the data entry flag based on the given dataGroups', function () {
-            controller = $controller('editUserController', {
-                $scope: scope
-            });
-            $rootScope.$apply();
-
-            expect(controller.dataEntryAction).toBe(true);
-        });
-
-        it('should not set the data entry flag if no data entry is available', inject(function ($q) {
-            dataGroupsService.getDataGroupsForUser.and.returnValue($q.when([]));
-
-            controller = $controller('editUserController', {
-                $scope: scope
-            });
-            $rootScope.$apply();
-
-            expect(controller.dataEntryAction).toBe(false);
-        }));
-    });
-
     describe('userEntityName', function () {
         var userService;
         var $q;
