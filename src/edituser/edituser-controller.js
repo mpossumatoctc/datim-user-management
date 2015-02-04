@@ -81,7 +81,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = {
                     access: dataGroup.access,
-                    entry: dataGroup.entry
+                    entry: dataGroup.entry || (dataGroup.name === 'SI' && getUserType() === 'Inter-Agency' && userUtils.hasUserRole(userToEdit, {name: 'Data Entry SI Country Team'}))
                 };
             }
             return dataGroups;

@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
 function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
-                            userStatusService, $state, errorHandler, userActions, _) {
+                            userStatusService, $state, errorHandler, userActions, userUtils, _) {
     var vm = this;
     var searchFieldNames = {
         name: 'name',
@@ -173,6 +173,14 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         dataGroupsService.getDataGroupsForUser(user)
             .then(function (dataGroups) {
                 vm.detailsUserDataGroups = dataGroups;
+
+                vm.detailsUserDataGroups.forEach(function (dataGroup) {
+                    if (dataGroup.name === 'SI') {
+                        if ((userTypesService.getUserType(vm.detailsUser) === 'Inter-Agency' && userUtils.hasUserRole(vm.detailsUser, {name: 'Data Entry SI Country Team'}))) {
+                            dataGroup.entry = true;
+                        }
+                    }
+                });
             })
             .catch(function () {
                 errorHandler.warning('Failed to load datagroups for user');
