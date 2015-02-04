@@ -28,6 +28,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.updateDataEntry = updateDataEntry;
     vm.getOrganisationUnitForUserToEdit = getOrganisationUnitForUserToEdit;
     vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
+    vm.getDataEntryRolesNotShown = getDataEntryRolesNotShown;
 
     $scope.user = vm.user;
 
@@ -301,6 +302,19 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function getDataGroupsForUserType(dataGroups) {
         return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
+    }
+
+    //TODO: Move this to actions service
+    function getUserManagerDataEntryRoles() {
+        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
+            .values()
+            .flatten()
+            .filter('userRoleId')
+            .value();
+    }
+
+    function getDataEntryRolesNotShown() {
+        return userUtils.getUserRestrictionsDifference(userActions.dataEntryRestrictions[getUserType()], getUserManagerDataEntryRoles());
     }
 
     /**

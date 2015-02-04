@@ -12,79 +12,86 @@ function userActionsService(Restangular, $q, userTypesService, userService,
     var availablePartnerActions =  [
         'Submit data'
     ];
+
+    /**
+     * The actions will be parsed when the userRoles are loaded from the api and a userRoleId property will be added/filled with the uid for that userRole
+     */
     var actions = [
-        {name: 'Accept data', userRole: 'Data Accepter'},
-        {name: 'Submit data', userRole: 'Data Submitter'},
-        {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true},
-        {name: 'Read data', userRole: 'Read Only', default: true}
+        {name: 'Accept data', userRole: 'Data Accepter', userRoleId: undefined},
+        {name: 'Submit data', userRole: 'Data Submitter', userRoleId: undefined},
+        {name: 'Manage users', userRole: 'User Administrator', userRoleId: undefined, userGroupRestriction: true},
+        {name: 'Read data', userRole: 'Read Only', userRoleId: undefined, default: true}
     ];
 
+    /**
+     * The dataEntryRestrictions will be parsed when the userRoles are loaded from the api and a userRoleId property will be added/filled with the uid for that userRole
+     */
     var dataEntryRestrictions = {
         'Inter-Agency': {
-            SI: [{
-                    userRole: 'Data Entry SI Country Team'
-                }, {
-                    userRole: 'Tracker'
-                }]/*,
+            SI: [
+                {userRole: 'Data Entry SI Country Team', userRoleId: undefined},
+                {userRole: 'Tracker', userRoleId: undefined}
+            ]/*,
             EVAL: [{
                     userRole: 'Data Entry EVAL'
                 }]*/
         },
         Agency: {
             SIMS: [
-                {userRole: 'Data Entry SIMS'},
-                {userRole: 'Data Entry SIMS Key Pops'}
+                {userRole: 'Data Entry SIMS', userRoleId: undefined},
+                {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
             ]
         },
         Partner: {
-            SI: [{
-                userRole: 'Data Entry SI'
-            }],
-            EA: [{
-                userRole: 'Data Entry EA'
-            }]
+            SI: [
+                {userRole: 'Data Entry SI', userRoleId: undefined}
+            ],
+            EA: [
+                {userRole: 'Data Entry EA', userRoleId: undefined}
+            ]
         }
     };
 
+    /**
+     * The dataEntryRestrictionsUserManager structure will be parsed when the userRoles are loaded from the api and a userRoleId property will be added/filled with the uid for that userRole
+     */
     var dataEntryRestrictionsUserManager = {
         'Inter-Agency': {
-            SI: [{
-                userRole: 'Data Entry SI Country Team'
-            }, {
-                userRole: 'Tracker'
-            }, {
-                userRole: 'Data Entry SI'
-            }],
-            SIMS: [
-                {userRole: 'Data Entry SIMS'},
-                {userRole: 'Data Entry SIMS Key Pops'}
+            SI: [
+                {userRole: 'Data Entry SI Country Team', userRoleId: undefined},
+                {userRole: 'Tracker', userRoleId: undefined},
+                {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
-            EA: [{
-                userRole: 'Data Entry EA'
-            }]/*,
+            SIMS: [
+                {userRole: 'Data Entry SIMS', userRoleId: undefined},
+                {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
+            ],
+            EA: [
+                {userRole: 'Data Entry EA', userRoleId: undefined}
+            ]/*,
              EVAL: [{
              userRole: 'Data Entry EVAL'
              }]*/
         },
         Agency: {
-            SI: [{
-                userRole: 'Data Entry SI'
-            }],
-            SIMS: [
-                {userRole: 'Data Entry SIMS'},
-                {userRole: 'Data Entry SIMS Key Pops'}
+            SI: [
+                {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
-            EA: [{
-                userRole: 'Data Entry EA'
-            }]
+            SIMS: [
+                {userRole: 'Data Entry SIMS', userRoleId: undefined},
+                {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
+            ],
+            EA: [
+                {userRole: 'Data Entry EA', userRoleId: undefined}
+            ]
         },
         Partner: {
-            SI: [{
-                userRole: 'Data Entry SI'
-            }],
-            EA: [{
-                userRole: 'Data Entry EA'
-            }]
+            SI: [
+                {userRole: 'Data Entry SI', userRoleId: undefined}
+            ],
+            EA: [
+                {userRole: 'Data Entry EA', userRoleId: undefined}
+            ]
         }
     };
 

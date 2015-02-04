@@ -6,6 +6,7 @@ function userUtilsService(errorHandler) {
     var previousUserActions;
 
     return {
+        getUserRestrictionsDifference: getUserRestrictionsDifference,
         getDataGroupsForUserType: getDataGroupsForUserType,
         getDataEntryStreamNamesForUserType: getDataEntryStreamNamesForUserType,
         updateDataEntry: updateDataEntry,
@@ -20,6 +21,21 @@ function userUtilsService(errorHandler) {
         hasUserRole: hasUserRole,
         hasStoredData: hasStoredData
     };
+
+    function getUserRestrictionsDifference(userRestrictionsForTypeLeft, userRestrictionsForTypeRight) {
+        var assignedUserManagerRoles = _.chain(userRestrictionsForTypeLeft)
+            .values()
+            .flatten()
+            .map(_.compose(_.values, _.partialRight(_.pick, ['userRoleId'])))
+            .flatten()
+            .value();
+
+        return _.chain(userRestrictionsForTypeRight)
+            .filter(function (userRole) {
+                return assignedUserManagerRoles.indexOf(userRole.userRoleId) === -1;
+            })
+            .value();
+    }
 
     function getDataGroupsForUserType(dataGroups, getUserType) {
         if (getUserType() === 'Partner') {

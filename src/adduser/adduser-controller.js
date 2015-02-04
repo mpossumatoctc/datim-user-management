@@ -33,6 +33,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
     vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
     vm.getErrorString = getErrorString;
+    vm.getDataEntryRolesNotShown = getDataEntryRolesNotShown;
 
     //Scope properties
     $scope.userOrgUnit = {
@@ -281,12 +282,17 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             .value();
     }
 
+    //TODO: Move this to actions service
     function getUserManagerDataEntryRoles() {
         return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
             .values()
             .flatten()
             .filter('userRoleId')
             .value();
+    }
+
+    function getDataEntryRolesNotShown() {
+        return userUtils.getUserRestrictionsDifference(userActions.dataEntryRestrictions[getUserType()], getUserManagerDataEntryRoles());
     }
 
     function validateDataGroups() {

@@ -88,6 +88,18 @@
                 </div>
             </div>
 
+            <div class="form-controls-wrap" ng-show="editUser.isUserManager && editUser.getDataEntryRolesNotShown().length > 0">
+                <div class="well">
+                    <div class="user-manager-note">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <span>Because this a user manager the following additional roles will also be assigned (based on the user type)</span>
+                        <ul>
+                            <li ng-repeat="userRole in editUser.getDataEntryRolesNotShown()"><span ng-bind="::userRole.userRole" translate></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <div class="row form-controls-wrap">
                 <button class="btn btn-primary add-user-button" ng-class="{ 'processing': editUser.isProcessingEditUser }" ng-disabled="!editForm.$valid || editUser.isProcessingEditUser" ng-click="editUser.editUser()">
                     <i class="fa fa-circle-o-notch fa-spin"></i>

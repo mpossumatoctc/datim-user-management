@@ -80,6 +80,19 @@
             </fieldset>
         </div>
     </div>
+
+    <div class="form-controls-wrap" ng-show="addUser.isUserManager && addUser.getDataEntryRolesNotShown().length > 0">
+        <div class="well">
+            <div class="user-manager-note">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span>Because this a user manager the following additional roles will also be assigned (based on the user type)</span>
+                <ul>
+                    <li ng-repeat="userRole in addUser.getDataEntryRolesNotShown()"><span ng-bind="::userRole.userRole" translate></span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <div class="form-controls-wrap">
         <button class="btn btn-primary add-user-button" ng-class="{ 'processing': addUser.isProcessingAddUser }" ng-disabled="!userForm.$valid || addUser.isProcessingAddUser" ng-click="addUser.addUser()">
             <i class="fa fa-circle-o-notch fa-spin"></i>
