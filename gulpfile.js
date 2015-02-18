@@ -219,12 +219,12 @@ gulp.task('copy-fonts', function () {
         .pipe(gulp.dest(buildDirectory));
 });
 
-gulp.task('build', function () {
-    return runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts');
+gulp.task('build', function (cb) {
+    runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', cb);
 });
 
-gulp.task('build-prod', function () {
-    return runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', 'package');
+gulp.task('build-prod', function (cb) {
+    runSequence('build', 'package', cb);
 });
 
 gulp.task('clean', function () {
