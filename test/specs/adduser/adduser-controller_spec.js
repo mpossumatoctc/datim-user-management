@@ -29,13 +29,11 @@ describe('Add user controller', function () {
                 },
                 dataEntryRestrictions: {
                     'Inter-Agency': {
-                        SI: [{
-                            userRole: 'Data Entry SI Country Team',
-                            userRoleId: 'dataEntryCountryTeamID'
-                        }, {
-                            userRole: 'Tracker',
-                            userRoleId:  'trackerid'
-                        }]
+                        SI: [
+                            {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
+                            {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
+                            {userRole: 'Tracker', userRoleId:  'trackerid'}
+                        ]
                     },
                     Agency: {
                         SIMS: [
@@ -53,6 +51,7 @@ describe('Add user controller', function () {
                         SI: [
                             {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
                             {userRole: 'Tracker', userRoleId: 'trackerid'},
+                            {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
                             {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'}
                         ],
                         SIMS: [
@@ -992,6 +991,7 @@ describe('Add user controller', function () {
                     var expectedRoles = [
                         {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
                         {userRole: 'Tracker', userRoleId: 'trackerid'},
+                        {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
                         {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
                         {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
                         {userRole: 'Data Entry SIMS Key Pops', userRoleId: 'simskeypopsid'},

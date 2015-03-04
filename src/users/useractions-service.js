@@ -30,7 +30,8 @@ function userActionsService(Restangular, $q, userTypesService, userService,
         'Inter-Agency': {
             SI: [
                 {userRole: 'Data Entry SI Country Team', userRoleId: undefined},
-                {userRole: 'Tracker', userRoleId: undefined}
+                {userRole: 'Tracker', userRoleId: undefined},
+                {userRole: 'Data Deduplication', userRoleId: undefined}
             ]/*,
             EVAL: [{
                     userRole: 'Data Entry EVAL'
@@ -60,6 +61,7 @@ function userActionsService(Restangular, $q, userTypesService, userService,
             SI: [
                 {userRole: 'Data Entry SI Country Team', userRoleId: undefined},
                 {userRole: 'Tracker', userRoleId: undefined},
+                {userRole: 'Data Deduplication', userRoleId: undefined},
                 {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
             SIMS: [
