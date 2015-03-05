@@ -306,11 +306,11 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         }
     }
 
-    function canEditUser(userId) {
-        if (!userId || userId === currentUser.id) {
-            return false;
+    function canEditUser(user) {
+        if (user && user.id && (user.id !== currentUser.id) && userTypesService.getUserType(user) !== 'Unknown type') {
+            return true;
         }
-        return true;
+        return false;
     }
 
     function getCSVUrl() {

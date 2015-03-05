@@ -1,1 +1,1 @@
-{"version":"0.1.4","name":"User Administration","description":"User administration app for PEPFAR DATIM.","icons":{"48":"images/icons/user-maintenance.png"},"developer":{"url":"","name":"Mark Polak"},"launch_path":"index.html","default_locale":"en","activities":{"dhis":{"href":"*"}}}
+{"version":"0.1.5","name":"User Administration","description":"User administration app for PEPFAR DATIM.","icons":{"48":"images/icons/user-maintenance.png"},"developer":{"url":"","name":"Mark Polak"},"launch_path":"index.html","default_locale":"en","activities":{"dhis":{"href":"*"}}}

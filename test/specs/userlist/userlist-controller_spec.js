@@ -7,6 +7,7 @@ describe('Userlist controller', function () { //jshint ignore:line
     var dataGroupsService;
     var userListService;
     var userActions;
+    var userTypesServiceMock;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         userStatusServiceMockFactory = function ($q) {
@@ -21,6 +22,11 @@ describe('Userlist controller', function () { //jshint ignore:line
                     this.disable = jasmine.createSpy().and.returnValue(failure);
                 }
             };
+        };
+
+        userTypesServiceMock = {
+            getUserType: jasmine.createSpy('userTypesService.getUserType')
+                .and.returnValue('Partner')
         };
 
         $provide.value('userFilter', [
@@ -91,7 +97,8 @@ describe('Userlist controller', function () { //jshint ignore:line
             return {
                 error: jasmine.createSpy(),
                 warning: jasmine.createSpy(),
-                errorFn: jasmine.createSpy()
+                errorFn: jasmine.createSpy(),
+                debug: jasmine.createSpy()
             };
         });
 
@@ -112,6 +119,10 @@ describe('Userlist controller', function () { //jshint ignore:line
         $provide.value('dataGroups', {});
         $provide.value('userToEdit', {});
         $provide.value('userLocale', {});
+
+        $provide.factory('userTypesService', function () {
+            return userTypesServiceMock;
+        });
     }));
 
     beforeEach(inject(function ($injector) {
@@ -602,15 +613,21 @@ describe('Userlist controller', function () { //jshint ignore:line
 
     describe('canEditUser', function () {
         it('should return true for any user not the current user', function () {
-            expect(controller.canEditUser('df33fssss')).toBe(true);
+            expect(controller.canEditUser({id: 'df33fssss'})).toBe(true);
         });
 
         it('should return false when the user is the currentuser', function () {
-            expect(controller.canEditUser('d234fsdfss')).toBe(false);
+            expect(controller.canEditUser({id: 'd234fsdfss'})).toBe(false);
         });
 
         it('should not be able to edit when no id is passed', function () {
-            expect(controller.canEditUser()).toBe(false);
+            expect(controller.canEditUser({})).toBe(false);
+        });
+
+        it('should return false when the user is of type Unknown Type', function () {
+            userTypesServiceMock.getUserType.and.returnValue('Unknown type');
+
+            expect(controller.canEditUser({id: 'df33fssss'})).toBe(false);
         });
     });
 
