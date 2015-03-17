@@ -27,11 +27,15 @@ function userTypesService($q) {
             .reverse();
 
         return userTypesForMatches.reduce(function (currentType) {
-            var userGroupRegex = new RegExp('OU .+? (.+?) ', 'i');
+            var partnerRegex = new RegExp('^OU .+? (Partner) ', 'i');
+            var agencyRegex = new RegExp('^OU .+? (Agency) ', 'i');
             var interAgencyRegex = new RegExp('^OU .+? Country team$', 'i');
 
             (user && user.userGroups || []).forEach(function (userGroup) {
-                var matches = userGroupRegex.exec(userGroup.name);
+                var matches = partnerRegex.exec(userGroup.name);
+                if (!matches) {
+                    matches = agencyRegex.exec(userGroup.name);
+                }
 
                 if (matches && (userTypesForMatches.indexOf(matches[1]) >= 0)) {
                     if (userTypesForMatches.indexOf(matches[1]) >= 0) {

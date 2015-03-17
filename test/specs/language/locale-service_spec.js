@@ -47,7 +47,8 @@ describe('Locale service', function () {
             });
             $rootScope.$apply();
 
-            expect(locales).toEqual(expectedLocales);
+            expect(locales.join(' ')).toEqual(expectedLocales.join(' '));
+            expect(locales.length).toEqual(expectedLocales.length);
         });
     });
 });

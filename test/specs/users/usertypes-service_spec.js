@@ -79,5 +79,65 @@ describe('userTypesService', function () {
 
             expect(userTypesService.getUserType(user)).toBe('Inter-Agency');
         });
+
+        it('should return the user the partner usertype', function () {
+            var user = {
+                userGroups:[
+                    {id:'BqQxti8UBwt', name:'OU South Africa Partner USAID users'},
+                    {id:'x2GXjtJgeTN', name:'OU South Africa Partner USAID All mechanisms'},
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'noSSQlumMRz', name:'OU South Africa Partner USAID User administrators'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ]
+            };
+
+            expect(userTypesService.getUserType(user)).toBe('Partner');
+        });
+
+        it('should return the user the partner usertype', function () {
+            var user = {
+                userGroups:[
+                    {id:'BqQxti8UBwt', name:'OU Rwanda Partner USAID users'},
+                    {id:'x2GXjtJgeTN', name:'OU Rwanda Partner USAID All mechanisms'},
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'noSSQlumMRz', name:'OU Rwanda Partner USAID User administrators'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ]
+            };
+
+            expect(userTypesService.getUserType(user)).toBe('Partner');
+        });
+
+        it('should return the user the agency usertype', function () {
+            var user = {
+                userGroups:[
+                    {id:'BqQxti8UBwt', name:'OU South Africa Agency USAID users'},
+                    {id:'x2GXjtJgeTN', name:'OU South Africa Agency USAID All mechanisms'},
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'noSSQlumMRz', name:'OU South Africa Agency USAID User administrators'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ]
+            };
+
+            expect(userTypesService.getUserType(user)).toBe('Agency');
+        });
+
+        it('should return the user the agency usertype', function () {
+            var user = {
+                userGroups:[
+                    {id:'BqQxti8UBwt', name:'OU Rwanda Agency USAID users'},
+                    {id:'x2GXjtJgeTN', name:'OU Rwanda Agency USAID All mechanisms'},
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'noSSQlumMRz', name:'OU Rwanda Agency USAID User administrators'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ]
+            };
+
+            expect(userTypesService.getUserType(user)).toBe('Agency');
+        });
     });
 });
