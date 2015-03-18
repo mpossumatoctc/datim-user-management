@@ -1,6 +1,7 @@
 describe('User service', function () {
     var fixtures = window.fixtures;
     var service;
+    var $q;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.factory('partnersService', function ($q) {
@@ -45,6 +46,7 @@ describe('User service', function () {
     }));
     beforeEach(inject(function ($injector) {
         service = $injector.get('userService');
+        $q = $injector.get('$q');
     }));
 
     it('should be an object', function () {
@@ -759,6 +761,8 @@ describe('User service', function () {
             user.userGroups = [
                 {name: 'OU Kenya Partner 10001 users - Banana'}
             ];
+
+            agenciesService.getAgencies.and.returnValue($q.reject('No agencies found that can be accessed by this user'));
 
             service.getUserEntity(user)
                 .then(function (response) {

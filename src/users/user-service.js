@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular, userUtils, partnersService, agenciesService, interAgencyService) {
+function userService($q, Restangular, userUtils, partnersService, agenciesService, interAgencyService, errorHandler) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -312,9 +312,18 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
     function getUserEntity(user) {
         var organisationUnit = user && Array.isArray(user.organisationUnits) && user.organisationUnits[0] || undefined;
 
+        function returnValue(value) {
+            return value;
+        }
+
+        function returnEmptyArray() {
+            return [];
+        }
+
         return $q.all([
                 partnersService.getPartners(organisationUnit),
-                agenciesService.getAgencies(organisationUnit),
+                agenciesService.getAgencies(organisationUnit)
+                    .then(returnValue, returnEmptyArray),
                 interAgencyService.getUserGroups(organisationUnit)
             ])
             .then(function (responses) {
@@ -323,7 +332,7 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
                     .concat([responses[2]]);
             })
             .then(function (partnersAndAgencies) {
-                return partnersAndAgencies.reduce(function (current, partnerAgency) {
+                var userEntity = partnersAndAgencies.reduce(function (current, partnerAgency) {
                     if (partnerAgency && partnerAgency.userUserGroup && partnerAgency.userAdminUserGroup &&
                         partnerAgency.userUserGroup.name && partnerAgency.userAdminUserGroup.id &&
                         userUtils.hasUserGroup(user, partnerAgency.userUserGroup)) {
@@ -331,6 +340,11 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
                     }
                     return current;
                 }, undefined);
+                return userEntity;
+            })
+            .catch(function (error) {
+                errorHandler.debug('User entity could not be determined due to:', error);
+                return $q.reject(error);
             });
     }
 }
