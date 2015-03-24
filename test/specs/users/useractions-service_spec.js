@@ -618,7 +618,7 @@ describe('User actions', function () {
 
         it('should return the correct data groups for agency', function () {
             expect(userActions.getDataEntryRestrictionDataGroups('agency'))
-                .toEqual(['SIMS']);
+                .toEqual(['SIMS', 'SIMS Key Pops']);
         });
 
         it('should return the correct data groups for inter-agency', function () {

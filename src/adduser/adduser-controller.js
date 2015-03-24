@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('addUserController', addUserC
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 60
                            userActions, userService, $state, notify, interAgencyService,
-                           userFormService, userUtils, errorHandler) {
+                           userFormService, userUtils, dataEntryService, errorHandler) {
 
     errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
 
@@ -22,12 +22,11 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.isGlobalUser = currentUser.isGlobalUser && currentUser.isGlobalUser();
     vm.dataEntryStreamNamesForUserType = [];
     vm.isUserManager = false;
+    vm.hasDataEntryEnabled = hasDataEntryEnabled;
 
     //Methods
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
-    vm.updateDataEntry = updateDataEntry;
-    vm.getDataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType;
     vm.getUserManagerRoles = getUserManagerRoles;
     vm.getUserManagerDataEntryRoles = getUserManagerDataEntryRoles;
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
@@ -62,16 +61,13 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                 });
             }
 
-            vm.dataEntryStreamNamesForUserType = vm.getDataEntryStreamNamesForUserType();
             vm.dataGroups = getDataGroupsForUserType(dataGroups);
             $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);
             vm.isUserManager = false;
+
+            dataEntryService.reset();
         }
     });
-
-    function updateDataEntry(streamName) {
-        userUtils.updateDataEntry(getUserType(), userActions, streamName, $scope);
-    }
 
     function initialize() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
@@ -91,6 +87,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);
 
         vm.actions = userActions.getActionsForUserType();
+    }
+
+    function hasDataEntryEnabled(streamName) {
+        return dataEntryService.hasDataEntryForStream(streamName);
     }
 
     function createUserGroupsObjectFromDataGroups(dataGroups) {
@@ -297,10 +297,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function validateDataGroups() {
         return validations.validateDataGroups($scope.user.dataGroups);
-    }
-
-    function getDataEntryStreamNamesForUserType() {
-        return userUtils.getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType);
     }
 
     function getUserType() {

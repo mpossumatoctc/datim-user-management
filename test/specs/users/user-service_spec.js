@@ -43,6 +43,14 @@ describe('User service', function () {
                     .and.returnValue(success)
             };
         });
+
+        $provide.factory('dataEntryService', function () {
+            return {
+                dataEntryRoles: {
+                    SI: true
+                }
+            };
+        });
     }));
     beforeEach(inject(function ($injector) {
         service = $injector.get('userService');
@@ -216,8 +224,8 @@ describe('User service', function () {
             ];
             actions[1].userRoleId = undefined;
 
-            expect(service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions))
-                .toEqual(expectedInviteObject);
+            expect(service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions).userCredentials.userRoles)
+                .toEqual(expectedInviteObject.userCredentials.userRoles);
         });
 
         it('should have a addEntityUserGroup method', function () {

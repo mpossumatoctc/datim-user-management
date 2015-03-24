@@ -9,7 +9,6 @@ function userUtilsService(errorHandler) {
         getUserRestrictionsDifference: getUserRestrictionsDifference,
         getDataGroupsForUserType: getDataGroupsForUserType,
         getDataEntryStreamNamesForUserType: getDataEntryStreamNamesForUserType,
-        updateDataEntry: updateDataEntry,
         setAllDataStreamsAndEntry: setAllDataStreamsAndEntry,
         storeDataStreamsAndEntry: storeDataStreamsAndEntry,
         restoreDataStreamsAndEntry: restoreDataStreamsAndEntry,
@@ -53,7 +52,8 @@ function userUtilsService(errorHandler) {
             return [];
         }
 
-        var userEntryDataEntryStreams = userActions.getDataEntryRestrictionDataGroups(getUserType())
+        var userType = angular.isString(getUserType) ? getUserType : getUserType();
+        var userEntryDataEntryStreams = userActions.getDataEntryRestrictionDataGroups(userType)
             .filter(function (streamName) {
                 return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
                         .map(pick('name'))
@@ -66,29 +66,6 @@ function userUtilsService(errorHandler) {
         errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);
 
         return userEntryDataEntryStreams;
-    }
-
-    function updateDataEntry(userType, userActions, streamName, $scope) {
-        var userGroupsThatApplyForDataEntryForUserType = userActions.getDataEntryRestrictionDataGroups(userType);
-
-        if (!angular.isString(streamName)) {
-            errorHandler.debug('Update data entry the streamname given is invalid');
-            return;
-        }
-
-        if (userGroupsThatApplyForDataEntryForUserType.indexOf(streamName) >= 0) {
-            //If data entry is given, also give the stream access
-            if (streamName && $scope.user.dataGroups[streamName] && $scope.user.dataGroups[streamName].entry) {
-                if ($scope.user.dataGroups[streamName].access === false) {
-                    $scope.user.dataGroups[streamName].access = true;
-                }
-            }
-        } else {
-            //This is not a valid dataGroup for entry
-            if ($scope.user.dataGroups[streamName]) {
-                $scope.user.dataGroups[streamName].entry = false;
-            }
-        }
     }
 
     /**

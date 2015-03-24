@@ -39,7 +39,10 @@ function userActionsService(Restangular, $q, userTypesService, userService,
         },
         Agency: {
             SIMS: [
-                {userRole: 'Data Entry SIMS', userRoleId: undefined},
+                {userRole: 'Data Entry SIMS', userRoleId: undefined}
+
+            ],
+            'SIMS Key Pops': [
                 {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
             ]
         },
@@ -65,22 +68,23 @@ function userActionsService(Restangular, $q, userTypesService, userService,
                 {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
             SIMS: [
-                {userRole: 'Data Entry SIMS', userRoleId: undefined},
+                {userRole: 'Data Entry SIMS', userRoleId: undefined}
+            ],
+            'SIMS Key Pops': [
                 {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}
-            ]/*,
-             EVAL: [{
-             userRole: 'Data Entry EVAL'
-             }]*/
+            ]
         },
         Agency: {
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
             SIMS: [
-                {userRole: 'Data Entry SIMS', userRoleId: undefined},
+                {userRole: 'Data Entry SIMS', userRoleId: undefined}
+            ],
+            'SIMS Key Pops': [
                 {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
             ],
             EA: [

@@ -39,8 +39,7 @@
                                ui-validate="{ oneSelected: 'addUser.validateDataGroups()'}"
                                id="dataStream[{{::name}}]" name="dataStream[{{::name}}]"
                                ng-model="user.dataGroups[name].access"
-                               ng-disabled="user.dataGroups[name].entry"
-                               ng-change="addUser.updateDataEntry(name)"
+                               ng-disabled="addUser.hasDataEntryEnabled(name)"
                                type="checkbox">
                         <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                     </li>
@@ -53,18 +52,15 @@
         <div class="col-sm-6">
             <fieldset name="User actions">
                 <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
+
+                <um-data-entry
+                        data-groups="user.dataGroups"
+                        update-data-entry="addUser.updateDataEntry"
+                        is-user-manager="addUser.isUserManager"
+                        user="user"
+                ></um-data-entry>
+
                 <ul class="checkbox-group">
-                    <li ng-repeat="streamName in addUser.dataEntryStreamNamesForUserType">
-                        <input id="dataEntry[{{::streamName}}]"
-                               name="dataEntry[{{::streamName}}]"
-                               type="checkbox"
-                               ng-model="user.dataGroups[streamName].entry"
-                               ng-change="addUser.updateDataEntry(streamName);"
-                               ng-disabled="addUser.isUserManager" />
-                        <label for="dataEntry[{{::streamName}}]">
-                            <span translate>Data Entry</span> <span ng-bind="streamName" translate></span>
-                        </label>
-                    </li>
                     <li ng-repeat="action in addUser.actions">
                         <input ng-model="user.userActions[action.name]"
                                ng-checked="action.default"

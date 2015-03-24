@@ -1,0 +1,13 @@
+<ul class="checkbox-group">
+    <li ng-repeat="streamName in umDataEntryCtrl.dataEntryStreamNamesForUserType">
+        <input id="dataEntry[{{::streamName}}]"
+               name="dataEntry[{{::streamName}}]"
+               type="checkbox"
+               ng-model="umDataEntryCtrl.dataEntryRoles.dataEntryRoles[streamName]"
+               ng-change="umDataEntryCtrl.updateDataEntry(streamName);"
+               ng-disabled="umDataEntryCtrl.isUserManager"/>
+        <label for="dataEntry[{{::streamName}}]">
+            <span translate>Data Entry</span> <span ng-bind="streamName" translate></span>
+        </label>
+    </li>
+</ul>

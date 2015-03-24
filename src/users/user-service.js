@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular, userUtils, partnersService, agenciesService, interAgencyService, errorHandler) {
+function userService($q, Restangular, userUtils, partnersService, agenciesService, interAgencyService, errorHandler, dataEntryService) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -92,16 +92,16 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
                 return {id: userGroup.id};
             }));
         });
-        Object.keys(user.dataGroups).forEach(function (dataGroup) {
-            if (user.userType.name && dataEntryRestrictions && user.dataGroups[dataGroup].access === true && user.dataGroups[dataGroup].entry === true) {
-                var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataGroup] || [];
-                dataEntryUserRoles.forEach(function (dataEntryUserRole) {
-                    var userRoleId = dataEntryUserRole.userRoleId;
-                    if (userRoleId) {
-                        inviteObject.userCredentials.userRoles.push({id: userRoleId});
-                    }
-                });
-            }
+
+        //Adds data entry roles to the user credentials
+        Object.keys(dataEntryService.dataEntryRoles).forEach(function (dataEntryKey) {
+            var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataEntryKey] || [];
+            dataEntryUserRoles.forEach(function (dataEntryUserRole) {
+                var userRoleId = dataEntryUserRole.userRoleId;
+                if (userRoleId) {
+                    inviteObject.userCredentials.userRoles.push({id: userRoleId});
+                }
+            });
         });
 
         //Add the user actions to the invite object
