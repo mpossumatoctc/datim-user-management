@@ -9,7 +9,10 @@ describe('Data entry directive', function () {
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.factory('userActionsService', function ($q) {
             return {
-                getActions: jasmine.createSpy().and.returnValue($q.when({}))
+                getActions: jasmine.createSpy().and.returnValue($q.when({
+                    getDataEntryRestrictionDataGroups: jasmine.createSpy()
+                        .and.returnValue(['SI', 'SIMS', 'SIMS Key Pops'])
+                }))
             };
         });
         $provide.factory('currentUserService', function ($q) {
@@ -25,7 +28,8 @@ describe('Data entry directive', function () {
         });
         $provide.factory('userUtils', function () {
             return {
-                getDataEntryStreamNamesForUserType: jasmine.createSpy('getDataEntryStreamNamesForUserType').and.returnValue(['SIMS', 'SIMS Key Pops'])
+                getDataEntryStreamNamesForUserType: jasmine.createSpy('getDataEntryStreamNamesForUserType')
+                    .and.returnValue(['SIMS', 'SIMS Key Pops'])
             };
         });
     }));
@@ -38,7 +42,18 @@ describe('Data entry directive', function () {
         element = angular.element('<um-data-entry user="user"></um-data-entry>');
         scope = $rootScope.$new();
         scope.user = {
-            userType: undefined
+            userType: undefined,
+            dataGroups: {
+                SI: {
+                    access: false
+                },
+                SIMS: {
+                    access: false
+                },
+                EA: {
+                    access: false
+                }
+            }
         };
 
         $compile(element)(scope);
@@ -83,6 +98,38 @@ describe('Data entry directive', function () {
             scope.$apply();
 
             expect(controller.updateDataEntry).toHaveBeenCalled();
+        });
+
+        it('should set access for the passed stream', function () {
+            controller.updateDataEntry('SI');
+
+            expect(controller.user.dataGroups.SI.access).toBe(true);
+        });
+
+        it('should not set access for the passes stream', function () {
+            controller.updateDataEntry('EA');
+
+            expect(controller.user.dataGroups.EA.access).toBe(false);
+        });
+
+        it('should set access for the datagroup based on the sub section', function () {
+            controller.updateDataEntry('SIMS Key Pops');
+
+            expect(controller.user.dataGroups.SIMS.access).toBe(true);
+        });
+
+        it('should not set any of the other datagroups access', function () {
+            controller.updateDataEntry('SIMS');
+
+            expect(controller.user.dataGroups.SIMS.access).toBe(true);
+            expect(controller.user.dataGroups.SI.access).toBe(false);
+            expect(controller.user.dataGroups.EA.access).toBe(false);
+        });
+
+        it('should not add an extra key to the datagroups object', function () {
+            controller.updateDataEntry('SIMS Key Pops');
+
+            expect(Object.keys(controller.user.dataGroups).length).toBe(3);
         });
     });
 });

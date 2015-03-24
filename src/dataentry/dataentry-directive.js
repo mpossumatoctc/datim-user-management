@@ -23,7 +23,8 @@ function dataEntryDirective() {
 
         function updateDataEntry(dataEntryName) {
             var streamName = getStreamNameFromDataEntryName(dataEntryName);
-            var userGroupsThatApplyForDataEntryForUserType = vm.userActions.getDataEntryRestrictionDataGroups(vm.user.userType.name);
+            var userGroupsThatApplyForDataEntryForUserType = vm.userActions
+                    .getDataEntryRestrictionDataGroups(vm.user.userType.name);
 
             if (!angular.isString(dataEntryName)) {
                 errorHandler.debug('Update data entry the streamname given is invalid');
