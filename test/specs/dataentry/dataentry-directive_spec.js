@@ -3,6 +3,7 @@ describe('Data entry directive', function () {
     var scope;
     var userActionsServiceMock;
     var currentUserMock;
+    var controller;
 
     beforeEach(module('dataentry/dataentry.html'));
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
@@ -22,6 +23,11 @@ describe('Data entry directive', function () {
                 reset: jasmine.createSpy('dataEntryService.reset')
             };
         });
+        $provide.factory('userUtils', function () {
+            return {
+                getDataEntryStreamNamesForUserType: jasmine.createSpy('getDataEntryStreamNamesForUserType').and.returnValue(['SIMS', 'SIMS Key Pops'])
+            };
+        });
     }));
     beforeEach(inject(function ($injector) {
         var $compile = $injector.get('$compile');
@@ -32,13 +38,18 @@ describe('Data entry directive', function () {
         element = angular.element('<um-data-entry user="user"></um-data-entry>');
         scope = $rootScope.$new();
         scope.user = {
-            userType: {
-                name: 'Agency'
-            }
+            userType: undefined
         };
 
         $compile(element)(scope);
         $rootScope.$digest();
+
+        controller = element.controller('umDataEntry');
+
+        scope.user.userType = {
+            name: 'Agency'
+        };
+        scope.$apply();
     }));
 
     it('should compile', function () {
@@ -56,8 +67,22 @@ describe('Data entry directive', function () {
     });
 
     describe('display of data entry', function () {
-        it('', function () {
+        it('should display the two sims data entry boxes', function () {
+            expect(element.find('li').length).toEqual(2);
 
+            expect(element.find('li label')[0].textContent.trim()).toBe('Data Entry SIMS');
+            expect(element.find('li label')[1].textContent.trim()).toBe('Data Entry SIMS Key Pops');
+        });
+    });
+
+    describe('interaction', function () {
+        it('should call the updateDataEntry function when a checkbox is clicked', function () {
+            spyOn(controller, 'updateDataEntry');
+
+            element.find('li input').first().click();
+            scope.$apply();
+
+            expect(controller.updateDataEntry).toHaveBeenCalled();
         });
     });
 });
