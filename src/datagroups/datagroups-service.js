@@ -6,7 +6,8 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
     var dataGroups = [
         {name: 'SI'},
         {name: 'EA'},
-        {name: 'SIMS'}
+        {name: 'SIMS'},
+        {name: 'SIMS Key Populations'}
     ];
     var userGroupNameConfig = {prefix: 'Data', suffix: 'access'};
     var userRoleNameConfig = {prefix: 'Data Entry'};

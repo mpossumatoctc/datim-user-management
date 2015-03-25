@@ -1,7 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('dataEntryService', dataEntryService);
 
 function dataEntryService() {
-    var streamNameRegExp = /(\w+)/i;
     var dataEntryRoles = {};
     var dataEntryRolesCache = [];
 
@@ -15,24 +14,19 @@ function dataEntryService() {
     };
 
     function hasDataEntryForStream(streamName) {
-        var filteredGroups = {};
+        var activeDataEntryKeys = [];
 
         Object.keys(dataEntryRoles)
             .forEach(function (dataEntryKey) {
-                filteredGroups[getStreamName(dataEntryKey)] = filteredGroups[getStreamName(dataEntryKey)] || [];
-                filteredGroups[getStreamName(dataEntryKey)].push(dataEntryKey);
+                if (dataEntryRoles[dataEntryKey] === true) {
+                    activeDataEntryKeys.push(dataEntryKey);
+                }
             });
 
-        if (filteredGroups[streamName]) {
-            return filteredGroups[streamName].reduce(function (current, entryKey) {
-                return current || dataEntryRoles[entryKey];
-            }, false);
-        }
-        return false;
-    }
+        //TODO: Remove this when the word is out on the key pops name thing
+        streamName = streamName === 'SIMS Key Populations' ? 'SIMS Key Pops' : streamName;
 
-    function getStreamName(dataEntryName) {
-        return streamNameRegExp.test(dataEntryName) ? streamNameRegExp.exec(dataEntryName)[1] : dataEntryName;
+        return activeDataEntryKeys.indexOf(streamName) >= 0;
     }
 
     function reset() {

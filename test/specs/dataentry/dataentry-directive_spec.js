@@ -81,6 +81,9 @@ describe('Data entry directive', function () {
                 },
                 EA: {
                     access: false
+                },
+                'SIMS Key Populations': {
+                    access: false
                 }
             }
         };
@@ -141,10 +144,10 @@ describe('Data entry directive', function () {
             expect(controller.user.dataGroups.EA.access).toBe(false);
         });
 
-        it('should set access for the datagroup based on the sub section', function () {
+        it('should set access for the mismatching sims group', function () {
             controller.updateDataEntry('SIMS Key Pops');
 
-            expect(controller.user.dataGroups.SIMS.access).toBe(true);
+            expect(controller.user.dataGroups['SIMS Key Populations'].access).toBe(true);
         });
 
         it('should not set any of the other datagroups access', function () {
@@ -158,7 +161,7 @@ describe('Data entry directive', function () {
         it('should not add an extra key to the datagroups object', function () {
             controller.updateDataEntry('SIMS Key Pops');
 
-            expect(Object.keys(controller.user.dataGroups).length).toBe(3);
+            expect(Object.keys(controller.user.dataGroups).length).toBe(4);
         });
     });
 

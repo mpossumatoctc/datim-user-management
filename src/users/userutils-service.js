@@ -41,6 +41,7 @@ function userUtilsService(errorHandler) {
             errorHandler.debug('Partner type found remove sims as datagroup');
             return _.chain(dataGroups)
                 .reject({name: 'SIMS'})
+                .reject({name: 'SIMS Key Populations'})
                 .value();
         }
         return dataGroups || [];

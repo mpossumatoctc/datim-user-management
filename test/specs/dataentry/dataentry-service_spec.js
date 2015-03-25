@@ -78,10 +78,16 @@ describe('Data Entry Service', function () {
             expect(service.hasDataEntryForStream('EA')).toBe(false);
         });
 
-        it('should return true for a stream with a sub stream that is set', function () {
+        it('should return false for a stream with an almost identical name', function () {
             service.dataEntryRoles['SIMS Key Pops'] = true;
 
-            expect(service.hasDataEntryForStream('SIMS')).toBe(true);
+            expect(service.hasDataEntryForStream('SIMS')).toBe(false);
+        });
+
+        it('should return true for key pops', function () {
+            service.dataEntryRoles['SIMS Key Pops'] = true;
+
+            expect(service.hasDataEntryForStream('SIMS Key Populations')).toBe(true);
         });
     });
 

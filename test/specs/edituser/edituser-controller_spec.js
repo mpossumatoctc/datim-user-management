@@ -3,6 +3,7 @@ describe('Edit user controller', function () {
     var dataGroupsService;
     var $rootScope;
     var scope;
+    var dataEntryServiceMock;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         $provide.value('userToEdit', {});
@@ -149,6 +150,12 @@ describe('Edit user controller', function () {
                 go: jasmine.createSpy('go')
             };
         });
+
+        $provide.factory('dataEntryService', function () {
+            return {
+                reset: jasmine.createSpy()
+            };
+        });
     }));
 
     beforeEach(inject(function ($injector) {
@@ -158,6 +165,7 @@ describe('Edit user controller', function () {
         scope = $rootScope.$new();
 
         dataGroupsService = $injector.get('dataGroupsService');
+        dataEntryServiceMock = $injector.get('dataEntryService');
 
         controller = $controller('editUserController', {
             $scope: scope
@@ -170,6 +178,10 @@ describe('Edit user controller', function () {
 
     it('should set injected userToEdit onto the controller', function () {
         expect(controller.userToEdit).toBeDefined();
+    });
+
+    it('should have reset dataEntryService', function () {
+        expect(dataEntryServiceMock.reset).toHaveBeenCalled();
     });
 
     it('should set injected userLocale onto the controller', function () {

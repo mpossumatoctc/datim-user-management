@@ -43,9 +43,8 @@ function dataEntryDirective() {
         }
 
         function getStreamNameFromDataEntryName(dataEntryName) {
-            var dataStreamRegExp = /(\w+)/i;
-
-            return dataStreamRegExp.test(dataEntryName) ? dataStreamRegExp.exec(dataEntryName)[1] : dataEntryName;
+            //TODO: Remove this when the word is out on the key pops name thing
+            return dataEntryName === 'SIMS Key Pops' ? 'SIMS Key Populations' : dataEntryName;
         }
 
         function initialise() {

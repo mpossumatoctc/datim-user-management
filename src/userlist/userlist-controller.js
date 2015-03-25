@@ -172,15 +172,20 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     function getDataGroupsForUser(user) {
         dataGroupsService.getDataGroupsForUser(user)
             .then(function (dataGroups) {
-                vm.detailsUserDataGroups = dataGroups;
+                dataGroups.forEach(function (dataGroup) {
+                    var exactMatch = new RegExp('^Data Entry ' + dataGroup.name + '$', 'i');
+                    var startMatch = new RegExp('^Data Entry ' + dataGroup.name + ' .+$', 'i');
 
-                vm.detailsUserDataGroups.forEach(function (dataGroup) {
-                    if (dataGroup.name === 'SI') {
-                        if ((userTypesService.getUserType(vm.detailsUser) === 'Inter-Agency' && userUtils.hasUserRole(vm.detailsUser, {name: 'Data Entry SI Country Team'}))) {
-                            dataGroup.entry = true;
-                        }
-                    }
+                    var userRoles = (user.userCredentials && user.userCredentials.userRoles) || [];
+
+                    var hasDataEntryForGroup = userRoles.some(function (userRole) {
+                        return exactMatch.test(userRole.name) || startMatch.test(userRole.name);
+                    });
+
+                    dataGroup.entry = hasDataEntryForGroup;
                 });
+
+                vm.detailsUserDataGroups = dataGroups;
             })
             .catch(function () {
                 errorHandler.warning('Failed to load datagroups for user');

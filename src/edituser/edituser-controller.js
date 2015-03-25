@@ -46,6 +46,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             return;
         }
 
+        //Reset data entry service state
+        dataEntryService.reset();
+
         dataGroupsService.getDataGroupsForUser(userToEdit)
             .then(correctUserRolesForType)
             .then(createDataGroupsObject);

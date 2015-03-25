@@ -47,7 +47,7 @@ describe('DataGroupService', function () {
                 userGroupRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Data&paging=false')
                     .respond(200, fixtures.get('userGroups'));
                 userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
-                        'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')
+                        'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&filter=name:eq:Data+Entry+SIMS+Key+Populations&paging=false')
                     .respond(200, fixtures.get('userRoles'));
 
                 currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me?fields=:all,userCredentials%5B:owner,!userGroupAccesses%5D,!userGroupAccesses')
@@ -202,6 +202,10 @@ describe('DataGroupService', function () {
                             userRoles: [
                                 {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
                             ]
+                        }, {
+                            name: 'SIMS Key Populations',
+                            userGroups: [  ],
+                            userRoles: [  ]
                         }
                     ];
 
@@ -246,7 +250,7 @@ describe('DataGroupService', function () {
                 userGroupRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userGroups?fields=id,name&filter=name:like:Data&paging=false')
                     .respond(200, fixtures.get('userGroups'));
                 userRoleRequest = $httpBackend.expectGET('http://localhost:8080/dhis/api/userRoles?' +
-                        'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&paging=false')
+                        'fields=id,name&filter=name:eq:Data+Entry+SI&filter=name:eq:Data+Entry+EA&filter=name:eq:Data+Entry+SIMS&filter=name:eq:Data+Entry+SIMS+Key+Populations&paging=false')
                     .respond(200, fixtures.get('userRoles'));
 
                 currentUserRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/me?fields=:all,userCredentials%5B:owner,!userGroupAccesses%5D,!userGroupAccesses')
