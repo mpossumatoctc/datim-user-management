@@ -217,9 +217,9 @@ describe('Add user controller', function () {
 
         it('should set the user dataGroups', function () {
             var expectedUserDataGroups = {
-                MER: {access: false, entry: false},
-                EA: {access: false, entry: false},
-                SIMS: {access: false, entry: false}
+                MER: {access: false},
+                EA: {access: false},
+                SIMS: {access: false}
             };
             expect(scope.user.dataGroups).toEqual(expectedUserDataGroups);
         });
@@ -328,48 +328,6 @@ describe('Add user controller', function () {
             beforeEach(inject(function ($injector) {
                 userActions = $injector.get('userActions');
             }));
-
-            it('should remove SIMS as an data stream', function () {
-                scope.user.userType = {name: 'Agency'};
-                scope.$apply();
-
-                scope.user.dataGroups.SIMS.entry = true;
-                scope.user.userType = {name: 'Partner'};
-                scope.$apply();
-
-                expect(scope.user.dataGroups.SIMS).not.toBeDefined();
-            });
-
-            it('should reset data entry to false', function () {
-                scope.user.userType = {name: 'Partner'};
-                scope.$apply();
-
-                userActions.getDataEntryRestrictionDataGroups
-                    .and.returnValue(['SI']);
-
-                scope.user.dataGroups.SI.entry = true;
-                scope.user.userType = {name: 'Inter-Agency'};
-                scope.$apply();
-
-                expect(scope.user.dataGroups.SI.entry).toBe(false);
-            });
-
-            it('should reset data entry to false', function () {
-                scope.user.userType = {name: 'Partner'};
-                scope.$apply();
-
-                userActions.getDataEntryRestrictionDataGroups
-                    .and.returnValue(['SI']);
-
-                scope.user.dataGroups.SI.entry = true;
-                scope.user.dataGroups.EA.entry = true;
-
-                scope.user.userType = {name: 'Inter-Agency'};
-                scope.$apply();
-
-                expect(scope.user.dataGroups.SI.entry).toBe(false);
-                expect(scope.user.dataGroups.EA.entry).toBe(false);
-            });
 
             it('should reset isUserManager to false when changing type', function () {
                 scope.user.userType = {name: 'Partner'};

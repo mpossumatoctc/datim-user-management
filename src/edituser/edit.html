@@ -41,9 +41,8 @@
                                        ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" 
                                        id="dataStream[{{::name}}]" 
                                        name="dataStream[{{::name}}]"
+                                       ng-model="user.dataGroups[name].access"
                                        ng-disabled="user.dataGroups[name].entry || editUser.isUserManager"
-                                       ng-model="user.dataGroups[name].access" 
-                                       ng-change="editUser.updateDataEntry(name)" 
                                        type="checkbox">
                                 <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                             </li>
@@ -58,18 +57,15 @@
 
                     <fieldset name="User actions">
                         <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
+
+                        <um-data-entry
+                                is-user-manager="editUser.isUserManager"
+                                user="user"
+                                user-type="editUser.getUserType()"
+                                user-to-edit="editUser.userToEdit"
+                        ></um-data-entry>
+
                         <ul class="checkbox-group">
-                            <li ng-repeat="streamName in editUser.dataEntryStreamNamesForUserType">
-                                <input id="dataEntry[{{::streamName}}]"
-                                       name="dataEntry[{{::streamName}}]"
-                                       type="checkbox"
-                                       ng-model="user.dataGroups[streamName].entry"
-                                       ng-change="editUser.updateDataEntry(streamName);"
-                                       ng-disabled="editUser.isUserManager" />
-                                <label for="dataEntry[{{::streamName}}]">
-                                    <span translate>Data Entry</span> <span ng-bind="streamName" translate></span>
-                                </label>
-                            </li>
                             <li ng-repeat="action in editUser.actions">
                                 <input ng-model="user.userActions[action.name]"
                                        ng-checked="action.hasAction"

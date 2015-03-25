@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('editUserController', editUserController);
 
 function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 55
-                            userLocale, userFormService, userActions,
+                            userLocale, userFormService, userActions, dataEntryService,
                             notify, userService, userTypesService, userUtils, errorHandler) {
     var vm = this;
     var validations = userFormService.getValidations();
@@ -17,7 +17,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.dataGroupsInteractedWith = validations.dataGroupsInteractedWith;
     vm.isProcessingEditUser = false;
     vm.userEntityName = '';
-    vm.dataEntryStreamNamesForUserType = [];
     vm.isUserManager = userUtils.hasUserAdminRights(userToEdit);
 
     vm.validateDataGroups = validateDataGroups;
@@ -45,8 +44,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
             $state.go('noaccess', {message: 'Editing your own account would only allow you to restrict it further, therefore it has been disabled.'});
             return;
         }
-
-        vm.dataEntryStreamNamesForUserType = getDataEntryStreamNamesForUserType();
 
         dataGroupsService.getDataGroupsForUser(userToEdit)
             .then(correctUserRolesForType)
@@ -81,8 +78,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         getDataGroupsForUserType(dataGroups).reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = {
-                    access: dataGroup.access,
-                    entry: dataGroup.entry || (dataGroup.name === 'SI' && getUserType() === 'Inter-Agency' && userUtils.hasUserRole(userToEdit, {name: 'Data Entry SI Country Team'}))
+                    access: dataGroup.access
                 };
             }
             return dataGroups;
@@ -244,10 +240,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         return userTypesService.getUserType(userToEdit);
     }
 
-    function getDataEntryStreamNamesForUserType() {
-        return userUtils.getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType);
-    }
-
     function changeUserStatus() {
         if (vm.userToEdit && vm.userToEdit.userCredentials) {
             vm.userToEdit.userCredentials.disabled = vm.userToEdit.userCredentials.disabled ? false : true;
@@ -278,12 +270,15 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
             $scope.user.dataGroups = userUtils.setAllDataStreams($scope.user.dataGroups);
             $scope.user.userActions = userUtils.setAllActions(vm.actions, true);
+            dataEntryService.setAllDataEntry(getUserType());
         } else {
             if (userUtils.hasStoredData()) {
                 $scope.user.dataGroups = userUtils.restoreDataStreams($scope.user.dataGroups);
                 $scope.user.userActions = userUtils.restoreUserActions($scope.user.userActions);
+                dataEntryService.restore();
             } else {
                 resetStreamsAndActions();
+                dataEntryService.reset();
             }
         }
     }
@@ -296,7 +291,6 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         });
         _.forEach($scope.user.dataGroups, function (userGroup) {
             userGroup.access = false;
-            userGroup.entry = false;
         });
     }
 

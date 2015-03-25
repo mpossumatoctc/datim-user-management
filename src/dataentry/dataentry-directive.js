@@ -5,9 +5,10 @@ function dataEntryDirective() {
         restrict: 'E',
         replace: true,
         scope: {
-            dataGroups: '=',
             isUserManager: '=',
-            user: '='
+            user: '=',
+            userType: '=',
+            userToEdit: '='
         },
         bindToController: true,
         controller: umDataEntryController,
@@ -24,7 +25,7 @@ function dataEntryDirective() {
         function updateDataEntry(dataEntryName) {
             var streamName = getStreamNameFromDataEntryName(dataEntryName);
             var userGroupsThatApplyForDataEntryForUserType = vm.userActions
-                    .getDataEntryRestrictionDataGroups(vm.user.userType.name);
+                    .getDataEntryRestrictionDataGroups(vm.userType || vm.user.userType.name);
 
             if (!angular.isString(dataEntryName)) {
                 errorHandler.debug('Update data entry the streamname given is invalid');
@@ -61,14 +62,34 @@ function dataEntryDirective() {
         }
 
         function registerWatch() {
-            //TODO: See if we can do this without a watch
-            $scope.$watch(function () {
-                return vm.user.userType;
-            }, function (newVal, oldVal) {
-                if (newVal !== oldVal && newVal && newVal.name) {
-                    vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, newVal.name);
-                }
-            });
+            if (vm.userType) {
+                //Get the usertype for the current user
+                vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.userType);
+
+                var userRoleIds = vm.userToEdit.userCredentials.userRoles.map(function (userRole) {
+                    return userRole.id;
+                });
+
+                Object.keys(vm.userActions.dataEntryRestrictions[vm.userType]).forEach(function (dataEntryName) {
+                    var hasEntryRolesRequired = vm.userActions.dataEntryRestrictions[vm.userType][dataEntryName].every(function (expectedRole) {
+                        return userRoleIds.indexOf(expectedRole.userRoleId) >= 0;
+                    });
+
+                    if (hasEntryRolesRequired) {
+                        dataEntryService.dataEntryRoles[dataEntryName] = true;
+                    }
+                });
+            } else {
+                //Register a watch for the invite screen as usertype changes
+                //TODO: See if we can do this without a watch
+                $scope.$watch(function () {
+                    return vm.user.userType;
+                }, function (newVal, oldVal) {
+                    if (newVal !== oldVal && newVal && newVal.name) {
+                        vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, newVal.name);
+                    }
+                });
+            }
         }
 
         initialise();

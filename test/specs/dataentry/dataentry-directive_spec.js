@@ -4,6 +4,7 @@ describe('Data entry directive', function () {
     var userActionsServiceMock;
     var currentUserMock;
     var controller;
+    var fixtures = window.fixtures;
 
     beforeEach(module('dataentry/dataentry.html'));
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
@@ -11,7 +12,35 @@ describe('Data entry directive', function () {
             return {
                 getActions: jasmine.createSpy().and.returnValue($q.when({
                     getDataEntryRestrictionDataGroups: jasmine.createSpy()
-                        .and.returnValue(['SI', 'SIMS', 'SIMS Key Pops'])
+                        .and.returnValue(['SI', 'SIMS', 'SIMS Key Pops']),
+                    dataEntryRestrictions: {
+                        'Inter-Agency': {
+                            SI: [{
+                                userRole: 'Data Entry SI Country Team',
+                                userRoleId: 'yYOqiMTxAOF'
+                            }]
+                        },
+                        Agency: {
+                            SI: [{
+                                userRole: 'Data Entry SI',
+                                userRoleId: 'k7BWFXkG6zt'
+                            }],
+                            EA: [{
+                                userRole: 'Data Entry EA',
+                                userRoleId: 'OKKx4bf4ueV'
+                            }]
+                        },
+                        Partner: {
+                            SI: [{
+                                userRole: 'Data Entry SI',
+                                userRoleId: 'k7BWFXkG6zt'
+                            }],
+                            SIMS: [{
+                                userRole: 'Data Entry SIMS',
+                                userRoleId: 'iXkZzRKD0i4'
+                            }]
+                        }
+                    }
                 }))
             };
         });
@@ -130,6 +159,48 @@ describe('Data entry directive', function () {
             controller.updateDataEntry('SIMS Key Pops');
 
             expect(Object.keys(controller.user.dataGroups).length).toBe(3);
+        });
+    });
+
+    describe('for edit user', function () {
+        var dataEntryServiceMock;
+
+        beforeEach(inject(function ($injector) {
+            var $compile = $injector.get('$compile');
+            var $rootScope = $injector.get('$rootScope');
+            userActionsServiceMock = $injector.get('userActionsService');
+            currentUserMock = $injector.get('currentUserService');
+            dataEntryServiceMock = $injector.get('dataEntryService');
+
+            element = angular.element('<um-data-entry user="user" user-type="\'Partner\'" user-to-edit="userToEdit"></um-data-entry>');
+            scope = $rootScope.$new();
+            scope.user = {
+                userType: undefined,
+                dataGroups: {
+                    SI: {
+                        access: false
+                    },
+                    SIMS: {
+                        access: false
+                    },
+                    EA: {
+                        access: false
+                    }
+                }
+            };
+
+            scope.userToEdit = fixtures.get('userGroupsRoles');
+
+            $compile(element)(scope);
+            $rootScope.$digest();
+
+            controller = element.controller('umDataEntry');
+
+            scope.$apply();
+        }));
+
+        it('should set the dataentry options for the user that will be edited', function () {
+            expect(dataEntryServiceMock.dataEntryRoles).toEqual({SI: true});
         });
     });
 });

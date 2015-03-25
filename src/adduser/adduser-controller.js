@@ -97,8 +97,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         return dataGroups.reduce(function (dataGroups, dataGroup) {
             if (dataGroup && dataGroup.name) {
                 dataGroups[dataGroup.name] = {
-                    access: false,
-                    entry: false
+                    access: false
                 };
             }
             return dataGroups;

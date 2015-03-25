@@ -286,7 +286,6 @@ describe('DataGroupService', function () {
                     {
                         name: 'SI',
                         access: true,
-                        entry: true,
                         userGroups: [
                             {name: 'Data SI access', id: 'c6hGi8GEZot'}
                         ],
@@ -296,7 +295,6 @@ describe('DataGroupService', function () {
                     }, {
                         name: 'EA',
                         access: false,
-                        entry: true,
                         userGroups: [
                             {name: 'Data EA access', id: 'YbkldVOJMUl'}
                         ],
@@ -306,7 +304,6 @@ describe('DataGroupService', function () {
                     }, {
                         name: 'SIMS',
                         access: false,
-                        entry: true,
                         userGroups: [
                             {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
                         ],
@@ -349,16 +346,13 @@ describe('DataGroupService', function () {
             it('should only return the selected streamgroups', function () {
                 var userStreams = {
                     SI: {
-                        access: true,
-                        entry: false
+                        access: true
                     },
                     EA: {
-                        access: false,
-                        entry: false
+                        access: false
                     },
                     SIMS: {
-                        access: false,
-                        entry: false
+                        access: false
                     }
                 };
 
@@ -389,16 +383,13 @@ describe('DataGroupService', function () {
 
                 var userStreams = {
                     SI: {
-                        access: false,
-                        entry: false
+                        access: false
                     },
                     EA: {
-                        access: false,
-                        entry: false
+                        access: false
                     },
                     SIMS: {
-                        access: false,
-                        entry: false
+                        access: false
                     }
                 };
 
@@ -452,16 +443,13 @@ describe('DataGroupService', function () {
 
                 var userStreams = {
                     SI: {
-                        access: false,
-                        entry: false
+                        access: false
                     },
                     EA: {
-                        access: true,
-                        entry: false
+                        access: true
                     },
                     SIMS: {
-                        access: false,
-                        entry: false
+                        access: false
                     }
                 };
 

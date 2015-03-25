@@ -116,21 +116,17 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
     }
 
     function getDataGroupsForUser(user) {
-        var userGroupIds;
-        var userRoleIds;
         if (!(user && user.userGroups && user.userCredentials)) {
             return $q.reject('Invalid user object provided');
         }
+
+        var userGroupIds;
         userGroupIds = (user.userGroups || []).map(function (userGroup) {
             return userGroup.id;
         });
-        userRoleIds = ((user.userCredentials && user.userCredentials.userRoles) || []).map(function (userRole) {
-            return userRole.id;
-        });
 
         return $q.all([loadUserGroups(), loadUserRoles()])
-            .then(determineDataAccessByUserGroups(userGroupIds))
-            .then(determineDataEntryByUserRoles(userRoleIds));
+            .then(determineDataAccessByUserGroups(userGroupIds));
     }
 
     function determineDataAccessByUserGroups(userGroupIds) {
@@ -140,21 +136,6 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
                     dataGroup.access = true;
                 } else {
                     dataGroup.access = false;
-                }
-                return dataGroup;
-            });
-        };
-    }
-
-    function determineDataEntryByUserRoles(userRoleIds) {
-        return function () {
-            return dataGroups.map(function (dataGroup) {
-                //FIXME: Currently checks all roles to determine data entry but this could change
-                //if more streams specific roles are added.
-                if (hasAll(dataGroup.userRoles, userRoleIds)) {
-                    dataGroup.entry = true;
-                } else {
-                    dataGroup.entry = false;
                 }
                 return dataGroup;
             });
