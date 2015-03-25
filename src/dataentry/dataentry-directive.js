@@ -79,6 +79,16 @@ function dataEntryDirective() {
                         dataEntryService.dataEntryRoles[dataEntryName] = true;
                     }
                 });
+
+                //FIXME: Special case hack for the 'Data Entry SI Country Team' case
+                var hasInterAgencySI = vm.userToEdit.userCredentials.userRoles.some(function (userRole) {
+                    return userRole.name === 'Data Entry SI Country Team';
+                });
+
+                if (hasInterAgencySI) {
+                    dataEntryService.dataEntryRoles.SI = true;
+                }
+                //End hack
             } else {
                 //Register a watch for the invite screen as usertype changes
                 //TODO: See if we can do this without a watch

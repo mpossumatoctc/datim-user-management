@@ -28,6 +28,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.getOrganisationUnitForUserToEdit = getOrganisationUnitForUserToEdit;
     vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
     vm.getDataEntryRolesNotShown = getDataEntryRolesNotShown;
+    vm.hasDataEntryEnabled = hasDataEntryEnabled;
 
     $scope.user = vm.user;
 
@@ -54,6 +55,10 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
         userService.getUserEntity(userToEdit)
             .then(setUserEntityName);
+    }
+
+    function hasDataEntryEnabled(streamName) {
+        return dataEntryService.hasDataEntryForStream(streamName);
     }
 
     function correctUserRolesForType(response) {
@@ -111,7 +116,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         removeExtraUserManagementRoles();
 
         var userGroups = dataGroupsService.getUserGroups(vm.userToEdit, vm.dataGroups, vm.user.dataGroups);
-        userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions);
+        userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions, getUserType());
         userToEdit.userGroups = userGroups;
 
         fixUserManagementRole();

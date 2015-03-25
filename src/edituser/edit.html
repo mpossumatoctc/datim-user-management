@@ -42,7 +42,7 @@
                                        id="dataStream[{{::name}}]" 
                                        name="dataStream[{{::name}}]"
                                        ng-model="user.dataGroups[name].access"
-                                       ng-disabled="user.dataGroups[name].entry || editUser.isUserManager"
+                                       ng-disabled="editUser.hasDataEntryEnabled(name) || editUser.isUserManager"
                                        type="checkbox">
                                 <label for="dataStream[{{::name}}]" ng-bind="name" translate></label>
                             </li>

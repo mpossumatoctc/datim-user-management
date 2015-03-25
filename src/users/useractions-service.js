@@ -2,7 +2,7 @@
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
 function userActionsService(Restangular, $q, userTypesService, userService,
-                            currentUserService, errorHandler) {
+                            currentUserService, errorHandler, dataEntryService) {
     var availableAgencyActions = [
         'Accept data', 'Submit data'
     ];
@@ -248,16 +248,33 @@ function userActionsService(Restangular, $q, userTypesService, userService,
         return userActions;
     }
 
-    function getUserRolesForUser(user, dataGroups, actions) {
-        var dataGroupsWithEntry;
-        var userRoles;
-        var dataEntryRoles;
-        var userActions = (user && user.userActions) || [];
+    function getUserRolesForUser(user, actions, userType) {
+        if (!userType || !angular.isString(userType)) {
+            throw new Error('Passed parameter userType should be a string');
+        }
 
-        dataGroupsWithEntry = userService.getSelectedDataGroups(user, dataGroups)
-            .filter(function (dataGroup) {
-                return user.dataGroups && user.dataGroups[dataGroup.name] && user.dataGroups[dataGroup.name].entry === true;
+        var userRoles;
+        var dataEntryRoles = [];
+        var userActions = (user && user.userActions) || [];
+        var dataEntryRoleNames = Object.keys(dataEntryService.dataEntryRoles)
+            .filter(function (dataEntryKey) {
+                return dataEntryService.dataEntryRoles[dataEntryKey];
+            })
+            .map(function (dataEntryKey) {
+                return dataEntryKey;
             });
+
+        dataEntryRoles = dataEntryRoleNames.map(function (dataEntryRoleName) {
+            return dataEntryRestrictions[userType][dataEntryRoleName]
+                .filter(function (userRole) {
+                    return userRole.userRoleId;
+                })
+                .map(function (userRole) {
+                    return {id: userRole.userRoleId, name: userRole.userRole};
+                });
+        }).reduce(function (current, value) {
+            return current.concat(value);
+        }, dataEntryRoles);
 
         userRoles = getUserActionsForNames(userActions, actions)
             .map(pick('userRoleId', 'userRole'))
@@ -268,10 +285,6 @@ function userActionsService(Restangular, $q, userTypesService, userService,
                     id: item.userRoleId
                 };
             });
-
-        dataEntryRoles = dataGroupsWithEntry
-            .map(pick('userRoles'))
-            .reduce(flatten(), []);
 
         return userRoles.concat(dataEntryRoles);
     }
@@ -294,8 +307,8 @@ function userActionsService(Restangular, $q, userTypesService, userService,
         return [].concat(dataGroupRoles).concat(actionRoles);
     }
 
-    function combineSelectedUserRolesWithExisting(userToEdit, user, dataGroups, actions) {
-        var selectedUserRoles = getUserRolesForUser(user, dataGroups, actions);
+    function combineSelectedUserRolesWithExisting(userToEdit, user, dataGroups, actions, userType) {
+        var selectedUserRoles = getUserRolesForUser(user, actions, userType);
         var availableUserRoleIds = getAvailableUserRoles(dataGroups, actions).map(pick('id'));
         var currentUserRoles = (userToEdit.userCredentials && userToEdit.userCredentials.userRoles) || [];
         var userRoleBasis = currentUserRoles.filter(function (userRole) {

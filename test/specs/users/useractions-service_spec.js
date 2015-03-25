@@ -64,6 +64,12 @@ describe('User actions', function () {
 
             return userServiceObject;
         });
+
+        $provide.factory('dataEntryService', function () {
+           return {
+                dataEntryRoles: {}
+           };
+        });
     }));
 
     beforeEach(inject(function ($injector) {
@@ -366,7 +372,6 @@ describe('User actions', function () {
             {
                 name: 'SI',
                 access: true,
-                entry: true,
                 userGroups: [
                     {name: 'Data SI access', id: 'c6hGi8GEZot'}
                 ],
@@ -376,7 +381,6 @@ describe('User actions', function () {
             }, {
                 name: 'EA',
                 access: false,
-                entry: true,
                 userGroups: [
                     {name: 'Data EA access', id: 'YbkldVOJMUl'}
                 ],
@@ -386,7 +390,6 @@ describe('User actions', function () {
             }, {
                 name: 'SIMS',
                 access: false,
-                entry: true,
                 userGroups: [
                     {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
                 ],
@@ -402,12 +405,14 @@ describe('User actions', function () {
         ];
 
         var userActions;
+        var dataEntryServiceMock;
 
-        beforeEach(inject(function ($httpBackend) {
+        beforeEach(inject(function ($httpBackend, dataEntryService) {
             userActionsService.getActions()
                 .then(function (actions) {
                     userActions = actions;
                 });
+            dataEntryServiceMock = dataEntryService;
 
             $httpBackend.flush();
         }));
@@ -417,29 +422,31 @@ describe('User actions', function () {
         });
 
         it('should return an empty array', function () {
-            expect(userActions.getUserRolesForUser()).toEqual([]);
+            expect(userActions.getUserRolesForUser(undefined, undefined, 'Partner')).toEqual([]);
         });
 
         it('should return the selected datagroup roles', function () {
+            dataEntryServiceMock.dataEntryRoles.SI = true;
             var user = {
-                dataGroups: {SI: {
-                    access: true,
-                    entry: true
-                }},
+                dataGroups: {
+                    SI: {
+                        access: true
+                    }
+                },
                 userActions: {}
             };
             var expectedRoles = [
                 {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
             ];
 
-            expect(userActions.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
+            expect(userActions.getUserRolesForUser(user, actions, 'Partner')).toEqual(expectedRoles);
         });
 
         it('should return the general user roles', function () {
+            dataEntryServiceMock.dataEntryRoles.SI = true;
             var user = {
                 dataGroups: {SI: {
-                    access: true,
-                    entry: true
+                    access: true
                 }},
                 userActions: {'Submit data': true}
             };
@@ -448,7 +455,7 @@ describe('User actions', function () {
                 {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
             ];
 
-            expect(userActions.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
+            expect(userActions.getUserRolesForUser(user, actions, 'Partner')).toEqual(expectedRoles);
         });
 
         it('should not give set data entry to true', function () {
@@ -467,7 +474,7 @@ describe('User actions', function () {
             var expectedRoles = [
                 {name: 'Data Submitter', id: 'n777lf1THwQ'}
             ];
-            expect(userActions.getUserRolesForUser(user, dataGroups, actions)).toEqual(expectedRoles);
+            expect(userActions.getUserRolesForUser(user, actions, 'Partner')).toEqual(expectedRoles);
         });
     });
 
@@ -476,13 +483,13 @@ describe('User actions', function () {
         var user;
         var actions;
         var userActions;
+        var dataEntryServiceMock;
 
-        beforeEach(function () {
+        beforeEach(inject(function ($injector) {
             dataGroups = [
                 {
                     name: 'SI',
                     access: true,
-                    entry: true,
                     userGroups: [
                         {name: 'Data SI access', id: 'c6hGi8GEZot'}
                     ],
@@ -492,7 +499,6 @@ describe('User actions', function () {
                 }, {
                     name: 'EA',
                     access: false,
-                    entry: false,
                     userGroups: [
                         {name: 'Data EA access', id: 'YbkldVOJMUl'}
                     ],
@@ -502,7 +508,6 @@ describe('User actions', function () {
                 }, {
                     name: 'SIMS',
                     access: false,
-                    entry: false,
                     userGroups: [
                         {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
                     ],
@@ -513,9 +518,7 @@ describe('User actions', function () {
             ];
             user = {
                 dataGroups: {SI: {
-                    access: true,
-                    entry: true
-
+                    access: true
                 }},
                 userActions: {'Submit data': true}
             };
@@ -530,7 +533,9 @@ describe('User actions', function () {
                     userActions = actions;
                 });
             $httpBackend.flush();
-        });
+
+            dataEntryServiceMock = $injector.get('dataEntryService');
+        }));
 
         it('should be a function', function () {
             expect(userActions.combineSelectedUserRolesWithExisting).toBeAFunction();
@@ -559,11 +564,14 @@ describe('User actions', function () {
                 {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
             ];
 
+            dataEntryServiceMock.dataEntryRoles.SI = true;
+
             var returnedUserRoles = userActions.combineSelectedUserRolesWithExisting(
                 existingUserObject,
                 userGroupsAndActions,
                 dataGroups,
-                actions
+                actions,
+                'Partner'
             );
 
             expect(returnedUserRoles).toEqual(expectedActions);
@@ -583,7 +591,8 @@ describe('User actions', function () {
                 existingUserObject,
                 userGroupsAndActions,
                 dataGroups,
-                actions
+                actions,
+                'Partner'
             );
 
             var expectedActions = [
