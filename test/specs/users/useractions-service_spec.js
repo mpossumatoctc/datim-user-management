@@ -66,9 +66,9 @@ describe('User actions', function () {
         });
 
         $provide.factory('dataEntryService', function () {
-           return {
+            return {
                 dataEntryRoles: {}
-           };
+            };
         });
     }));
 
@@ -368,36 +368,6 @@ describe('User actions', function () {
     });
 
     describe('getUserRolesForUser', function () {
-        var dataGroups = [
-            {
-                name: 'SI',
-                access: true,
-                userGroups: [
-                    {name: 'Data SI access', id: 'c6hGi8GEZot'}
-                ],
-                userRoles: [
-                    {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
-                ]
-            }, {
-                name: 'EA',
-                access: false,
-                userGroups: [
-                    {name: 'Data EA access', id: 'YbkldVOJMUl'}
-                ],
-                userRoles: [
-                    {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
-                ]
-            }, {
-                name: 'SIMS',
-                access: false,
-                userGroups: [
-                    {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
-                ],
-                userRoles: [
-                    {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
-                ]
-            }
-        ];
         var actions = [
             {name: 'Submit data', userRole: 'Data Submitter', userRoleId: 'n777lf1THwQ', hasAction: true},
             {name: 'Manage users', userRole: 'User Administrator', userGroupRestriction: true, userRoleId: 'KagqnetfxMr', hasAction: false},
