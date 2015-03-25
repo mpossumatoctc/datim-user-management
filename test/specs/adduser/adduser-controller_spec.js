@@ -38,7 +38,7 @@ describe('Add user controller', function () {
                     Agency: {
                         SIMS: [
                             {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                            {userRole: 'Data Entry SIMS Key Pops', userRoleId: 'simskeypopsid'}
+                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'}
                         ]
                     },
                     Partner: {
@@ -56,13 +56,13 @@ describe('Add user controller', function () {
                         ],
                         SIMS: [
                             {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                            {userRole: 'Data Entry SIMS Key Pops', userRoleId: 'simskeypopsid'}
+                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'}
                         ],
                         EA: [{userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}]
                     },
                     Agency: {
                         SI: [{userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'}],
-                        SIMS: [{userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'}, {userRole: 'Data Entry SIMS Key Pops', userRoleId: 'simskeypopsid'}],
+                        SIMS: [{userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'}, {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'}],
                         EA: [{userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}]
                     },
                     Partner: {
@@ -952,7 +952,7 @@ describe('Add user controller', function () {
                     var expectedRoles = [
                         {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
                         {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                        {userRole: 'Data Entry SIMS Key Pops', userRoleId: 'simskeypopsid'},
+                        {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'},
                         {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
                     ];
 
@@ -966,7 +966,7 @@ describe('Add user controller', function () {
                         {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
                         {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
                         {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                        {userRole: 'Data Entry SIMS Key Pops', userRoleId: 'simskeypopsid'},
+                        {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'},
                         {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
                     ];
                     scope.user.userType = {name: 'Inter-Agency'};
@@ -1031,7 +1031,7 @@ describe('Add user controller', function () {
             var expectedUserRoles = [
                     {userRole: 'Data Entry SI', userRoleId:  'k7BWFXkG6zt'},
                     {userRole: 'Data Entry SIMS', userRoleId:  'iXkZzRKD0i4'},
-                    {userRole: 'Data Entry SIMS Key Pops', userRoleId:  'simskeypopsid'},
+                    {userRole: 'Data Entry SIMS Key Populations', userRoleId:  'simskeypopsid'},
                     {userRole: 'Data Entry EA', userRoleId:  'OKKx4bf4ueV'}
             ];
 

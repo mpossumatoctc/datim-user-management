@@ -12,7 +12,7 @@ describe('Data entry directive', function () {
             return {
                 getActions: jasmine.createSpy().and.returnValue($q.when({
                     getDataEntryRestrictionDataGroups: jasmine.createSpy()
-                        .and.returnValue(['SI', 'SIMS', 'SIMS Key Pops']),
+                        .and.returnValue(['SI', 'SIMS', 'SIMS Key Populations']),
                     dataEntryRestrictions: {
                         'Inter-Agency': {
                             SI: [{
@@ -58,7 +58,7 @@ describe('Data entry directive', function () {
         $provide.factory('userUtils', function () {
             return {
                 getDataEntryStreamNamesForUserType: jasmine.createSpy('getDataEntryStreamNamesForUserType')
-                    .and.returnValue(['SIMS', 'SIMS Key Pops'])
+                    .and.returnValue(['SIMS', 'SIMS Key Populations'])
             };
         });
     }));
@@ -118,7 +118,7 @@ describe('Data entry directive', function () {
             expect(element.find('li').length).toEqual(2);
 
             expect(element.find('li label')[0].textContent.trim()).toBe('Data Entry SIMS');
-            expect(element.find('li label')[1].textContent.trim()).toBe('Data Entry SIMS Key Pops');
+            expect(element.find('li label')[1].textContent.trim()).toBe('Data Entry SIMS Key Populations');
         });
     });
 
@@ -145,7 +145,7 @@ describe('Data entry directive', function () {
         });
 
         it('should set access for the mismatching sims group', function () {
-            controller.updateDataEntry('SIMS Key Pops');
+            controller.updateDataEntry('SIMS Key Populations');
 
             expect(controller.user.dataGroups['SIMS Key Populations'].access).toBe(true);
         });
@@ -159,7 +159,7 @@ describe('Data entry directive', function () {
         });
 
         it('should not add an extra key to the datagroups object', function () {
-            controller.updateDataEntry('SIMS Key Pops');
+            controller.updateDataEntry('SIMS Key Populations');
 
             expect(Object.keys(controller.user.dataGroups).length).toBe(4);
         });

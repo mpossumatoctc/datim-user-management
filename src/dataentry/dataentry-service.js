@@ -23,9 +23,6 @@ function dataEntryService() {
                 }
             });
 
-        //TODO: Remove this when the word is out on the key pops name thing
-        streamName = streamName === 'SIMS Key Populations' ? 'SIMS Key Pops' : streamName;
-
         return activeDataEntryKeys.indexOf(streamName) >= 0;
     }
 

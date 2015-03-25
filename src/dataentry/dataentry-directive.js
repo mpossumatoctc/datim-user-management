@@ -43,8 +43,7 @@ function dataEntryDirective() {
         }
 
         function getStreamNameFromDataEntryName(dataEntryName) {
-            //TODO: Remove this when the word is out on the key pops name thing
-            return dataEntryName === 'SIMS Key Pops' ? 'SIMS Key Populations' : dataEntryName;
+            return dataEntryName;
         }
 
         function initialise() {

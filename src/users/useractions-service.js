@@ -42,8 +42,8 @@ function userActionsService(Restangular, $q, userTypesService, userService,
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
 
             ],
-            'SIMS Key Pops': [
-                {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
+            'SIMS Key Populations': [
+                {userRole: 'Data Entry SIMS Key Populations', userRoleId: undefined}
             ]
         },
         Partner: {
@@ -70,8 +70,8 @@ function userActionsService(Restangular, $q, userTypesService, userService,
             SIMS: [
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
             ],
-            'SIMS Key Pops': [
-                {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
+            'SIMS Key Populations': [
+                {userRole: 'Data Entry SIMS Key Populations', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}
@@ -84,8 +84,8 @@ function userActionsService(Restangular, $q, userTypesService, userService,
             SIMS: [
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
             ],
-            'SIMS Key Pops': [
-                {userRole: 'Data Entry SIMS Key Pops', userRoleId: undefined}
+            'SIMS Key Populations': [
+                {userRole: 'Data Entry SIMS Key Populations', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}
