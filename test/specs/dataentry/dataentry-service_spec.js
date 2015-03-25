@@ -4,6 +4,35 @@ describe('Data Entry Service', function () {
     beforeEach(module('PEPFAR.usermanagement'));
     beforeEach(inject(function ($injector) {
         service = $injector.get('dataEntryService');
+
+        service.userActions = {dataEntryRestrictions: {
+            'Inter-Agency': {
+                SI: [{
+                    userRole: 'Data Entry SI Country Team',
+                    userRoleId: 'yYOqiMTxAOF'
+                }]
+            },
+            Agency: {
+                SI: [{
+                    userRole: 'Data Entry SI',
+                    userRoleId: 'k7BWFXkG6zt'
+                }],
+                EA: [{
+                    userRole: 'Data Entry EA',
+                    userRoleId: 'OKKx4bf4ueV'
+                }]
+            },
+            Partner: {
+                SI: [{
+                    userRole: 'Data Entry SI',
+                    userRoleId: 'k7BWFXkG6zt'
+                }],
+                SIMS: [{
+                    userRole: 'Data Entry SIMS',
+                    userRoleId: 'iXkZzRKD0i4'
+                }]
+            }
+        }};
     }));
 
     it('should have a property for dataEntryRoles', function () {
@@ -53,6 +82,49 @@ describe('Data Entry Service', function () {
             service.dataEntryRoles['SIMS Key Pops'] = true;
 
             expect(service.hasDataEntryForStream('SIMS')).toBe(true);
+        });
+    });
+
+    describe('setAllDataEntry', function () {
+        it('should be a function', function () {
+            expect(service.setAllDataEntry).toEqual(jasmine.any(Function));
+        });
+
+        it('should set all the values for the passed usertype', function () {
+            var expectedDataEntryRoles = {
+                SI: true,
+                SIMS: true
+            };
+
+            service.setAllDataEntry('Partner');
+
+            expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
+        });
+
+        it('should throw when a usertype was not provided', function () {
+            expect(function () { service.setAllDataEntry(); }).toThrowError('Passed usertype should be a string');
+        });
+    });
+
+    describe('restore', function () {
+        beforeEach(function () {
+            service.dataEntryRoles.SI = true;
+            service.dataEntryRoles.SIMS = false;
+        });
+
+        it('should be a function', function () {
+            expect(service.restore).toEqual(jasmine.any(Function));
+        });
+
+        it('should restore the last config before setAllDataEntry was called', function () {
+            var expectedDataEntryRoles = {
+                SI: true
+            };
+
+            service.setAllDataEntry('Partner');
+            service.restore();
+
+            expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
         });
     });
 });

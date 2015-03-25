@@ -52,6 +52,7 @@ function dataEntryDirective() {
                 .then(function (responses) {
                     vm.currentUser = responses[0];
                     vm.userActions = responses[1];
+                    dataEntryService.userActions = vm.userActions;
                 })
                 .then(registerWatch)
                 .catch(function () {

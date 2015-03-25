@@ -119,16 +119,13 @@ describe('User service', function () {
                 userRoles: [],
                 dataGroups: {
                     SI: {
-                        access: true,
-                        entry: true
+                        access: true
                     },
                     EA: {
-                        access: false,
-                        entry: true
+                        access: false
                     },
                     SIMS: {
-                        access: false,
-                        entry: true
+                        access: false
                     }
                 }
             };
@@ -261,17 +258,24 @@ describe('User service', function () {
             var inviteEntity;
 
             userObject.dataGroups.SI = {
-                entry: true,
                 access: true
             };
             userObject.dataGroups.EA = {
-                entry: true,
                 access: true
             };
             inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions);
 
             expect(inviteEntity.userCredentials.userRoles).not.toContain({id: 'yYOqiMTxAOF'});
         });
+
+        it('should not add a userRole if it has not been set to true', inject(function (dataEntryService) {
+            var inviteEntity;
+
+            dataEntryService.dataEntryRoles.SI = false;
+            inviteEntity = service.getUserInviteObject(userObject, dataGroups, actions, {}, dataEntryRestrictions);
+
+            expect(inviteEntity.userCredentials.userRoles).not.toContain({id: 'k7BWFXkG6zt'});
+        }));
     });
 
     describe('inviteUser', function () {

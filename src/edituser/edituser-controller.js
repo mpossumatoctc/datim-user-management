@@ -273,14 +273,14 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function checkAllBoxesForUserManager() {
         if (vm.isUserManager) {
-            userUtils.storeDataStreamsAndEntry($scope.user.dataGroups);
+            userUtils.storeDataStreams($scope.user.dataGroups);
             userUtils.storeUserActions($scope.user.userActions);
 
-            $scope.user.dataGroups = userUtils.setAllDataStreamsAndEntry($scope.user.dataGroups);
+            $scope.user.dataGroups = userUtils.setAllDataStreams($scope.user.dataGroups);
             $scope.user.userActions = userUtils.setAllActions(vm.actions, true);
         } else {
             if (userUtils.hasStoredData()) {
-                $scope.user.dataGroups = userUtils.restoreDataStreamsAndEntry($scope.user.dataGroups);
+                $scope.user.dataGroups = userUtils.restoreDataStreams($scope.user.dataGroups);
                 $scope.user.userActions = userUtils.restoreUserActions($scope.user.userActions);
             } else {
                 resetStreamsAndActions();

@@ -481,6 +481,8 @@
         }
     }];
 
+    fixtures.user_biwZmBty5f9 = {"email":"simsde@thedutchies.com","userCredentials":{"userRoles":[{"id":"biwZmBty5f9","name":"Data Entry SIMS Key Pops"},{"id":"iXkZzRKD0i4","name":"Data Entry SIMS"},{"id":"b2uHwX9YLhu","name":"Read Only"}]},"userGroups":[{"id":"l0wllTVjshe","name":"OU Angola Agency DOD all mechanisms","created":"2014-09-29T08:44:23.709+0000","lastUpdated":"2014-12-10T23:28:58.504+0000","href":"http://localhost:8080/dhis/api/userGroups/l0wllTVjshe"},{"id":"fpEQtr4Wyq4","name":"OU Angola Agency DOD users","created":"2014-09-29T08:44:23.421+0000","lastUpdated":"2014-12-10T23:29:01.198+0000","href":"http://localhost:8080/dhis/api/userGroups/fpEQtr4Wyq4"},{"id":"iuD8wUFz95X","name":"Data SIMS access","created":"2014-09-29T08:44:09.145+0000","lastUpdated":"2015-03-17T10:58:53.707+0000","href":"http://localhost:8080/dhis/api/userGroups/iuD8wUFz95X"}]};
+
     window.fixtures = {
         get: function (fixtureName) {
             if (fixtures[fixtureName])

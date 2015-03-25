@@ -3,11 +3,15 @@ angular.module('PEPFAR.usermanagement').factory('dataEntryService', dataEntrySer
 function dataEntryService() {
     var streamNameRegExp = /(\w+)/i;
     var dataEntryRoles = {};
+    var dataEntryRolesCache = [];
 
     return {
+        userActions: {},
         dataEntryRoles: dataEntryRoles,
         reset: reset,
-        hasDataEntryForStream: hasDataEntryForStream
+        restore: restore,
+        hasDataEntryForStream: hasDataEntryForStream,
+        setAllDataEntry: setAllDataEntry
     };
 
     function hasDataEntryForStream(streamName) {
@@ -35,5 +39,30 @@ function dataEntryService() {
         Object.keys(dataEntryRoles).forEach(function (dataEntryKey) {
             delete dataEntryRoles[dataEntryKey];
         });
+    }
+
+    function restore() {
+        reset();
+        dataEntryRolesCache.forEach(function (dataEntryKey) {
+            dataEntryRoles[dataEntryKey] = true;
+        });
+    }
+
+    function setAllDataEntry(userType) {
+        if (!angular.isString(userType)) {
+            throw new Error('Passed usertype should be a string');
+        }
+
+        dataEntryRolesCache = [];
+        Object.keys(dataEntryRoles).forEach(function (dataEntryKey) {
+            if (dataEntryRoles[dataEntryKey] === true) {
+                dataEntryRolesCache.push(dataEntryKey);
+            }
+        });
+
+        Object.keys(this.userActions.dataEntryRestrictions[userType])
+            .forEach(function (streamName) {
+                dataEntryRoles[streamName] = true;
+            });
     }
 }

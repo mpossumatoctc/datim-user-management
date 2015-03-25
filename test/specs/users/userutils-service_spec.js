@@ -9,9 +9,9 @@ describe('User utils service', function () {
         userUtils = $injector.get('userUtils');
 
         dataStreams = {
-            EA: {access: false, entry: false},
-            SI: {access: false, entry: false},
-            SIMS: {access: false, entry: false}
+            EA: {access: false},
+            SI: {access: false},
+            SIMS: {access: false}
         };
 
         userActions = {};
@@ -27,18 +27,18 @@ describe('User utils service', function () {
         expect(userUtils).toBeAnObject();
     });
 
-    describe('setAllDataStreamsAndEntry', function () {
+    describe('setAllDataStreams', function () {
         it('should be a function', function () {
-            expect(userUtils.setAllDataStreamsAndEntry).toBeAFunction();
+            expect(userUtils.setAllDataStreams).toBeAFunction();
         });
 
         it('should expect 1 argument', function () {
-            expect(userUtils.setAllDataStreamsAndEntry.length).toBe(1);
+            expect(userUtils.setAllDataStreams.length).toBe(1);
         });
 
         it('should throw if the argument is not an object', function () {
             function shouldThrow() {
-                userUtils.setAllDataStreamsAndEntry();
+                userUtils.setAllDataStreams();
             }
 
             expect(shouldThrow).toThrowError('Expected passed value "dataGroups" to be an object');
@@ -46,47 +46,46 @@ describe('User utils service', function () {
 
         it('should set access and entry to true for all streams', function () {
             var expectedDataStreams = {
-                EA: {access: true, entry: true},
-                SI: {access: true, entry: true},
-                SIMS: {access: true, entry: true}
+                EA: {access: true},
+                SI: {access: true},
+                SIMS: {access: true}
             };
 
-            expect(userUtils.setAllDataStreamsAndEntry(dataStreams)).toEqual(expectedDataStreams);
+            expect(userUtils.setAllDataStreams(dataStreams)).toEqual(expectedDataStreams);
         });
     });
 
     describe('storeDataGroups', function () {
         it('should be a function', function () {
-            expect(userUtils.storeDataStreamsAndEntry).toBeAFunction();
+            expect(userUtils.storeDataStreams).toBeAFunction();
         });
 
         it('should take 1 argument', function () {
-            expect(userUtils.storeDataStreamsAndEntry.length).toBe(1);
+            expect(userUtils.storeDataStreams.length).toBe(1);
         });
 
         it('should throw if the argument is not an object', function () {
             function shouldThrow() {
-                userUtils.storeDataStreamsAndEntry();
+                userUtils.storeDataStreams();
             }
 
             expect(shouldThrow).toThrowError('Expected passed value "dataGroups" to be an object');
         });
     });
 
-    describe('restoreDataStreamsAndEntry', function () {
+    describe('restoreDataStreams', function () {
         beforeEach(function () {
             dataStreams.EA.access = true;
             dataStreams.SIMS.access = true;
-            dataStreams.EA.entry = true;
         });
 
         it('should be a function', function () {
-            expect(userUtils.restoreDataStreamsAndEntry).toBeAFunction();
+            expect(userUtils.restoreDataStreams).toBeAFunction();
         });
 
         it('should throw if the argument is not an object', function () {
             function shouldThrow() {
-                userUtils.restoreDataStreamsAndEntry();
+                userUtils.restoreDataStreams();
             }
 
             expect(shouldThrow).toThrowError('Expected passed value "dataGroups" to be an object');
@@ -94,18 +93,18 @@ describe('User utils service', function () {
 
         it('should restore the dataStreams back to the original settings', function () {
             var expectedDataStreams = {
-                EA: {access: true, entry: true},
-                SI: {access: false, entry: false},
-                SIMS: {access: true, entry: false}
+                EA: {access: true},
+                SI: {access: false},
+                SIMS: {access: true}
             };
 
-            dataStreams = userUtils.setAllDataStreamsAndEntry(dataStreams);
+            dataStreams = userUtils.setAllDataStreams(dataStreams);
 
-            expect(userUtils.restoreDataStreamsAndEntry(dataStreams)).toEqual(expectedDataStreams);
+            expect(userUtils.restoreDataStreams(dataStreams)).toEqual(expectedDataStreams);
         });
 
         it('should return the current dataStreams when there is no previous value', function () {
-            expect(userUtils.restoreDataStreamsAndEntry(dataStreams)).toEqual(dataStreams);
+            expect(userUtils.restoreDataStreams(dataStreams)).toEqual(dataStreams);
         });
     });
 
@@ -249,7 +248,7 @@ describe('User utils service', function () {
 
         it('should return true if there is stored data available', function () {
             userUtils.storeUserActions({});
-            userUtils.storeDataStreamsAndEntry({});
+            userUtils.storeDataStreams({});
 
             expect(userUtils.hasStoredData()).toBe(true);
         });

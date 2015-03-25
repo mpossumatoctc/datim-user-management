@@ -94,15 +94,17 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
         });
 
         //Adds data entry roles to the user credentials
-        Object.keys(dataEntryService.dataEntryRoles).forEach(function (dataEntryKey) {
-            var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataEntryKey] || [];
-            dataEntryUserRoles.forEach(function (dataEntryUserRole) {
-                var userRoleId = dataEntryUserRole.userRoleId;
-                if (userRoleId) {
-                    inviteObject.userCredentials.userRoles.push({id: userRoleId});
-                }
+        Object.keys(dataEntryService.dataEntryRoles)
+            .filter(function (dataEntryKey) { return dataEntryService.dataEntryRoles[dataEntryKey] === true; })
+            .forEach(function (dataEntryKey) {
+                var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataEntryKey] || [];
+                dataEntryUserRoles.forEach(function (dataEntryUserRole) {
+                    var userRoleId = dataEntryUserRole.userRoleId;
+                    if (userRoleId) {
+                        inviteObject.userCredentials.userRoles.push({id: userRoleId});
+                    }
+                });
             });
-        });
 
         //Add the user actions to the invite object
         actions.forEach(function (action) {

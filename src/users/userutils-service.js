@@ -9,9 +9,9 @@ function userUtilsService(errorHandler) {
         getUserRestrictionsDifference: getUserRestrictionsDifference,
         getDataGroupsForUserType: getDataGroupsForUserType,
         getDataEntryStreamNamesForUserType: getDataEntryStreamNamesForUserType,
-        setAllDataStreamsAndEntry: setAllDataStreamsAndEntry,
-        storeDataStreamsAndEntry: storeDataStreamsAndEntry,
-        restoreDataStreamsAndEntry: restoreDataStreamsAndEntry,
+        setAllDataStreams: setAllDataStreams,
+        storeDataStreams: storeDataStreams,
+        restoreDataStreams: restoreDataStreams,
         setAllActions: setAllActions,
         storeUserActions: storeUserActions,
         restoreUserActions: restoreUserActions,
@@ -69,7 +69,7 @@ function userUtilsService(errorHandler) {
     }
 
     /**
-     * Saves the passed object to be retrieved by `restoreDataStreamsAndEntry`. And returns a new Object with
+     * Saves the passed object to be retrieved by `restoreDataStreams`. And returns a new Object with
      * the same keys as the passed one, the object values for the streams will have their access
      * and entry set to `true`.
      *
@@ -78,19 +78,19 @@ function userUtilsService(errorHandler) {
      *
      * @throws {Error} When `dataGroups` is not an object
      */
-    function setAllDataStreamsAndEntry(dataGroups) {
+    function setAllDataStreams(dataGroups) {
         throwWhenNotObject(dataGroups, 'dataGroups');
 
         previousDataGroups = dataGroups;
 
         return _.chain(dataGroups)
             .mapValues(function () {
-                return {access: true, entry: true};
+                return {access: true};
             })
             .value();
     }
 
-    function storeDataStreamsAndEntry(dataGroups) {
+    function storeDataStreams(dataGroups) {
         throwWhenNotObject(dataGroups, 'dataGroups');
 
         previousDataGroups = dataGroups;
@@ -105,7 +105,7 @@ function userUtilsService(errorHandler) {
      *
      * @throws {Error} When `dataGroups` is not an object
      */
-    function restoreDataStreamsAndEntry(dataGroups) {
+    function restoreDataStreams(dataGroups) {
         throwWhenNotObject(dataGroups, 'dataGroups');
 
         return previousDataGroups || dataGroups;
