@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('appController', appController);
 
-function appController($scope, Restangular, webappManifest, errorHandler) {
+function appController($scope, Restangular, webappManifest, errorHandler, currentUserService) {
     var vm = this;
 
     vm.title = 'User management';
@@ -12,11 +12,15 @@ function appController($scope, Restangular, webappManifest, errorHandler) {
         link: ''
     };
 
+    vm.isGlobalUser = false;
+    vm.hasAllAuthority = false;
+
     vm.subTitles = {
         add: 'Invite user',
         list: 'Manage users',
         edit: 'Edit user',
-        noaccess: 'No access'
+        noaccess: 'No access',
+        globalAdd: 'Invite Global user'
     };
 
     initialise();
@@ -30,7 +34,7 @@ function appController($scope, Restangular, webappManifest, errorHandler) {
         vm.subTitle = vm.subTitles[toState.name] || '';
     });
     $scope.$on('$stateChangeError', function (event, toState) {
-        errorHandler.debug(['Failed to switch to ', toState].join(' '));
+        errorHandler.debug('Failed to switch to ', toState);
         vm.isLoading = false;
     });
 
@@ -48,6 +52,14 @@ function appController($scope, Restangular, webappManifest, errorHandler) {
                 }
                 vm.headerBar.title = systemSettings.applicationTitle || '';
                 vm.headerBar.link = [baseUrl, systemSettings.startModule, 'index.action'].join('/');
+            });
+
+        currentUserService.getCurrentUser()
+            .then(function (currentUser) {
+                if (currentUser.isGlobalUser() && currentUser.isUserAdministrator()) {
+                    vm.isGlobalUser = true;
+                }
+                vm.hasAllAuthority = currentUser.hasAllAuthority();
             });
     }
 }

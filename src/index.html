@@ -16,7 +16,8 @@
 
     <div class="app-content-wrap">
         <div class="button-group">
-            <a ng-disabled="app.currentState == 'add'" class="btn btn-default" ui-sref="add"><i class="fa fa-plus-square-o"></i> <span translate>Invite user</span></a>
+            <a ng-show="app.isGlobalUser || app.hasAllAuthority" ng-disabled="app.currentState == 'globalAdd'" class="btn btn-default ng-hide" ui-sref="globalAdd"><i class="fa fa-plus-square-o"></i> <span translate>Invite Global user</span></a>
+            <a ng-show="!app.isGlobalUser || app.hasAllAuthority" ng-disabled="app.currentState == 'add'" class="btn btn-default" ui-sref="add"><i class="fa fa-plus-square-o"></i> <span translate>Invite user</span></a>
             <a ng-disabled="app.currentState == 'list'" class="btn btn-default" ui-sref="list"><i class="fa fa-users"></i> <span translate>Manage users</span></a>
         </div>
         <h1 class="main-title" ng-bind="app.subTitle"></h1>
@@ -85,6 +86,8 @@
     <script src="users/userutils-service.js"></script>
     <script src="dataentry/dataentry-directive.js"></script>
     <script src="dataentry/dataentry-service.js"></script>
+    <script src="globaluserinvite/globaluserinvite-controller.js"></script>
+    <script src="globaluserinvite/globaluser-service.js"></script>
     <!-- endbuild -->
 
 </body>

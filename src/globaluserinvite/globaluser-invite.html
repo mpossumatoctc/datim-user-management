@@ -1,0 +1,48 @@
+<script type="text/ng-template" id="userFormMessages">
+    <div ng-message="required">This field is required</div>
+</script>
+<form name="userForm">
+    <div class="form-controls-wrap">
+        <span class="form-control-wrap" ng-class="{'ng-valid': userForm.emailAddress.$valid}">
+            <input class="form-control"
+                   placeholder="E-mail address"
+                   name="emailAddress"
+                   type="email"
+                   ng-required="true"
+                   ng-model="globalUserCtrl.user.email">
+        </span>
+        <div class="error-messages" ng-messages="userForm.emailAddress.$error" ng-messages-include="userFormMessages" ng-if="userForm.emailAddress.$dirty">
+            <div ng-message="email">This field should contain a valid e-mail address</div>
+        </div>
+    </div>
+    <div class="form-controls-wrap">
+        <locale-select user="globalUserCtrl.user" required="true"></locale-select>
+    </div>
+
+    <div class="form-controls-wrap row">
+        <div class="col-sm-12">
+            <fieldset name="User actions">
+                <legend>User actions<i class="fa fa-check valid-icon"></i></legend>
+                <div ng-repeat="(key, value) in globalUserCtrl.user.userActions">
+                    <label for="userAction_{{::key}}">
+                        <input id="userAction_{{::key}}" type="checkbox" ng-value="false" ng-model="globalUserCtrl.user.userActions[key]">
+                        <span translate ng-bind="key"></span>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="form-controls-wrap">
+        <button class="btn btn-primary add-user-button" 
+                ng-class="{ 'processing': globalUserCtrl.isProcessing }" 
+                ng-disabled="!userForm.$valid || globalUserCtrl.isProcessing" 
+                ng-click="globalUserCtrl.invite()">
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+            <span ng-bind="globalUserCtrl.getErrorString(userForm) || 'Invite user'"></span>
+        </button>
+    </div>
+
+    <!--<pre><code>{{ globalUserCtrl.user | json : 2 }}</code></pre>-->
+    <pre><code>{{ globalUserCtrl.userInviteObjectToSend | json : 2 }}</code></pre>
+</form>

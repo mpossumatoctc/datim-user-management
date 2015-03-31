@@ -8,6 +8,7 @@ describe('App controller', function () {
     beforeEach(module('ui.router'));
     beforeEach(module('PEPFAR.usermanagement'));
     beforeEach(inject(function ($controller, $injector) {
+        var $q = $injector.get('$q');
         $rootScope = $injector.get('$rootScope');
         $httpBackend = $injector.get('$httpBackend');
         errorHandler = $injector.get('errorHandler');
@@ -17,7 +18,14 @@ describe('App controller', function () {
 
         scope = $rootScope.$new();
         controller = $controller('appController', {
-            $scope: scope
+            $scope: scope,
+            currentUserService: {
+                getCurrentUser: jasmine.createSpy().and.returnValue($q.when({
+                    isGlobalUser: jasmine.createSpy(),
+                    isUserAdministrator: jasmine.createSpy(),
+                    hasAllAuthority: jasmine.createSpy()
+                }))
+            }
         });
     }));
 

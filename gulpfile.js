@@ -206,9 +206,9 @@ gulp.task('min', ['sass'], function () {
             single_quotes: true,
             stats: true
         })))
-        //.pipe(gulpif('*.js', uglify({
-        //    mangle: mangleJS
-        //})))
+        .pipe(gulpif('*.js', uglify({
+            mangle: mangleJS
+        })))
         .pipe(gulpif('!**/index.html', rev()))
         .pipe(replaceRev())
         .pipe(gulp.dest(buildDirectory));

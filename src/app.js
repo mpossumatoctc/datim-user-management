@@ -93,6 +93,28 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 username: ''
             }
         })
+        .state('globalAdd', {
+            url: '/global/add',
+            templateUrl: 'globaluserinvite/globaluser-invite.html',
+            controller: 'globalUserInviteController as globalUserCtrl',
+            resolve: {
+                userTypes: function (userTypesService) {
+                    return userTypesService.getUserTypes();
+                },
+                dataGroups: function (dataGroupsService) {
+                    return dataGroupsService.getDataGroups();
+                },
+                userActions: function (userActionsService) {
+                    return userActionsService.getActions();
+                },
+                currentUser: function (currentUserService) {
+                    return currentUserService.getCurrentUser();
+                },
+                userGroups: function (globalUserService) {
+                    return globalUserService.getUserGroups();
+                }
+            }
+        })
         .state('noaccess', {
             url: '/noaccess',
             templateUrl: 'noaccess/noaccess.html',

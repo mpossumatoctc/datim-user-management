@@ -310,6 +310,10 @@
         ]
     };
 
+    fixtures.globalUserGroups = {"userGroups":[{"id":"gh9tn4QBbKZ","name":"Global Users"}]};
+    fixtures.globalAdminUserGroups = {"userGroups":[{"id":"ghYxzrKHldx","name":"Global User Administrators"}]};
+    fixtures.globalAdminMechGroups = {"userGroups":[{"id":"TOOIJWRzJ3g","name":"Global all mechanisms"}]};
+
     fixtures.usersPage1 = {"pager": {"page": 1, "pageCount": 19, "total": 919, "nextPage": "http://localhost:8080/dhis/api/users?page=2"}, "users": [
         {"id": "UuuWuLWe4Rv", "created": "2014-10-07T21:42:22.842+0000", "name": "(TBD) (TBD)", "lastUpdated": "2014-10-16T16:47:51.176+0000", "href": "http://localhost:8080/dhis/api/users/UuuWuLWe4Rv"},
         {"id": "LNqrLrWxPSB", "created": "2014-10-07T21:46:27.046+0000", "name": "(TBD) (TBD)", "lastUpdated": "2014-10-16T16:47:51.182+0000", "href": "http://localhost:8080/dhis/api/users/LNqrLrWxPSB"},
