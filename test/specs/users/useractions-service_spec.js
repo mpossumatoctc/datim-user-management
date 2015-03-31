@@ -14,7 +14,7 @@ describe('User actions', function () {
                 },
                 getDataGroups: jasmine.createSpy('getDataGroups').and.returnValue($q.when([
                     {
-                       name: 'SI',
+                        name: 'SI',
                         userGroups: [
                             {name: 'Data SI access', id: 'c6hGi8GEZot'}
                         ],
@@ -22,7 +22,7 @@ describe('User actions', function () {
                             {name: 'Data Entry SI', id: 'k7BWFXkG6zt'}
                         ]
                     }, {
-                       name: 'EA',
+                        name: 'EA',
                         userGroups: [
                             {name: 'Data EA access', id: 'YbkldVOJMUl'}
                         ],
@@ -30,7 +30,7 @@ describe('User actions', function () {
                             {name: 'Data Entry EA', id: 'OKKx4bf4ueV'}
                         ]
                     }, {
-                       name: 'SIMS',
+                        name: 'SIMS',
                         userGroups: [
                             {name: 'Data SIMS access', id: 'iuD8wUFz95X'}
                         ],
