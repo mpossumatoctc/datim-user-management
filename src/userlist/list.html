@@ -187,6 +187,15 @@
         </div>
 	</div>
     <div class="pagination">
-        <pagination ng-show="userList.pagination.getNumberOfPages() > 1" total-items="userList.pagination.getTotalItemCount()" items-per-page="userList.pagination.getPageSize()" ng-model="userList.currentPage" ng-change="userList.pageChanged()"></pagination>
+        <pagination ng-show="userList.pagination.getNumberOfPages() > 1"
+                    total-items="userList.pagination.getTotalItemCount()"
+                    items-per-page="userList.pagination.getPageSize()"
+                    ng-model="userList.currentPage"
+                    ng-change="userList.pageChanged()"
+                    max-size="10"
+                    boundary-links="true"
+                    rotate="false">
+
+        </pagination>
     </div>
 </div>
