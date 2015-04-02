@@ -1,13 +1,11 @@
 angular.module('PEPFAR.usermanagement').service('userFilterService', userFilterService);
 
-function userFilterService($q, userTypesService, organisationUnitService) {
+function userFilterService($q, userTypesService, organisationUnitService, currentUserService) {
     var deferred = $q.defer();
     var userFilter = [
         {name: 'Name'},
         {name: 'Username'},
-        {name: 'E-Mail'},
-        {name: 'Roles'},
-        {name: 'User Groups'}
+        {name: 'E-Mail'}
     ];
 
     deferred.resolve(userFilter);
@@ -26,6 +24,30 @@ function userFilterService($q, userTypesService, organisationUnitService) {
         userTypesService.getUserTypes()
             .then(function (userTypes) {
                 userFilter.push({name: 'Types', secondary: userTypes});
+            });
+
+        // TODO: Write some tests for this..
+        currentUserService.getCurrentUser()
+            .then(function (currentUser) {
+                if (currentUser && currentUser.userCredentials.userRoles && angular.isArray(currentUser.userCredentials.userRoles)) {
+                    var userRoleFilters = currentUser.userCredentials.userRoles.map(function (userRole) {
+                        return {name: userRole.name};
+                    });
+                    if (userRoleFilters.length) {
+                        userFilter.push({name: 'User Role', secondary: userRoleFilters});
+                    }
+                }
+
+                if (currentUser && currentUser.userGroups && angular.isArray(currentUser.userGroups)) {
+                    var userGroupFilters = currentUser.userGroups.map(function (userGroup) {
+                        return {name: userGroup.name};
+                    });
+                    window.console.log(userGroupFilters);
+
+                    if (userGroupFilters.length) {
+                        userFilter.push({name: 'User Group', secondary: userGroupFilters});
+                    }
+                }
             });
     }
 

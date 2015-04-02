@@ -8,7 +8,8 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         username: 'userCredentials.username',
         'e-mail': 'email',
         roles: 'userCredentials.userRoles.name',
-        'user groups': 'userGroups.name',
+        'user role': 'userCredentials.userRoles.name',
+        'user group': 'userGroups.name',
         'organisation unit': 'organisationUnits.name',
         types: 'userGroups.name'
     };
@@ -218,9 +219,15 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             //Only use valid filters
             if (!isValidFilter(filterDefinition)) { return; }
 
+            var filtersThatRequireEquality = ['user role', 'user group'];
+            var comparator = filterDefinition.comparator;
+            if (filtersThatRequireEquality.indexOf(filterDefinition.type.name.toLowerCase()) >= 0) {
+                comparator = 'eq';
+            }
+
             filter = [
                 fieldNames[filterDefinition.type.name.toLowerCase()],
-                filterDefinition.comparator,
+                comparator,
                 angular.isString(filterDefinition.value) ? filterDefinition.value : filterDefinition.value.name
             ];
 
