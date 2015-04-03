@@ -42,7 +42,6 @@ function userFilterService($q, userTypesService, organisationUnitService, curren
                     var userGroupFilters = currentUser.userGroups.map(function (userGroup) {
                         return {name: userGroup.name};
                     });
-                    window.console.log(userGroupFilters);
 
                     if (userGroupFilters.length) {
                         userFilter.push({name: 'User Group', secondary: userGroupFilters});
