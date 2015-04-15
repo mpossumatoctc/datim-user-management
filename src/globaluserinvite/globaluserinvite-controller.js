@@ -25,7 +25,6 @@ function globalUserInviteController(dataGroups, currentUser,
     vm.user = {
         locale: {name: 'en'},
         userActions: {
-            'Accept data': false,
             'Manage users': false
         },
         dataGroups: dataGroups.reduce(function (dataGroupObject, dataGroup) {
