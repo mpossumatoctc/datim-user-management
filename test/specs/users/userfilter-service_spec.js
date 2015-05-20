@@ -58,7 +58,7 @@ describe('UserFilter service', function () {
                 {name: 'Name'},
                 {name: 'Username'},
                 {name: 'E-Mail'},
-                {name: 'Types', secondary: [{name: 'Inter-Agency'}, {name: 'Agency'}, {name: 'Partner'}]},
+                {name: 'Types', secondary: [{name: 'Inter-Agency', value: 'Country team'}, {name: 'Agency'}, {name: 'Partner'}]},
                 {name: 'Organisation Unit', secondary: [{name: 'Rwanda'}]},
                 {name: 'User Role', secondary: [{name: 'Data Entry SI'}]},
                 {name: 'User Group', secondary: [{name: 'Data SI access'}]}
@@ -108,6 +108,21 @@ describe('UserFilter service', function () {
             expectedFiltersWithoutUserGroup = expectedFilters.slice(0, 6);
 
             expect(filters).toEqual(expectedFiltersWithoutUserGroup);
+        });
+
+        it('should return a value override for the Inter-Agency userType', function () {
+            var filters;
+            var userTypeFilters;
+
+            service.getUserFilter().then(function (response) {
+                filters = response;
+            });
+            $rootScope.$apply();
+
+            //Grab the userType filter of the filters object
+            userTypeFilters = filters[3];
+
+            expect(userTypeFilters.secondary[0].value).toEqual('Country team');
         });
     });
 });

@@ -228,12 +228,12 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             filter = [
                 fieldNames[filterDefinition.type.name.toLowerCase()],
                 comparator,
-                angular.isString(filterDefinition.value) ? filterDefinition.value : filterDefinition.value.name
+                //Use the value if it is a string, otherwise check the value property and lastly use the name property
+                angular.isString(filterDefinition.value) ? filterDefinition.value :
+                    (filterDefinition.value.value ? filterDefinition.value.value : filterDefinition.value.name)
             ];
-
             userListService.setFilter(filter.join(':'));
         });
-
         loadList();
     }
 

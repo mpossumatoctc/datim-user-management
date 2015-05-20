@@ -3,6 +3,7 @@ angular.module('PEPFAR.usermanagement').service('userTypesService', userTypesSer
 function userTypesService($q) {
     var deferred = $q.defer();
     var userTypes = [
+        {name: 'Global'},
         {name: 'Inter-Agency'},
         {name: 'Agency'},
         {name: 'Partner'}

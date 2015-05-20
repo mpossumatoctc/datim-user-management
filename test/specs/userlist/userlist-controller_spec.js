@@ -66,7 +66,8 @@ describe('Userlist controller', function () { //jshint ignore:line
                 removeFilter: jasmine.createSpy('removeFilter'),
                 resetFilters: jasmine.createSpy('resetFilters'),
                 getFilters: jasmine.createSpy('getFilters').and.returnValue([]),
-                getCSVUrl: jasmine.createSpy('getCSVUrl').and.returnValue('')
+                getCSVUrl: jasmine.createSpy('getCSVUrl').and.returnValue(''),
+                setFilter: jasmine.createSpy('setFilter').and.returnValue(undefined)
             };
         });
         $provide.factory('userActions', function ($q) {
@@ -498,6 +499,36 @@ describe('Userlist controller', function () { //jshint ignore:line
 
         it('should have a search method', function () {
             expect(controller.search.doSearch).toBeAFunction();
+        });
+
+        describe('doSearch', function () {
+            it('should call the setFilter method for each search', function () {
+                controller.search.activeFilters.push({
+                    id: new Date().toString(),
+                    type: {name: 'Types'},
+                    value: {name: 'Agency'},
+                    comparator: 'like'
+                });
+
+                controller.doSearch();
+                $rootScope.$apply();
+
+                expect(userListService.setFilter).toHaveBeenCalled();
+            });
+
+            it('should call the setFilter method with the value override', function () {
+                controller.search.activeFilters.push({
+                    id: new Date().toString(),
+                    type: {name: 'Types'},
+                    value: {name: 'Inter-Agency', value: 'Country team'},
+                    comparator: 'like'
+                });
+
+                controller.doSearch();
+                $rootScope.$apply();
+
+                expect(userListService.setFilter).toHaveBeenCalledWith('userGroups.name:like:Country team');
+            });
         });
     });
 

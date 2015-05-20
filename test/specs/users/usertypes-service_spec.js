@@ -24,6 +24,7 @@ describe('userTypesService', function () {
         it('should return an array when the promised is resolved', function () {
             var userTypes;
             var expectedUserTypes = [
+                {name: 'Global'},
                 {name: 'Inter-Agency'},
                 {name: 'Agency'},
                 {name: 'Partner'}

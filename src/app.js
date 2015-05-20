@@ -31,9 +31,6 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 userActions: function (userActionsService) {
                     return userActionsService.getActions();
                 },
-                userTypes: function (userTypesService) {
-                    return userTypesService.getUserTypes();
-                },
                 dataGroups: function (dataGroupsService) {
                     return dataGroupsService.getDataGroups();
                 }
@@ -98,9 +95,6 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             templateUrl: 'globaluserinvite/globaluser-invite.html',
             controller: 'globalUserInviteController as globalUserCtrl',
             resolve: {
-                userTypes: function (userTypesService) {
-                    return userTypesService.getUserTypes();
-                },
                 dataGroups: function (dataGroupsService) {
                     return dataGroupsService.getDataGroups();
                 },

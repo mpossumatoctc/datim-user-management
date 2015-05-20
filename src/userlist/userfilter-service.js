@@ -23,6 +23,12 @@ function userFilterService($q, userTypesService, organisationUnitService, curren
 
         userTypesService.getUserTypes()
             .then(function (userTypes) {
+                userTypes = userTypes.map(function (userType) {
+                    if (userType.name === 'Inter-Agency') {
+                        userType.value = 'Country team';
+                    }
+                    return userType;
+                });
                 userFilter.push({name: 'Types', secondary: userTypes});
             });
 
