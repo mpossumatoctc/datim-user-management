@@ -215,7 +215,8 @@ gulp.task('min', ['sass'], function () {
 });
 
 gulp.task('copy-files', function () {
-    //TODO: Copy templates
+    return gulp.src(['vendor/bootstrap/dist/fonts/*'])
+        .pipe(gulp.dest(buildDirectory + '/fonts'));
 });
 
 gulp.task('copy-fonts', function () {

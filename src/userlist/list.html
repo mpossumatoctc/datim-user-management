@@ -101,18 +101,18 @@
             </div>
         </div>
     </div>
-    
-	<div class="search-result" ng-show="userList.users">
+
+    <div class="search-result" ng-show="userList.users">
         <div class="loading-mask" ng-show="userList.listIsLoading">
             <div class="loading-mask-inner"><i class="fa fa-circle-o-notch fa-spin"></i>&nbsp;Loading users...</div>
         </div>
-		<ul class="user-list" ng-class="{'user-details-open': userList.detailsOpen}">
-		    <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)" >
-		    	<div class="result">
-		    		<div class="row user-details-main">
-		    			<div class="col-sm-7">
-		    				<div class="user-name"><span ng-bind="::user.surname"></span>, <span ng-bind="::user.firstName"></span></div>
-		    			</div>
+        <ul class="user-list" ng-class="{'user-details-open': userList.detailsOpen}">
+            <li class="user-list-row" user-id="{{user.id}}" ng-repeat="user in userList.users" ng-class="{disabled: user.userCredentials.disabled, 'is-details-user': userList.isDetailsUser(user)}" ng-click="userList.showDetails(user)" >
+                <div class="result">
+                    <div class="row user-details-main">
+                        <div class="col-sm-7">
+                            <div class="user-name"><span ng-bind="::user.surname"></span>, <span ng-bind="::user.firstName"></span></div>
+                        </div>
                         <div class="col-sm-5">
                             <div class="deactivate">
                                 <span class="user-status user-disabled" ng-show="user.userCredentials.disabled">
@@ -134,21 +134,28 @@
                                 </div>
                             </div>
                         </div>
-		    		</div>
+                    </div>
                     <div class="row user-details-main user-details-additional" ng-class="{'user-details-open': userList.detailsOpen}">
                         <div class="col-sm-6">
                             <div class="email"><i class="fa fa-envelope"></i>&nbsp;<span ng-bind="::user.email"></span></div>
                             <div class="username"><i class="fa fa-user"></i>&nbsp;<span ng-bind="::user.userCredentials.username"></span></div>
                         </div>
                     </div>
-		    	</div>
-		    </li>
-		</ul>
+                </div>
+            </li>
+        </ul>
         <div class="user-details-view" ng-show="userList.detailsOpen">
             <div>
                 <button type="button" class="close user-details-close" ng-click="userList.closeDetails()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <div class="user-details-title">
-                    <span class="user-name" ng-bind="userList.detailsUser.firstName + ' ' + userList.detailsUser.surname"></span>&nbsp;is&nbsp;a<span ng-show="userList.detailsUserUserType[0] === 'A' || userList.detailsUserUserType[0] === 'I'">n</span>&nbsp;<span class="details-user-type" ng-bind="userList.detailsUserUserType"></span>&nbsp;user
+                    <div>
+                        <span class="user-name" ng-bind="userList.detailsUser.firstName + ' ' + userList.detailsUser.surname"></span>
+                    </div>
+                    <div>
+                        <div><i class="fa fa-suitcase"></i> User type: <span class="details-user-type" ng-bind="userList.detailsUserUserType"></span></div>
+                        <div ng-show="userList.detailsUserEntity.name"><i class="fa fa-group"></i> Organisation: <span class="details-user-organisation" ng-bind="userList.detailsUserEntity.name"></span></div>
+                        <div><i class="fa fa-globe"></i> Country: <span class="details-user-country" ng-bind="userList.detailsUser.organisationUnits[0].name"></span></div>
+                    </div>
                 </div>
                 <div class="data-group">
                     <h3>Data streams</h3>

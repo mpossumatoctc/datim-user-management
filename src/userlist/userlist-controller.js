@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
 function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
-                            userStatusService, $state, errorHandler, userActions, userUtils, _) {
+                            userStatusService, $state, errorHandler, userActions, userService, _) {
     var vm = this;
     var searchFieldNames = {
         name: 'name',
@@ -31,6 +31,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.detailsUserDataGroups = [];
     vm.detailsUserUserType = '';
     vm.detailsUserActions = [];
+    vm.detailsUserEntity = {};
     vm.doSearch = doSearch;
     vm.editUser = editUser;
     vm.placeHolder = 'Search for user';
@@ -152,6 +153,10 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
             vm.detailsUserUserType = userTypesService.getUserType(user);
+            userService.getUserEntity(user)
+                .then(function (userEntity) {
+                    vm.detailsUserEntity = userEntity;
+                });
             userActions.getActionsForUser(user).then(function (actions) {
                 vm.detailsUserActions = actions;
             });

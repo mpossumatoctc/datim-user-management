@@ -269,7 +269,7 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
 
         Restangular
             .all('userSettings')
-            .get('keyUiLocale', {user: userName})
+            .get('keyUiLocale', {user: userName}, {Accept: 'text/plain'})
             .then(function (locale) {
                 deferred.resolve({
                     name: locale,

@@ -1,16 +1,22 @@
 <div>
     <div class="user-edit-header">
         <div class="row user-name">
-            <h3 ng-bind="::editUser.userToEdit.name"></h3><span class="user-type"><span ng-bind="::editUser.getUserType()"></span> <span ng-bind="editUser.userEntityName"></span></span>
+            <h3 ng-bind="::editUser.userToEdit.name"></h3>
+        </div>
+        <div class="row user-type">
+            <i class="fa fa-briefcase"></i> User type: <span ng-bind="::editUser.getUserType()"></span>
+        </div>
+        <div class="row user-entity" ng-show="editUser.userEntityName">
+            <i class="fa fa-group"></i> Organisation: <span ng-bind="editUser.userEntityName"></span>
         </div>
         <div class="row email" ng-show="editUser.userToEdit.email">
-            <i class="fa fa-envelope"></i> <span ng-bind="::editUser.userToEdit.email"></span>
+            <i class="fa fa-envelope"></i> E-Mail <span ng-bind="::editUser.userToEdit.email"></span>
         </div>
         <div class="row username">
-            <i class="fa fa-user"></i> <span ng-bind="::editUser.userToEdit.userCredentials.username"></span>
+            <i class="fa fa-user"></i> Username: <span ng-bind="::editUser.userToEdit.userCredentials.username"></span>
         </div>
         <div class="row country">
-            <i class="fa fa-globe"></i> <span ng-bind="::editUser.getOrganisationUnitForUserToEdit()"></span>
+            <i class="fa fa-globe"></i> Country: <span ng-bind="::editUser.getOrganisationUnitForUserToEdit()"></span>
         </div>
         <user-status user="editUser.userToEdit.userCredentials" ng-click="editUser.changeUserStatus()"></user-status>
     </div>
@@ -37,9 +43,9 @@
                         <legend>Data streams<i class="fa fa-check valid-icon" ng-show="editUser.validateDataGroups()"></i></legend>
                         <ul class="checkbox-group">
                             <li ng-repeat="(name, value) in user.dataGroups">
-                                <input ui-validate-watch="'editUser.validateDataGroups()'" 
-                                       ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}" 
-                                       id="dataStream[{{::name}}]" 
+                                <input ui-validate-watch="'editUser.validateDataGroups()'"
+                                       ui-validate="{ oneSelected: 'editUser.validateDataGroups()'}"
+                                       id="dataStream[{{::name}}]"
                                        name="dataStream[{{::name}}]"
                                        ng-model="user.dataGroups[name].access"
                                        ng-disabled="editUser.hasDataEntryEnabled(name) || editUser.isUserManager"
