@@ -1,7 +1,7 @@
 /* globals has, pick, flatten */
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, $q, userTypesService, userService,
+function userActionsService(Restangular, $q, userTypesService,
                             currentUserService, errorHandler, dataEntryService) {
     var availableAgencyActions = [
         'Accept data', 'Submit data'

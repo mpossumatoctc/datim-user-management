@@ -1,6 +1,7 @@
 angular.module('PEPFAR.usermanagement').factory('partnersService', partnersService);
 
 function partnersService($q, Restangular, errorHandler, _) {
+    'use strict';
 
     return {
         getPartners: getPartners
@@ -13,7 +14,7 @@ function partnersService($q, Restangular, errorHandler, _) {
     function getPartnersForOrganisationUnit(organisationUnit) {
         var organisationUnitName;
 
-        if (!(organisationUnit && organisationUnit.name)) {
+        if (!(organisationUnit && organisationUnit.name && organisationUnit.id)) {
             return $q.reject('No organisation unit found');
         }
         organisationUnitName = organisationUnit.name;
@@ -23,6 +24,7 @@ function partnersService($q, Restangular, errorHandler, _) {
                 getUserGroups(organisationUnitName)]
             )
             .then(matchPartnersWithUserGroups)
+            .then(addDataEntryFlags(organisationUnit.id))
             .catch(errorHandler.debugFn(['No partners found in', organisationUnitName, 'that you can access all mechanisms for'].join(' ')));
     }
 
@@ -150,5 +152,80 @@ function partnersService($q, Restangular, errorHandler, _) {
 
                 return userGroups.userGroups || [];
             });
+    }
+
+    function addDataEntryFlags(organisationUnitId) {
+        return function (partners) {
+            return getDodDataEntryPartnerChecker()
+                .then(function (dodDataEntryPartnerData) {
+                    partners.forEach(function (partner) {
+                        //If the partner is found for in this org unit we have special dataEntry requirements
+                        if (dodDataEntryPartnerData[organisationUnitId] &&
+                            isPartnerListContainsPartner(dodDataEntryPartnerData[organisationUnitId], partner)) {
+                            partner.dodEntry = true;
+
+                            if (isPartnerListContainsPartnerAndHasNonDod(dodDataEntryPartnerData[organisationUnitId], partner)) {
+                                partner.normalEntry = true;
+                            } else {
+                                partner.normalEntry = false;
+                            }
+                        } else {
+                            //If the partner is not in the result we set the defaults
+                            partner.dodEntry = false;
+                            partner.normalEntry = true;
+                        }
+                    });
+                    return partners;
+                });
+        };
+
+        function isPartnerListContainsPartner(partnerList, partner) {
+            return partnerList.some(function (dodOnlyEntry) {
+                return dodOnlyEntry.partner === partner.id;
+            });
+        }
+
+        function isPartnerListContainsPartnerAndHasNonDod(partnerList, partner) {
+            return partnerList.some(function (dodOnlyEntry) {
+                return dodOnlyEntry.partner === partner.id && dodOnlyEntry.nondod === '1';
+            });
+        }
+
+    }
+
+    function getDodDataEntryPartnerChecker() {
+        return Restangular
+            .all('systemSettings').withHttpConfig({cache: true})
+            .get('keyAPP_User_Management-dod_only_SqlView')
+            .then(function (data) {
+                if (data.value) {
+                    return data.value;
+                }
+                return errorHandler.error('Unable to load keyAPP_User_Management-dod_only_SqlView from SystemSettings');
+            })
+            .then(function (sqlViewId) {
+                return Restangular
+                    .all('sqlViews')
+                    .all(sqlViewId).withHttpConfig({cache: true})
+                    .get('data.json')
+                    .then(buildObjectsFromSqlView)
+                    .then(function (data) {
+                        return _.groupBy(data, 'ou');
+                    });
+            })
+            .catch(errorHandler.error);
+
+        function buildObjectsFromSqlView(sqlViewData) {
+            var headers = sqlViewData.headers;
+            var rows = sqlViewData.rows;
+
+            return (rows || []).map(function (dataRow) {
+                var dataObject = {};
+                (headers || []).forEach(function (header, index) {
+                    dataObject[header.name] = dataRow[index];
+                });
+                return dataObject;
+            });
+        }
     }
 }

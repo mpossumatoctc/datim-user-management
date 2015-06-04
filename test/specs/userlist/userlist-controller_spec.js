@@ -137,6 +137,13 @@ describe('Userlist controller', function () { //jshint ignore:line
             };
         });
 
+        $provide.factory('userService', function ($q) {
+            return {
+                getUserEntity: jasmine.createSpy()
+                    .and.returnValue($q.when({}))
+            };
+        });
+
         $provide.factory('currentUser', function () {
             return {
                 id: 'd234fsdfss',
