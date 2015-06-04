@@ -587,12 +587,12 @@ describe('User actions', function () {
 
         it('should return the correct data groups for partner', function () {
             expect(userActions.getDataEntryRestrictionDataGroups('Partner'))
-                .toEqual(['SI', 'EA']);
+                .toEqual(['SI', 'SI DOD', 'EA']);
         });
 
         it('should return the correct data groups for partner with lowercase', function () {
             expect(userActions.getDataEntryRestrictionDataGroups('partner'))
-                .toEqual(['SI', 'EA']);
+                .toEqual(['SI', 'SI DOD', 'EA']);
         });
 
         it('should return the correct data groups for agency', function () {
@@ -602,7 +602,7 @@ describe('User actions', function () {
 
         it('should return the correct data groups for inter-agency', function () {
             expect(userActions.getDataEntryRestrictionDataGroups('Inter-Agency'))
-                .toEqual(['SI']); /*'EVAL' is also here but is merge into SI*/
+                .toEqual(['SI']);
         });
     });
 

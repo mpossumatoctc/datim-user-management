@@ -21,6 +21,9 @@ function dataEntryService() {
                 if (dataEntryRoles[dataEntryKey] === true) {
                     activeDataEntryKeys.push(dataEntryKey);
                 }
+                if (dataEntryKey === 'SI DOD' && dataEntryRoles[dataEntryKey]) {
+                    activeDataEntryKeys.push('SI');
+                }
             });
 
         return activeDataEntryKeys.indexOf(streamName) >= 0;
@@ -39,7 +42,9 @@ function dataEntryService() {
         });
     }
 
-    function setAllDataEntry(userType) {
+    function setAllDataEntry(userType, userEntity) {
+        window.console.log(userEntity);
+
         if (!angular.isString(userType)) {
             throw new Error('Passed usertype should be a string');
         }

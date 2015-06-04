@@ -44,6 +44,9 @@ function dataEntryDirective() {
         }
 
         function getStreamNameFromDataEntryName(dataEntryName) {
+            if (dataEntryName === 'SI DOD') {
+                return 'SI';
+            }
             return dataEntryName;
         }
 
@@ -67,9 +70,7 @@ function dataEntryDirective() {
                         return userService.getUserEntity(vm.userToEdit)
                             .then(function (userEntity) {
                                 return function (dataEntryStreams) {
-                                    window.console.log(userEntity);
-                                    //TODO: Do the dod only stuff here
-                                    return dataEntryStreams;
+                                    return filterDataEntryStreamsForUserEntity(userEntity, dataEntryStreams);
                                 };
                             })
                             .then(resolve)
@@ -96,14 +97,43 @@ function dataEntryDirective() {
                                 dataEntryTypes = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.user.userType.name);
 
                                 //TODO: Do the dod only stuff here
+                                dataEntryTypes = filterDataEntryStreamsForUserEntity(vm.user.userEntity, dataEntryTypes);
                             }
-
+                            switchOffUnavailableDataEntry(vm.user.userEntity);
                             vm.dataEntryStreamNamesForUserType = dataEntryTypes;
                         } else {
                             vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.user.userType.name);
                         }
                     }
                 });
+            }
+
+            function switchOffUnavailableDataEntry(userEntity) {
+                if (!userEntity || !userEntity.dodEntry) {
+                    dataEntryService.dataEntryRoles['SI DOD'] = false;
+                }
+
+                if (!userEntity || !userEntity.normalEntry) {
+                    dataEntryService.dataEntryRoles.SI = false;
+                }
+
+                return userEntity;
+            }
+
+            function filterDataEntryStreamsForUserEntity(userEntity, dataEntryStreams) {
+                window.console.log('===================================');
+                window.console.log(userEntity);
+                window.console.log(userEntity.dodEntry);
+                window.console.log(userEntity.normalEntry);
+                window.console.log('===================================');
+
+                return dataEntryStreams
+                    .filter(function (streamName) {
+                        return streamName !== 'SI DOD' || userEntity.dodEntry;
+                    })
+                    .filter(function (streamName) {
+                        return streamName !== 'SI' || userEntity.normalEntry;
+                    });
             }
 
             function handleDataEnty(dataEntryFilterer) {
@@ -130,7 +160,12 @@ function dataEntryDirective() {
                     return userRole.name === 'Data Entry SI Country Team';
                 });
 
-                if (hasInterAgencySI) {
+                //FIXME: Special case hack for the 'Data Entry SI DOD' case
+                var hasDodSI = vm.userToEdit.userCredentials.userRoles.some(function (userRole) {
+                    return userRole.name === 'Data Entry SI DOD';
+                });
+
+                if (hasInterAgencySI || hasDodSI) {
                     dataEntryService.dataEntryRoles.SI = true;
                 }
                 //End hack

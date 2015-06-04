@@ -32,10 +32,7 @@ function userActionsService(Restangular, $q, userTypesService,
                 {userRole: 'Data Entry SI Country Team', userRoleId: undefined},
                 {userRole: 'Tracker', userRoleId: undefined},
                 {userRole: 'Data Deduplication', userRoleId: undefined}
-            ]/*,
-            EVAL: [{
-                    userRole: 'Data Entry EVAL'
-                }]*/
+            ]
         },
         Agency: {
             SIMS: [
@@ -49,6 +46,9 @@ function userActionsService(Restangular, $q, userTypesService,
         Partner: {
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
+            ],
+            'SI DOD': [
+                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}
@@ -94,6 +94,9 @@ function userActionsService(Restangular, $q, userTypesService,
         Partner: {
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
+            ],
+            'SI DOD': [
+                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}

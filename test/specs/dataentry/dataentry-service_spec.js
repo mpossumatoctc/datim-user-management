@@ -127,7 +127,7 @@ describe('Data Entry Service', function () {
                 SI: true
             };
 
-            service.setAllDataEntry('Partner');
+            service.setAllDataEntry('Partner', {normalEntry: true});
             service.restore();
 
             expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
