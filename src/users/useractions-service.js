@@ -67,6 +67,9 @@ function userActionsService(Restangular, $q, userTypesService,
                 {userRole: 'Data Deduplication', userRoleId: undefined},
                 {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
+            'SI DOD': [
+                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
+            ],
             SIMS: [
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
             ],
@@ -80,6 +83,9 @@ function userActionsService(Restangular, $q, userTypesService,
         Agency: {
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
+            ],
+            'SI DOD': [
+                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
             ],
             SIMS: [
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
@@ -342,6 +348,7 @@ function userActionsService(Restangular, $q, userTypesService,
             .values()
             .flatten()
             .filter('userRoleId')
+            // FIXME: Refactor this out as it kind of a hack.
             .filter(function (userRole) {
                 if (userEntity && ((userRole.userRole === 'Data Entry SI DOD' && userEntity.dodEntry === false) || (userRole.userRole === 'Data Entry SI' && userEntity.normalEntry === false))) {
                     return false;

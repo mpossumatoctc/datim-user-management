@@ -56,7 +56,17 @@ function dataEntryService() {
 
         Object.keys(this.userActions.dataEntryRestrictions[userType])
             .forEach(function (streamName) {
-                dataEntryRoles[streamName] = true;
+                if (userType !== 'Partner') {
+                    dataEntryRoles[streamName] = true;
+                } else {
+                    //Partner specific rules regarding DOD
+                    if ((userEntity && streamName === 'SI DOD' && userEntity.dodEntry) ||
+                        (userEntity && streamName === 'SI' && userEntity.normalEntry) ||
+                        (streamName !== 'SI DOD' && streamName !== 'SI')
+                    ) {
+                        dataEntryRoles[streamName] = true;
+                    }
+                }
             });
     }
 }
