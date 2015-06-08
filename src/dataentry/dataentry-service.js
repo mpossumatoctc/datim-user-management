@@ -21,10 +21,13 @@ function dataEntryService() {
                 if (dataEntryRoles[dataEntryKey] === true) {
                     activeDataEntryKeys.push(dataEntryKey);
                 }
-                if (dataEntryKey === 'SI DOD' && dataEntryRoles[dataEntryKey]) {
-                    activeDataEntryKeys.push('SI');
-                }
             });
+
+        // FIXME: Hack for DOD Data Entry
+        if (streamName === 'SI' && dataEntryRoles['SI DOD']) {
+            return true;
+        }
+        // FIXME: End Hack for DOD Data Entry
 
         return activeDataEntryKeys.indexOf(streamName) >= 0;
     }

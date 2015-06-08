@@ -109,11 +109,11 @@ function dataEntryDirective() {
             }
 
             function switchOffUnavailableDataEntry(userEntity) {
-                if (!userEntity || !userEntity.dodEntry) {
+                if (userEntity && !userEntity.dodEntry) {
                     dataEntryService.dataEntryRoles['SI DOD'] = false;
                 }
 
-                if (!userEntity || !userEntity.normalEntry) {
+                if (userEntity && !userEntity.normalEntry) {
                     dataEntryService.dataEntryRoles.SI = false;
                 }
 
@@ -129,10 +129,9 @@ function dataEntryDirective() {
 
                 return dataEntryStreams
                     .filter(function (streamName) {
-                        return streamName !== 'SI DOD' || userEntity.dodEntry;
-                    })
-                    .filter(function (streamName) {
-                        return streamName !== 'SI' || userEntity.normalEntry;
+                        return ((streamName === 'SI DOD' && userEntity.dodEntry) ||
+                            (streamName === 'SI' && userEntity.normalEntry)) ||
+                            (streamName !== 'SI' && streamName !== 'SI DOD');
                     });
             }
 
@@ -160,12 +159,7 @@ function dataEntryDirective() {
                     return userRole.name === 'Data Entry SI Country Team';
                 });
 
-                //FIXME: Special case hack for the 'Data Entry SI DOD' case
-                var hasDodSI = vm.userToEdit.userCredentials.userRoles.some(function (userRole) {
-                    return userRole.name === 'Data Entry SI DOD';
-                });
-
-                if (hasInterAgencySI || hasDodSI) {
+                if (hasInterAgencySI) {
                     dataEntryService.dataEntryRoles.SI = true;
                 }
                 //End hack
