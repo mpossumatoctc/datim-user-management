@@ -264,7 +264,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         var dataAccessGroups = _.map(getUserManagerDataAccessGroups(), _.partialRight(_.pick, ['id']));
         vm.userInviteObject.userGroups = vm.userInviteObject.userGroups.concat(dataAccessGroups);
 
-        var dataEntryRoles = _.map(getUserManagerDataEntryRoles(), _.compose(renameProperty('userRoleId', 'id'), _.partialRight(_.pick, ['userRoleId'])));
+        var dataEntryRoles = _.map(getUserManagerDataEntryRoles($scope.user.userEntity), _.compose(renameProperty('userRoleId', 'id'), _.partialRight(_.pick, ['userRoleId'])));
         vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(dataEntryRoles);
     }
 
@@ -283,17 +283,12 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             .value();
     }
 
-    //TODO: Move this to actions service
     function getUserManagerDataEntryRoles() {
-        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
-            .values()
-            .flatten()
-            .filter('userRoleId')
-            .value();
+        return userActions.getUserManagerDataEntryRoles(getUserType(), $scope.user.userEntity);
     }
 
     function getDataEntryRolesNotShown() {
-        return userUtils.getUserRestrictionsDifference(userActions.dataEntryRestrictions[getUserType()], getUserManagerDataEntryRoles());
+        return userUtils.getUserRestrictionsDifference(userActions.dataEntryRestrictions[getUserType()], getUserManagerDataEntryRoles(getUserType(), $scope.user.userEntity));
     }
 
     function validateDataGroups() {

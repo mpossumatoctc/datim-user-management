@@ -151,7 +151,8 @@ function userActionsService(Restangular, $q, userTypesService,
                     getActionsForUser: getActionsForUser,
                     getUserRolesForUser: getUserRolesForUser,
                     combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting,
-                    filterActionsForCurrentUser: filterActionsForCurrentUser
+                    filterActionsForCurrentUser: filterActionsForCurrentUser,
+                    getUserManagerDataEntryRoles: getUserManagerDataEntryRoles
                 };
             });
     }
@@ -334,5 +335,19 @@ function userActionsService(Restangular, $q, userTypesService,
         return userType.split('-').map(function (namePart) {
             return namePart.charAt(0).toUpperCase() + namePart.substr(1).toLowerCase();
         }).join('-');
+    }
+
+    function getUserManagerDataEntryRoles(userType, userEntity) {
+        return _.chain(dataEntryRestrictionsUserManager[userType])
+            .values()
+            .flatten()
+            .filter('userRoleId')
+            .filter(function (userRole) {
+                if (userEntity && ((userRole.userRole === 'Data Entry SI DOD' && userEntity.dodEntry === false) || (userRole.userRole === 'Data Entry SI' && userEntity.normalEntry === false))) {
+                    return false;
+                }
+                return true;
+            })
+            .value();
     }
 }

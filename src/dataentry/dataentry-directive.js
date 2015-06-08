@@ -121,11 +121,11 @@ function dataEntryDirective() {
             }
 
             function filterDataEntryStreamsForUserEntity(userEntity, dataEntryStreams) {
-                window.console.log('===================================');
-                window.console.log(userEntity);
-                window.console.log(userEntity.dodEntry);
-                window.console.log(userEntity.normalEntry);
-                window.console.log('===================================');
+                errorHandler.debug('===================================');
+                errorHandler.debug(userEntity);
+                errorHandler.debug(userEntity.dodEntry);
+                errorHandler.debug(userEntity.normalEntry);
+                errorHandler.debug('===================================');
 
                 return dataEntryStreams
                     .filter(function (streamName) {

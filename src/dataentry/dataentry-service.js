@@ -43,8 +43,6 @@ function dataEntryService() {
     }
 
     function setAllDataEntry(userType, userEntity) {
-        window.console.log(userEntity);
-
         if (!angular.isString(userType)) {
             throw new Error('Passed usertype should be a string');
         }

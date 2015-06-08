@@ -95,7 +95,10 @@
         {"id": "yYOqiMTxAOF", "name": "Data Entry SI Country Team"},
         {"id": "OKKx4bf4ueV", "name": "Data Entry EA"},
         {"id": "k7BWFXkG6zt", "name": "Data Entry SI"},
-        {"id": "iXkZzRKD0i4", "name": "Data Entry SIMS"}
+        {"id": "iXkZzRKD0i4", "name": "Data Entry SIMS"},
+        {"id": "biwZmBty5f9", "name": "Data Entry SIMS Key Populations"},
+        {"name": 'Tracker', "id": 'trackerid'},
+        {name: 'Data Deduplication', id: 'datadedupeid'}
     ]};
 
     fixtures.currentUser = {"name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:06:25.617+0000", "surname": "Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "firstName": "kp1001ea",

@@ -306,13 +306,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
     }
 
-    //TODO: Move this to actions service
     function getUserManagerDataEntryRoles() {
-        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
-            .values()
-            .flatten()
-            .filter('userRoleId')
-            .value();
+        return userActions.getUserManagerDataEntryRoles(getUserType(), userEntity);
     }
 
     function getDataEntryRolesNotShown() {

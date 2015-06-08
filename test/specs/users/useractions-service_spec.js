@@ -37,6 +37,15 @@ describe('User actions', function () {
                         userRoles: [
                             {name: 'Data Entry SIMS', id: 'iXkZzRKD0i4'}
                         ]
+                    },
+                    {
+                        name: 'SIMS Key Populations',
+                        userGroups: [
+                            {name: 'Data SIMS Key Populations access', id: 'iDxh7xwdWZq'}
+                        ],
+                        userRoles: [
+                            {name: 'Data Entry SIMS Key Populations', id: 'biwZmBty5f9'}
+                        ]
                     }
                 ]))
             };
@@ -622,6 +631,44 @@ describe('User actions', function () {
             var partnerDataGroups = userActions.dataEntryRestrictions.Partner;
 
             expect(partnerDataGroups.SI[0].userRoleId).toBe('k7BWFXkG6zt');
+        });
+    });
+
+    describe('getUserManagerDataEntryRoles', function () {
+        var userActions;
+
+        beforeEach(inject(function () {
+            userActionsService.getActions()
+                .then(function (actions) {
+                    userActions = actions;
+                });
+
+            $httpBackend.flush();
+        }));
+
+        it('should get the data entry roles for the the user type', function () {
+            var expectedRoles = [
+                {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
+                {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
+                {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'biwZmBty5f9'},
+                {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
+            ];
+
+            expect(userActions.getUserManagerDataEntryRoles('Agency')).toEqual(expectedRoles);
+        });
+
+        it('should give the inter-agency data entry roles', function () {
+            var expectedRoles = [
+                {userRole: 'Data Entry SI Country Team', userRoleId: 'yYOqiMTxAOF'},
+                {userRole: 'Tracker', userRoleId: 'trackerid'},
+                {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
+                {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
+                {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
+                {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'biwZmBty5f9'},
+                {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
+            ];
+
+            expect(userActions.getUserManagerDataEntryRoles('Inter-Agency')).toEqual(expectedRoles);
         });
     });
 });
