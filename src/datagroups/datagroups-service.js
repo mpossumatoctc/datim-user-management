@@ -90,22 +90,15 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
     }
 
     function getRoleFilters() {
-        return dataGroups.filter(function (dataGroup) {
-            return dataGroup && dataGroup.name && typeof dataGroup.name === 'string';
-        }).map(function (dataGroup) {
-            if (dataGroup.name) {
-                return getNameEqualsFilterFor(
-                    getNameFromConfig(dataGroup.name, userRoleNameConfig));
-            }
-        });
-    }
+        var dataGroupNames = dataGroups
+            .filter(function (dataGroup) {
+                return dataGroup && dataGroup.name && typeof dataGroup.name === 'string';
+            })
+            .map(function (dataGroup) {
+                return 'Data Entry ' + dataGroup.name;
+            });
 
-    function getNameEqualsFilterFor(name) {
-        return [
-            'name',
-            'eq',
-            name
-        ].join(':');
+        return ['name:in:[', dataGroupNames.join(','), ']'].join('');
     }
 
     function getNameFromConfig(name, config) {
