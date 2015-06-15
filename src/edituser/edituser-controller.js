@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('editUserController', editUse
 
 function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 55
                             userLocale, userFormService, userActions, dataEntryService,
-                            notify, userService, userTypesService, userUtils, errorHandler) {
+                            notify, userService, userTypesService, userUtils, errorHandler, userEntity) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -278,7 +278,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
             $scope.user.dataGroups = userUtils.setAllDataStreams($scope.user.dataGroups);
             $scope.user.userActions = userUtils.setAllActions(vm.actions, true);
-            dataEntryService.setAllDataEntry(getUserType());
+            dataEntryService.setAllDataEntry(getUserType(), userEntity);
         } else {
             if (userUtils.hasStoredData()) {
                 $scope.user.dataGroups = userUtils.restoreDataStreams($scope.user.dataGroups);
@@ -306,13 +306,8 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
     }
 
-    //TODO: Move this to actions service
     function getUserManagerDataEntryRoles() {
-        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
-            .values()
-            .flatten()
-            .filter('userRoleId')
-            .value();
+        return userActions.getUserManagerDataEntryRoles(getUserType(), userEntity);
     }
 
     function getDataEntryRolesNotShown() {

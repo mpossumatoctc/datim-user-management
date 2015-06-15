@@ -23,6 +23,12 @@ function dataEntryService() {
                 }
             });
 
+        // FIXME: Hack for DOD Data Entry
+        if (streamName === 'SI' && dataEntryRoles['SI DOD']) {
+            return true;
+        }
+        // FIXME: End Hack for DOD Data Entry
+
         return activeDataEntryKeys.indexOf(streamName) >= 0;
     }
 
@@ -39,7 +45,7 @@ function dataEntryService() {
         });
     }
 
-    function setAllDataEntry(userType) {
+    function setAllDataEntry(userType, userEntity) {
         if (!angular.isString(userType)) {
             throw new Error('Passed usertype should be a string');
         }
@@ -53,7 +59,17 @@ function dataEntryService() {
 
         Object.keys(this.userActions.dataEntryRestrictions[userType])
             .forEach(function (streamName) {
-                dataEntryRoles[streamName] = true;
+                if (userType !== 'Partner') {
+                    dataEntryRoles[streamName] = true;
+                } else {
+                    //Partner specific rules regarding DOD
+                    if ((userEntity && streamName === 'SI DOD' && userEntity.dodEntry) ||
+                        (userEntity && streamName === 'SI' && userEntity.normalEntry) ||
+                        (streamName !== 'SI DOD' && streamName !== 'SI')
+                    ) {
+                        dataEntryRoles[streamName] = true;
+                    }
+                }
             });
     }
 }
