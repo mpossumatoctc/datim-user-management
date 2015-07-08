@@ -20,7 +20,8 @@ function appController($scope, Restangular, webappManifest, errorHandler, curren
         list: 'Manage users',
         edit: 'Edit user',
         noaccess: 'No access',
-        globalAdd: 'Invite Global user'
+        globalAdd: 'Invite Global user',
+        globalEdit: 'Edit Global user'
     };
 
     initialise();

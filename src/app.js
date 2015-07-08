@@ -126,8 +126,15 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 userGroups: function (globalUserService) {
                     return globalUserService.getUserGroups();
                 },
-                userToEdit: function ($stateParams, userService) {
-                    return userService.getUser($stateParams.userId);
+                userToEdit: function ($stateParams, userService, userTypesService, notify) {
+                    return userService.getUser($stateParams.userId)
+                        .then(function (userToEdit) {
+                            if (userTypesService.getUserType(userToEdit) === 'Global') {
+                                return userToEdit;
+                            }
+                            notify.warning('Given user id does not seem to correspond with a Global user');
+                            throw new Error('Not a global user');
+                        });
                 },
                 userLocale: function ($stateParams, userService) {
                     return userService.getUserLocale($stateParams.username);

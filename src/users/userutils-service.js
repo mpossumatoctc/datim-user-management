@@ -16,6 +16,7 @@ function userUtilsService(errorHandler) {
         storeUserActions: storeUserActions,
         restoreUserActions: restoreUserActions,
         hasUserAdminRights: hasUserAdminRights,
+        hasAdminUserGroup: hasAdminUserGroup,
         hasUserGroup: hasUserGroup,
         hasUserRole: hasUserRole,
         hasStoredData: hasStoredData

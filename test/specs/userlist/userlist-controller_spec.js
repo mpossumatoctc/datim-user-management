@@ -711,6 +711,15 @@ describe('Userlist controller', function () { //jshint ignore:line
             expect(controller.canEditUser({id: 'df33fssss'})).toBe(false);
         });
 
+        it('should return true when the currentUser is a global user who wants to edit another global', function () {
+            userTypesServiceMock.getUserType.and.returnValue('Global');
+            currentUserMock.isGlobalUser = function () {
+                return true;
+            };
+
+            expect(controller.canEditUser({id: 'df33fssss'})).toBe(true);
+        });
+
         it('should return true when the currentUser is a global user but has the all authority', function () {
             currentUserMock.isGlobalUser = function () { return true; };
             currentUserMock.hasAllAuthority = function () { return true; };

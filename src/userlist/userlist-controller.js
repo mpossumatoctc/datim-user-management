@@ -329,7 +329,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function canEditUser(user) {
-        if (currentUser.isGlobalUser() && !currentUser.hasAllAuthority()) {
+        if (currentUser.isGlobalUser() && !currentUser.hasAllAuthority() && userTypesService.getUserType(user) !== 'Global') {
             return false;
         }
 
