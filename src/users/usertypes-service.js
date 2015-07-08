@@ -31,6 +31,7 @@ function userTypesService($q) {
             var partnerRegex = new RegExp('^OU .+? (Partner) ', 'i');
             var agencyRegex = new RegExp('^OU .+? (Agency) ', 'i');
             var interAgencyRegex = new RegExp('^OU .+? Country team$', 'i');
+            var globalRegex = new RegExp('^Global users', 'i');
 
             (user && user.userGroups || []).forEach(function (userGroup) {
                 var matches = partnerRegex.exec(userGroup.name);
@@ -45,6 +46,9 @@ function userTypesService($q) {
                 } else {
                     if (interAgencyRegex.test(userGroup.name)) {
                         currentType = 'Inter-Agency';
+                    }
+                    if (globalRegex.test(userGroup.name)) {
+                        currentType = 'Global';
                     }
                 }
             });

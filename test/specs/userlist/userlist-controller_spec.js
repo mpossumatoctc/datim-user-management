@@ -8,6 +8,7 @@ describe('Userlist controller', function () { //jshint ignore:line
     var userListService;
     var userActions;
     var userTypesServiceMock;
+    var currentUserMock;
 
     beforeEach(module('PEPFAR.usermanagement', function ($provide) {
         userStatusServiceMockFactory = function ($q) {
@@ -27,6 +28,15 @@ describe('Userlist controller', function () { //jshint ignore:line
         userTypesServiceMock = {
             getUserType: jasmine.createSpy('userTypesService.getUserType')
                 .and.returnValue('Partner')
+        };
+
+        currentUserMock = {
+            id: 'd234fsdfss',
+            hasAllAuthority: jasmine.createSpy('hasAllAuthority').and.returnValue(false),
+            isUserAdministrator: jasmine.createSpy('isUserAdministrator').and.returnValue(true),
+            isGlobalUser: function () {
+                return false;
+            }
         };
 
         $provide.value('userFilter', [
@@ -152,11 +162,7 @@ describe('Userlist controller', function () { //jshint ignore:line
         });
 
         $provide.factory('currentUser', function () {
-            return {
-                id: 'd234fsdfss',
-                hasAllAuthority: jasmine.createSpy('hasAllAuthority').and.returnValue(false),
-                isUserAdministrator: jasmine.createSpy('isUserAdministrator').and.returnValue(true)
-            };
+            return currentUserMock;
         });
 
         $provide.value('dataGroups', {});
@@ -595,7 +601,14 @@ describe('Userlist controller', function () { //jshint ignore:line
         it('should call $state.go', function () {
             controller.editUser({id: 'stuff', userCredentials: {username: 'markpo'}});
 
-            expect($state.go).toHaveBeenCalled();
+            expect($state.go).toHaveBeenCalledWith('edit', {userId: 'stuff', username: 'markpo'});
+        });
+
+        it('should not call $state.go', function () {
+            userTypesServiceMock.getUserType.and.returnValue('Global');
+            controller.editUser({id: 'stuff', userCredentials: {username: 'markpo'}});
+
+            expect($state.go).toHaveBeenCalledWith('globalEdit', {userId: 'stuff', username: 'markpo'});
         });
     });
 
@@ -702,6 +715,21 @@ describe('Userlist controller', function () { //jshint ignore:line
             userTypesServiceMock.getUserType.and.returnValue('Unknown type');
 
             expect(controller.canEditUser({id: 'df33fssss'})).toBe(false);
+        });
+
+        it('should return false when the currentUser is a global user', function () {
+            currentUserMock.isGlobalUser = function () {
+                return true;
+            };
+
+            expect(controller.canEditUser({id: 'df33fssss'})).toBe(false);
+        });
+
+        it('should return true when the currentUser is a global user but has the all authority', function () {
+            currentUserMock.isGlobalUser = function () { return true; };
+            currentUserMock.hasAllAuthority = function () { return true; };
+
+            expect(controller.canEditUser({id: 'df33fssss'})).toBe(true);
         });
     });
 

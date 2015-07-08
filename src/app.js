@@ -115,6 +115,31 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 }
             }
         })
+        .state('globalEdit', {
+            url: '/global/edit/{userId}/{username}',
+            templateUrl: 'globaluseredit/globaluser-edit.html',
+            controller: 'globalUserEditController as globalUserCtrl',
+            resolve: {
+                dataGroups: function (dataGroupsService) {
+                    return dataGroupsService.getDataGroups();
+                },
+                userActions: function (userActionsService) {
+                    return userActionsService.getActions();
+                },
+                currentUser: function (currentUserService) {
+                    return currentUserService.getCurrentUser();
+                },
+                userGroups: function (globalUserService) {
+                    return globalUserService.getUserGroups();
+                },
+                userToEdit: function ($stateParams, userService) {
+                    return userService.getUser($stateParams.userId);
+                },
+                userLocale: function ($stateParams, userService) {
+                    return userService.getUserLocale($stateParams.username);
+                }
+            }
+        })
         .state('noaccess', {
             url: '/noaccess',
             templateUrl: 'noaccess/noaccess.html',

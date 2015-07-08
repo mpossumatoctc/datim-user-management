@@ -318,12 +318,21 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function editUser(user) {
+        if (userTypesService.getUserType(user) === 'Global') {
+            $state.go('globalEdit', {userId: user.id, username: user.userCredentials.username});
+            return;
+        }
+
         if (user && user.id && user.userCredentials && user.userCredentials.username) {
             $state.go('edit', {userId: user.id, username: user.userCredentials.username});
         }
     }
 
     function canEditUser(user) {
+        if (currentUser.isGlobalUser() && !currentUser.hasAllAuthority()) {
+            return false;
+        }
+
         if (user && user.id && (user.id !== currentUser.id) && userTypesService.getUserType(user) !== 'Unknown type') {
             return true;
         }

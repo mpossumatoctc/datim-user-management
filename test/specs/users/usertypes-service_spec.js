@@ -140,5 +140,20 @@ describe('userTypesService', function () {
 
             expect(userTypesService.getUserType(user)).toBe('Agency');
         });
+
+        it('should return the global user type', function () {
+            var user = {
+                userGroups:[
+                    {id:'gh9tn4QBbKZ', name:'Global users'},
+                    {id:'TOOIJWRzJ3g', name:'Global all mechanisms'},
+                    {id:'YbkldVOJMUl', name:'Data EA access'},
+                    {id:'c6hGi8GEZot', name:'Data SI access'},
+                    {id:'ghYxzrKHldx', name:'Global User administrators'},
+                    {id:'iuD8wUFz95X', name:'Data SIMS access'}
+                ]
+            };
+
+            expect(userTypesService.getUserType(user)).toBe('Global');
+        });
     });
 });
