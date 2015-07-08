@@ -82,12 +82,6 @@ describe('Edit user controller', function () {
                 ]
             };
         });
-        $provide.factory('userEntity', function () {
-            return {
-                dodEntry: false,
-                normalEntry: true
-            };
-        });
         $provide.factory('userService', function ($q) {
             var userEntity = {
                 id: 'FPUgmtt8HRi',

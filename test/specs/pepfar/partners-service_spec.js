@@ -13,7 +13,6 @@ describe('Partners service', function () {
         partnersService = $injector.get('partnersService');
 
         organisationUnit = {
-            id: 'ds0ADyc9UCU',
             name: 'Kenya'
         };
     }));
@@ -28,7 +27,6 @@ describe('Partners service', function () {
         var partnersRequest;
         var userGroupsRequest;
         var cogsRequest;
-        var dodOnlySqlViewRequest;
 
         function withFakeUserGroups(expectedAgencies) {
             return {
@@ -57,12 +55,6 @@ describe('Partners service', function () {
                     userGroups: [
                     ]
                 });
-
-            $httpBackend.whenGET('http://localhost:8080/dhis/api/systemSettings/keyAPP_User_Management-dod_only_SqlView')
-                .respond(200, '{"value": "gESI9gFkIkX"}');
-
-            dodOnlySqlViewRequest = $httpBackend.whenGET('http://localhost:8080/dhis/api/sqlViews/gESI9gFkIkX/data.json')
-                .respond(200, fixtures.get('dodOnlySqlView'));
         }));
 
         afterEach(function () {
@@ -108,8 +100,6 @@ describe('Partners service', function () {
                 name: 'Banana',
                 created: '2014-05-28T19:50:31.398+0000',
                 lastUpdated: '2014-10-05T13:07:56.182+0000',
-                dodEntry: false,
-                normalEntry: true,
                 mechUserGroup: {
                     id: 'tICoPGZAWNk',
                     name: 'OU Kenya Partner 10001 all mechanisms - Banana'
@@ -130,39 +120,8 @@ describe('Partners service', function () {
                 partners = data;
             });
             $httpBackend.flush();
+
             expect(partners[0]).toEqual(expectedPartner);
-        });
-
-        it('should set the correct dataEntry flags for a dodOnly partner', function () {
-            var partners;
-
-            userGroupsRequest.respond(200, fixtures.get('kenyaPartnerUserGroups'));
-
-            partnersService.getPartners(organisationUnit).then(function (data) {
-                partners = data;
-            });
-            $httpBackend.flush();
-
-            expect(partners[1].dodEntry).toEqual(true);
-            expect(partners[1].normalEntry).toEqual(false);
-        });
-
-        it('should set the correct dataEntry flags for dod partner with nonDod entry too', function () {
-            var partners;
-            var dodOnlySqlView = fixtures.get('dodOnlySqlView');
-            //Set the nonDod column of the fixture to 1 for nonDod entry
-            dodOnlySqlView.rows[0][2] = '1';
-
-            userGroupsRequest.respond(200, fixtures.get('kenyaPartnerUserGroups'));
-            dodOnlySqlViewRequest.respond(200, dodOnlySqlView);
-
-            partnersService.getPartners(organisationUnit).then(function (data) {
-                partners = data;
-            });
-            $httpBackend.flush();
-
-            expect(partners[1].dodEntry).toEqual(true);
-            expect(partners[1].normalEntry).toEqual(true);
         });
 
         it('should only load the partners that have a mechusergroup and userusergroup', function () {

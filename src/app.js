@@ -83,12 +83,6 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 userLocale: function ($stateParams, userService) {
                     return userService.getUserLocale($stateParams.username);
-                },
-                userEntity: function ($stateParams, userService) {
-                    return userService.getUser($stateParams.userId)
-                        .then(function (user) {
-                            return userService.getUserEntity(user);
-                        });
                 }
             },
             params: {

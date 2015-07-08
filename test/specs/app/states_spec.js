@@ -29,26 +29,18 @@ describe('Application states', function () {
                 return {};
             }
         });
-        $provide.factory('userService', function ($q) {
-            return {
-                getUser: function () {
-                    return $q.when({});
-                },
-                getUserLocale: function () {
-                    return 'en';
-                },
-                getUserEntity: function () {
-                    return $q.when({});
-                }
-            };
+        $provide.value('userService', {
+            getUser: function () {
+                return {};
+            },
+            getUserLocale: function () {
+                return 'en';
+            }
         });
         $provide.value('userActionsService', {
             getActions: function () {
                 return {};
             }
-        });
-        $provide.factory('userEntity', function () {
-            return {};
         });
     }));
     beforeEach(inject(function ($templateCache, $injector) {
@@ -186,9 +178,6 @@ describe('Application state error handling', function () {
             getActions: function () {
                 return {};
             }
-        });
-        $provide.factory('userEntity', function () {
-            return {};
         });
     }));
 

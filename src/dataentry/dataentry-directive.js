@@ -16,8 +16,7 @@ function dataEntryDirective() {
         templateUrl: 'dataentry/dataentry.html'
     };
 
-    function umDataEntryController($q, $scope, userActionsService, currentUserService, userService,
-                                   userUtils, notify, errorHandler, dataEntryService) {
+    function umDataEntryController($q, $scope, userActionsService, currentUserService, userUtils, notify, errorHandler, dataEntryService) {
         var vm = this;
 
         vm.updateDataEntry = updateDataEntry;
@@ -44,9 +43,6 @@ function dataEntryDirective() {
         }
 
         function getStreamNameFromDataEntryName(dataEntryName) {
-            if (dataEntryName === 'SI DOD') {
-                return 'SI';
-            }
             return dataEntryName;
         }
 
@@ -65,81 +61,8 @@ function dataEntryDirective() {
 
         function registerWatch() {
             if (vm.userType) {
-                $q(function (resolve, reject) {
-                    if (vm.userType === 'Partner') {
-                        return userService.getUserEntity(vm.userToEdit)
-                            .then(function (userEntity) {
-                                return function (dataEntryStreams) {
-                                    return filterDataEntryStreamsForUserEntity(userEntity, dataEntryStreams);
-                                };
-                            })
-                            .then(resolve)
-                            .catch(reject);
-                    }
-                    resolve(function (dataEntryStreams) {
-                        return dataEntryStreams;
-                    });
-                })
-                    .then(handleDataEnty)
-                    .catch(errorHandler.error);
-
-            } else {
-                //Register a watch for the invite screen since usertype is subject to changes
-                //TODO: See if we can do this without a watch
-                $scope.$watch(function () {
-                    return vm.user.userType && vm.user.userType.name + (vm.user.userEntity && vm.user.userEntity.name);
-                }, function (newVal, oldVal) {
-                    if (newVal !== oldVal && newVal && vm.user.userType.name) {
-                        if (vm.user.userType.name === 'Partner') {
-                            var dataEntryTypes = [];
-
-                            if (vm.user.userEntity && vm.user.userEntity.name) {
-                                dataEntryTypes = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.user.userType.name);
-
-                                //TODO: Do the dod only stuff here
-                                dataEntryTypes = filterDataEntryStreamsForUserEntity(vm.user.userEntity, dataEntryTypes);
-                            }
-                            switchOffUnavailableDataEntry(vm.user.userEntity);
-                            vm.dataEntryStreamNamesForUserType = dataEntryTypes;
-                        } else {
-                            vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.user.userType.name);
-                        }
-                    }
-                });
-            }
-
-            function switchOffUnavailableDataEntry(userEntity) {
-                if (!userEntity || !userEntity.dodEntry) {
-                    dataEntryService.dataEntryRoles['SI DOD'] = false;
-                }
-
-                if (!userEntity || !userEntity.normalEntry) {
-                    dataEntryService.dataEntryRoles.SI = false;
-                }
-
-                return userEntity;
-            }
-
-            function filterDataEntryStreamsForUserEntity(userEntity, dataEntryStreams) {
-                errorHandler.debug('===================================');
-                errorHandler.debug(userEntity);
-                errorHandler.debug(userEntity.dodEntry);
-                errorHandler.debug(userEntity.normalEntry);
-                errorHandler.debug('===================================');
-
-                return dataEntryStreams
-                    .filter(function (streamName) {
-                        return streamName !== 'SI DOD' || userEntity.dodEntry;
-                    })
-                    .filter(function (streamName) {
-                        return streamName !== 'SI' || userEntity.normalEntry;
-                    });
-            }
-
-            function handleDataEnty(dataEntryFilterer) {
-                var dataEntryStreams = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.userType);
-
-                vm.dataEntryStreamNamesForUserType = dataEntryFilterer(dataEntryStreams);
+                //Get the usertype for the current user
+                vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, vm.userType);
 
                 var userRoleIds = vm.userToEdit.userCredentials.userRoles.map(function (userRole) {
                     return userRole.id;
@@ -169,6 +92,16 @@ function dataEntryDirective() {
                     dataEntryService.dataEntryRoles.SI = true;
                 }
                 //End hack
+            } else {
+                //Register a watch for the invite screen as usertype changes
+                //TODO: See if we can do this without a watch
+                $scope.$watch(function () {
+                    return vm.user.userType;
+                }, function (newVal, oldVal) {
+                    if (newVal !== oldVal && newVal && newVal.name) {
+                        vm.dataEntryStreamNamesForUserType = userUtils.getDataEntryStreamNamesForUserType(vm.currentUser, vm.userActions, newVal.name);
+                    }
+                });
             }
         }
 

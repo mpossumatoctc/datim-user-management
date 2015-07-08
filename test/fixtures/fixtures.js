@@ -95,10 +95,7 @@
         {"id": "yYOqiMTxAOF", "name": "Data Entry SI Country Team"},
         {"id": "OKKx4bf4ueV", "name": "Data Entry EA"},
         {"id": "k7BWFXkG6zt", "name": "Data Entry SI"},
-        {"id": "iXkZzRKD0i4", "name": "Data Entry SIMS"},
-        {"id": "biwZmBty5f9", "name": "Data Entry SIMS Key Populations"},
-        {"name": 'Tracker', "id": 'trackerid'},
-        {name: 'Data Deduplication', id: 'datadedupeid'}
+        {"id": "iXkZzRKD0i4", "name": "Data Entry SIMS"}
     ]};
 
     fixtures.currentUser = {"name": "kp1001ea Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "created": "2014-09-12T13:16:38.843+0000", "lastUpdated": "2014-11-20T11:06:25.617+0000", "surname": "Kenya partner access to mechanism 1001 EA data Banana USAID Mechanism", "firstName": "kp1001ea",
@@ -491,8 +488,6 @@
 
     fixtures.userbiwZmBty5f9 =
         {"email":"simsde@thedutchies.com","userCredentials":{"userRoles":[{"id":"biwZmBty5f9","name":"Data Entry SIMS Key Populations"},{"id":"iXkZzRKD0i4","name":"Data Entry SIMS"},{"id":"b2uHwX9YLhu","name":"Read Only"}]},"userGroups":[{"id":"l0wllTVjshe","name":"OU Angola Agency DOD all mechanisms","created":"2014-09-29T08:44:23.709+0000","lastUpdated":"2014-12-10T23:28:58.504+0000","href":"http://localhost:8080/dhis/api/userGroups/l0wllTVjshe"},{"id":"fpEQtr4Wyq4","name":"OU Angola Agency DOD users","created":"2014-09-29T08:44:23.421+0000","lastUpdated":"2014-12-10T23:29:01.198+0000","href":"http://localhost:8080/dhis/api/userGroups/fpEQtr4Wyq4"},{"id":"iuD8wUFz95X","name":"Data SIMS access","created":"2014-09-29T08:44:09.145+0000","lastUpdated":"2015-03-17T10:58:53.707+0000","href":"http://localhost:8080/dhis/api/userGroups/iuD8wUFz95X"}]}
-
-    fixtures.dodOnlySqlView = {"title":"APP user management non DOD","subtitle":"User management app ","headers":[{"name":"ou","column":"ou","type":"java.lang.String","hidden":false,"meta":false},{"name":"partner","column":"partner","type":"java.lang.String","hidden":false,"meta":false},{"name":"nondod","column":"nondod","type":"java.lang.String","hidden":false,"meta":false}],"height":3,"rows":[["ds0ADyc9UCU","e9F2oANoK6F","0"]],"width":3};
 
     window.fixtures = {
         get: function (fixtureName) {

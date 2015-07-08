@@ -147,20 +147,6 @@ describe('Userlist controller', function () { //jshint ignore:line
             };
         });
 
-        $provide.factory('userService', function ($q) {
-            return {
-                getUserEntity: jasmine.createSpy()
-                    .and.returnValue($q.when({}))
-            };
-        });
-
-        $provide.factory('userEntity', function () {
-            return {
-                dodEntry: false,
-                normalEntry: true
-            };
-        });
-
         $provide.factory('currentUser', function () {
             return currentUserMock;
         });

@@ -61,12 +61,6 @@ describe('Data entry directive', function () {
                     .and.returnValue(['SIMS', 'SIMS Key Populations'])
             };
         });
-        $provide.factory('userService', function ($q) {
-            return {
-                getUserEntity: jasmine.createSpy()
-                    .and.returnValue($q.when({}))
-            };
-        });
     }));
     beforeEach(inject(function ($injector) {
         var $compile = $injector.get('$compile');

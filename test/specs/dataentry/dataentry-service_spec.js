@@ -17,9 +17,9 @@ describe('Data Entry Service', function () {
                     userRole: 'Data Entry SI',
                     userRoleId: 'k7BWFXkG6zt'
                 }],
-                SIMS: [{
-                    userRole: 'Data Entry SIMS',
-                    userRoleId: 'iXkZzRKD0i4'
+                EA: [{
+                    userRole: 'Data Entry EA',
+                    userRoleId: 'OKKx4bf4ueV'
                 }]
             },
             Partner: {
@@ -27,15 +27,10 @@ describe('Data Entry Service', function () {
                     userRole: 'Data Entry SI',
                     userRoleId: 'k7BWFXkG6zt'
                 }],
-                'SI DOD': [{
-                    userRole: 'Data Entry SI DOD',
-                    userRoleId: 'UDDyRlwTKVy'
-                }],
-                EA: [{
-                    userRole: 'Data Entry EA',
-                    userRoleId: 'OKKx4bf4ueV'
+                SIMS: [{
+                    userRole: 'Data Entry SIMS',
+                    userRoleId: 'iXkZzRKD0i4'
                 }]
-
             }
         }};
     }));
@@ -101,62 +96,19 @@ describe('Data Entry Service', function () {
             expect(service.setAllDataEntry).toEqual(jasmine.any(Function));
         });
 
-        it('should set all the values for the agency usertype', function () {
+        it('should set all the values for the passed usertype', function () {
             var expectedDataEntryRoles = {
                 SI: true,
                 SIMS: true
             };
 
-            service.setAllDataEntry('Agency');
-
-            expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
-        });
-
-        it('should set all the values for the partner usertype', function () {
-            var expectedDataEntryRoles = {
-                SI: true,
-                EA: true
-            };
-
-            service.setAllDataEntry('Partner', {
-                dodEntry: false,
-                normalEntry: true
-            });
+            service.setAllDataEntry('Partner');
 
             expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
         });
 
         it('should throw when a usertype was not provided', function () {
             expect(function () { service.setAllDataEntry(); }).toThrowError('Passed usertype should be a string');
-        });
-
-        it('should set dod entry but not normal entry', function () {
-            var expectedDataEntryRoles = {
-                'SI DOD': true,
-                EA: true
-            };
-
-            service.setAllDataEntry('Partner', {
-                dodEntry: true,
-                normalEntry: false
-            });
-
-            expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
-        });
-
-        it('should set both dod entry and normal entry', function () {
-            var expectedDataEntryRoles = {
-                SI: true,
-                'SI DOD': true,
-                EA: true
-            };
-
-            service.setAllDataEntry('Partner', {
-                dodEntry: true,
-                normalEntry: true
-            });
-
-            expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);
         });
     });
 
@@ -175,7 +127,7 @@ describe('Data Entry Service', function () {
                 SI: true
             };
 
-            service.setAllDataEntry('Partner', {normalEntry: true});
+            service.setAllDataEntry('Partner');
             service.restore();
 
             expect(service.dataEntryRoles).toEqual(expectedDataEntryRoles);

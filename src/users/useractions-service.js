@@ -1,7 +1,7 @@
 /* globals has, pick, flatten */
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, $q, userTypesService,
+function userActionsService(Restangular, $q, userTypesService, userService,
                             currentUserService, errorHandler, dataEntryService) {
     var availableAgencyActions = [
         'Accept data', 'Submit data'
@@ -32,7 +32,10 @@ function userActionsService(Restangular, $q, userTypesService,
                 {userRole: 'Data Entry SI Country Team', userRoleId: undefined},
                 {userRole: 'Tracker', userRoleId: undefined},
                 {userRole: 'Data Deduplication', userRoleId: undefined}
-            ]
+            ]/*,
+            EVAL: [{
+                    userRole: 'Data Entry EVAL'
+                }]*/
         },
         Agency: {
             SIMS: [
@@ -46,9 +49,6 @@ function userActionsService(Restangular, $q, userTypesService,
         Partner: {
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
-            ],
-            'SI DOD': [
-                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}
@@ -67,9 +67,6 @@ function userActionsService(Restangular, $q, userTypesService,
                 {userRole: 'Data Deduplication', userRoleId: undefined},
                 {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
-            'SI DOD': [
-                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
-            ],
             SIMS: [
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
             ],
@@ -84,9 +81,6 @@ function userActionsService(Restangular, $q, userTypesService,
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
             ],
-            'SI DOD': [
-                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
-            ],
             SIMS: [
                 {userRole: 'Data Entry SIMS', userRoleId: undefined}
             ],
@@ -100,9 +94,6 @@ function userActionsService(Restangular, $q, userTypesService,
         Partner: {
             SI: [
                 {userRole: 'Data Entry SI', userRoleId: undefined}
-            ],
-            'SI DOD': [
-                {userRole: 'Data Entry SI DOD', userRoleId: undefined}
             ],
             EA: [
                 {userRole: 'Data Entry EA', userRoleId: undefined}
@@ -157,8 +148,7 @@ function userActionsService(Restangular, $q, userTypesService,
                     getActionsForUser: getActionsForUser,
                     getUserRolesForUser: getUserRolesForUser,
                     combineSelectedUserRolesWithExisting: combineSelectedUserRolesWithExisting,
-                    filterActionsForCurrentUser: filterActionsForCurrentUser,
-                    getUserManagerDataEntryRoles: getUserManagerDataEntryRoles
+                    filterActionsForCurrentUser: filterActionsForCurrentUser
                 };
             });
     }
@@ -341,20 +331,5 @@ function userActionsService(Restangular, $q, userTypesService,
         return userType.split('-').map(function (namePart) {
             return namePart.charAt(0).toUpperCase() + namePart.substr(1).toLowerCase();
         }).join('-');
-    }
-
-    function getUserManagerDataEntryRoles(userType, userEntity) {
-        return _.chain(dataEntryRestrictionsUserManager[userType])
-            .values()
-            .flatten()
-            .filter('userRoleId')
-            // FIXME: Refactor this out as it kind of a hack.
-            .filter(function (userRole) {
-                if (userEntity && ((userRole.userRole === 'Data Entry SI DOD' && userEntity.dodEntry === false) || (userRole.userRole === 'Data Entry SI' && userEntity.normalEntry === false))) {
-                    return false;
-                }
-                return true;
-            })
-            .value();
     }
 }

@@ -30,7 +30,7 @@ describe('Add user controller', function () {
                 dataEntryRestrictions: {
                     'Inter-Agency': {
                         SI: [
-                            {userRole: 'Data Entry SI Country Team', userRoleId: 'yYOqiMTxAOF'},
+                            {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
                             {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
                             {userRole: 'Tracker', userRoleId:  'trackerid'}
                         ]
@@ -38,7 +38,7 @@ describe('Add user controller', function () {
                     Agency: {
                         SIMS: [
                             {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'biwZmBty5f9'}
+                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'}
                         ]
                     },
                     Partner: {
@@ -49,37 +49,27 @@ describe('Add user controller', function () {
                 dataEntryRestrictionsUserManager: {
                     'Inter-Agency': {
                         SI: [
-                            {userRole: 'Data Entry SI Country Team', userRoleId: 'yYOqiMTxAOF'},
+                            {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
                             {userRole: 'Tracker', userRoleId: 'trackerid'},
                             {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
                             {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'}
                         ],
                         SIMS: [
                             {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'biwZmBty5f9'}
+                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'}
                         ],
                         EA: [{userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}]
                     },
                     Agency: {
                         SI: [{userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'}],
-                        SIMS: [
-                            {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                            {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'biwZmBty5f9'}
-                        ],
+                        SIMS: [{userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'}, {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'}],
                         EA: [{userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}]
                     },
                     Partner: {
                         SI: [{userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'}],
                         EA: [{userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}]
                     }
-                },
-                getUserManagerDataEntryRoles: jasmine.createSpy()
-                    .and.returnValue([
-                        {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
-                        {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
-                        {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'biwZmBty5f9'},
-                        {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
-                    ])
+                }
             };
         });
 
@@ -920,7 +910,7 @@ describe('Add user controller', function () {
 
                 expect(controller.userInviteObject.userCredentials.userRoles)
                     .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'}, {id: 'KagqnetfxMr'},
-                        {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'biwZmBty5f9'}, {id: 'OKKx4bf4ueV'}]);
+                        {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'simskeypopsid'}, {id: 'OKKx4bf4ueV'}]);
             });
 
             it('should set the roles onto the invite object only once', function () {
@@ -929,7 +919,7 @@ describe('Add user controller', function () {
 
                 expect(controller.userInviteObject.userCredentials.userRoles)
                     .toEqual([{id: 'QbxXEPw9xlf'}, {id: 'n777lf1THwQ'}, {id: 'b2uHwX9YLhu'}, {id: 'KagqnetfxMr'},
-                        {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'biwZmBty5f9'}, {id: 'OKKx4bf4ueV'}]);
+                        {id: 'k7BWFXkG6zt'}, {id: 'iXkZzRKD0i4'}, {id: 'simskeypopsid'}, {id: 'OKKx4bf4ueV'}]);
             });
 
             describe('getUserManagerRoles', function () {
@@ -954,6 +944,34 @@ describe('Add user controller', function () {
                     scope.user.userType = {name: 'Partner'};
 
                     expect(controller.getUserManagerRoles()).toEqual(expectedRoles);
+                });
+            });
+
+            describe('getUserManagerDataEntryRoles', function () {
+                it('should get the data entry roles for the the user type', function () {
+                    var expectedRoles = [
+                        {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
+                        {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
+                        {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'},
+                        {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
+                    ];
+
+                    expect(controller.getUserManagerDataEntryRoles()).toEqual(expectedRoles);
+                });
+
+                it('should give the inter-agency data entry roles', function () {
+                    var expectedRoles = [
+                        {userRole: 'Data Entry SI Country Team', userRoleId: 'dataEntryCountryTeamID'},
+                        {userRole: 'Tracker', userRoleId: 'trackerid'},
+                        {userRole: 'Data Deduplication', userRoleId: 'datadedupeid'},
+                        {userRole: 'Data Entry SI', userRoleId: 'k7BWFXkG6zt'},
+                        {userRole: 'Data Entry SIMS', userRoleId: 'iXkZzRKD0i4'},
+                        {userRole: 'Data Entry SIMS Key Populations', userRoleId: 'simskeypopsid'},
+                        {userRole: 'Data Entry EA', userRoleId: 'OKKx4bf4ueV'}
+                    ];
+                    scope.user.userType = {name: 'Inter-Agency'};
+
+                    expect(controller.getUserManagerDataEntryRoles()).toEqual(expectedRoles);
                 });
             });
 
@@ -996,13 +1014,13 @@ describe('Add user controller', function () {
                     {name: 'SIMS'}
                 ],
                 dimensionConstraint: {id: 'SomeID'}
+                /*currentUser: currentUserMock()*/
             });
 
             scope.user.dataGroups.SI.access = true;
             scope.user.userType = {
                 name: 'Inter-Agency'
             };
-
         }));
 
         it('should be a function', function () {
@@ -1013,29 +1031,15 @@ describe('Add user controller', function () {
             var expectedUserRoles = [
                     {userRole: 'Data Entry SI', userRoleId:  'k7BWFXkG6zt'},
                     {userRole: 'Data Entry SIMS', userRoleId:  'iXkZzRKD0i4'},
-                    {userRole: 'Data Entry SIMS Key Populations', userRoleId:  'biwZmBty5f9'},
+                    {userRole: 'Data Entry SIMS Key Populations', userRoleId:  'simskeypopsid'},
                     {userRole: 'Data Entry EA', userRoleId:  'OKKx4bf4ueV'}
             ];
-
-            userActionsMock.getUserManagerDataEntryRoles
-                .and.returnValue([
-                    {userRole: 'Data Entry SI', userRoleId:  'k7BWFXkG6zt'},
-                    {userRole: 'Data Entry SIMS', userRoleId:  'iXkZzRKD0i4'},
-                    {userRole: 'Data Entry SIMS Key Populations', userRoleId:  'biwZmBty5f9'},
-                    {userRole: 'Data Entry EA', userRoleId:  'OKKx4bf4ueV'}
-                ]);
 
             expect(controller.getDataEntryRolesNotShown()).toEqual(expectedUserRoles);
         });
 
         it('should not return any extra roles for partners', function () {
             scope.user.userType = {name: 'Partner'};
-
-            userActionsMock.getUserManagerDataEntryRoles
-                .and.returnValue([
-                    {userRole: 'Data Entry SI', userRoleId:  'k7BWFXkG6zt'},
-                    {userRole: 'Data Entry EA', userRoleId:  'OKKx4bf4ueV'}
-                ]);
 
             expect(controller.getDataEntryRolesNotShown()).toEqual([]);
         });
@@ -1045,14 +1049,6 @@ describe('Add user controller', function () {
                 {userRole: 'Data Entry SI', userRoleId:  'k7BWFXkG6zt'},
                 {userRole: 'Data Entry EA', userRoleId:  'OKKx4bf4ueV'}
             ];
-
-            userActionsMock.getUserManagerDataEntryRoles
-                .and.returnValue([
-                    {userRole: 'Data Entry SI', userRoleId:  'k7BWFXkG6zt'},
-                    {userRole: 'Data Entry SIMS', userRoleId:  'iXkZzRKD0i4'},
-                    {userRole: 'Data Entry SIMS Key Populations', userRoleId:  'biwZmBty5f9'},
-                    {userRole: 'Data Entry EA', userRoleId:  'OKKx4bf4ueV'}
-                ]);
 
             scope.user.userType = {name: 'Agency'};
 
