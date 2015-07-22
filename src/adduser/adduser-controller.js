@@ -187,7 +187,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
             $scope.user.dataGroups = userUtils.setAllDataStreams($scope.user.dataGroups);
             $scope.user.userActions = userUtils.setAllActions(vm.actions);
-            dataEntryService.setAllDataEntry(getUserType());
+            dataEntryService.setAllDataEntry(getUserType(), $scope.user.userEntity);
         } else {
             $scope.user.dataGroups = userUtils.restoreDataStreams($scope.user.dataGroups);
             $scope.user.userActions = userUtils.restoreUserActions($scope.user.userActions);
@@ -283,13 +283,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             .value();
     }
 
-    //TODO: Move this to actions service
     function getUserManagerDataEntryRoles() {
-        return _.chain(userActions.dataEntryRestrictionsUserManager[getUserType()])
-            .values()
-            .flatten()
-            .filter('userRoleId')
-            .value();
+        return userActions.getUserManagerDataEntryRoles(getUserType(), $scope.user.userEntity);
     }
 
     function getDataEntryRolesNotShown() {
