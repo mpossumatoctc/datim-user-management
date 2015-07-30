@@ -153,9 +153,11 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
             vm.detailsUserUserType = userTypesService.getUserType(user);
+
+            vm.detailsUserEntity = {};
             userService.getUserEntity(user)
                 .then(function (userEntity) {
-                    vm.detailsUserEntity = userEntity;
+                    vm.detailsUserEntity = userEntity || {};
                 });
             userActions.getActionsForUser(user).then(function (actions) {
                 vm.detailsUserActions = actions;

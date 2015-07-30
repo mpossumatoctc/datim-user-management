@@ -436,6 +436,35 @@ describe('Userlist controller', function () { //jshint ignore:line
 
             expect(controller.detailsUserActions.length).toBe(3);
         });
+
+        it('should have set the user entity for details box', inject(function (userService, $q) {
+            userService.getUserEntity.and.returnValue($q.when({name: 'MarkOrg'}));
+
+            controller.showDetails(user);
+            $rootScope.$apply();
+
+            expect(controller.detailsUserEntity.name).toEqual('MarkOrg');
+        }));
+
+        it('should reset the value if the user does not have an entity', inject(function (userService, $q) {
+            userService.getUserEntity.and.returnValue($q.when({name: 'MarkOrg'}));
+
+            controller.showDetails({});
+            $rootScope.$apply();
+
+            expect(controller.detailsUserEntity.name).toEqual('MarkOrg');
+
+            userService.getUserEntity.and.returnValue($q.when(undefined));
+            controller.showDetails(user);
+
+            //Before request returns from the server
+            expect(controller.detailsUserEntity).toEqual({});
+
+            $rootScope.$apply();
+
+            //After request returns from the server
+            expect(controller.detailsUserEntity).toEqual({});
+        }));
     });
 
     describe('getDataGroupsForUser', function () {
