@@ -258,7 +258,7 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
 
         return Restangular.one('userSettings')
             .one('keyUiLocale')
-            .post(undefined, locale, {user: username}, {'Content-Type': 'text/plain'})
+            .post(undefined, locale.trim(), {user: username}, {'Content-Type': 'text/plain'})
             .then(function () {
                 return locale;
             });

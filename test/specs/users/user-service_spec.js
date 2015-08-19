@@ -513,6 +513,15 @@ describe('User service', function () {
                 $httpBackend.flush();
             });
 
+            it('should strip any whitespace around the locale identifier', function () {
+                $httpBackend.resetExpectations();
+                $httpBackend.expectPOST('http://localhost:8080/dhis/api/userSettings/keyUiLocale?user=johnsnow', 'fr')
+                    .respond(200, 'Success');
+
+                service.saveUserLocale('johnsnow', 'fr \n');
+                $httpBackend.flush();
+            });
+
             it('should not call the api if no username was given', function () {
                 function shouldThrow() {
                     service.saveUserLocale(undefined, 'en');
