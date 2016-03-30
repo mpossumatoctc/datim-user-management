@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').service('userFilterService', userFilterService);
 
-function userFilterService($q, userTypesService, organisationUnitService, currentUserService) {
+function userFilterService($q, userTypesService, organisationUnitService, currentUserService, userRolesService) {
     var deferred = $q.defer();
     var userFilter = [
         {name: 'Name'},
@@ -33,9 +33,14 @@ function userFilterService($q, userTypesService, organisationUnitService, curren
             });
 
         // TODO: Write some tests for this..
-        currentUserService.getCurrentUser()
-            .then(function (currentUser) {
-                if (currentUser && currentUser.userCredentials.userRoles && angular.isArray(currentUser.userCredentials.userRoles)) {
+        $q.all([currentUserService.getCurrentUser(), userRolesService.getAllUserRoles()])
+            .then(function (responses) {
+                var currentUser = responses[0];
+                var allUserRoles = responses[1];
+
+                if (currentUser && currentUser.hasAllAuthority()) {
+                    userFilter.push({name: 'User Role', secondary: allUserRoles});
+                } else if (currentUser.userCredentials.userRoles && angular.isArray(currentUser.userCredentials.userRoles)) {
                     var userRoleFilters = currentUser.userCredentials.userRoles.map(function (userRole) {
                         return {name: userRole.name};
                     });

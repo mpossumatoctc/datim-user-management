@@ -34,8 +34,8 @@ function appController($scope, Restangular, webappManifest, errorHandler, curren
         vm.currentState = toState.name;
         vm.subTitle = vm.subTitles[toState.name] || '';
     });
-    $scope.$on('$stateChangeError', function (event, toState) {
-        errorHandler.debug('Failed to switch to ', toState);
+    $scope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+        errorHandler.debug('Failed to switch to ', toState, error);
         vm.isLoading = false;
     });
 

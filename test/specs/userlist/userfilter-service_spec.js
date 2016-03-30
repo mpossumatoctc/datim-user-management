@@ -18,12 +18,22 @@ describe('UserFilter service', function () {
                 getOrganisationUnitsForLevel: jasmine.createSpy().and.returnValue(success)
             };
         });
+        $provide.factory('userRolesService', function ($q) {
+            return {
+                getAllUserRoles: function () {
+                    return $q.when([]);
+                }
+            };
+        });
 
         currentUserMock = {
             userCredentials: {
                 userRoles: [{name: 'Data Entry SI'}]
             },
-            userGroups: [{name: 'Data SI access'}]
+            userGroups: [{name: 'Data SI access'}],
+            hasAllAuthority: function () {
+                return false;
+            }
         };
 
         $provide.factory('currentUserService', function ($q) {
