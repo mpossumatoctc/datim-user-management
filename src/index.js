@@ -1,15 +1,3 @@
-if (process.env.NODE_ENV !== 'production') {
-    jQuery.ajaxSetup({ // eslint-disable-line no-undef
-        headers: {
-            Authorization: `Basic ${btoa('admin:district')}`,
-        },
-    });
-
-    jQuery('head').append(`
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    `);
-}
-
 require("../vendor/jquery/dist/jquery.js");
 window.toastr = require("../vendor/toastr/toastr.js");
 require("../vendor/lodash/dist/lodash.js");
@@ -65,3 +53,8 @@ require("./dataentry/dataentry-service.js");
 require("./globaluserinvite/globaluserinvite-controller.js");
 require("./globaluserinvite/globaluser-service.js");
 require("./globaluseredit/globaluseredit-controller.js");
+
+// When in dev mode we need to set up CORS authentication
+if (process.env.NODE_ENV !== 'production') {
+    require("../dev_cors_auth")
+}

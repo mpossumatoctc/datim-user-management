@@ -20,3 +20,4 @@ src/main/_manifest.webapp
 dhis.json
 
 src/jquery.min.js
+dev_cors_auth.js
