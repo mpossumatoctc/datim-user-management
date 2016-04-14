@@ -7,11 +7,7 @@
     <title>User Administration</title>
 
     <!-- build:css css/app.css -->
-    <link href="../vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
-    <link href="../vendor/angular-ui-select/dist/select.css" rel="stylesheet" type="text/css" />
-    <link href="../vendor/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
-    <link href="../vendor/toastr/toastr.css" rel="stylesheet" type="text/css" />
-    <link href="../temp/css/app/app.css" rel="stylesheet" type="text/css" />
+    <link href="../css/app.css" rel="stylesheet" type="text/css" />
     <!-- endbuild -->
 </head>
 <body ng-controller="appController as app">
@@ -34,66 +30,13 @@
         </div>
     </div>
 
-    <!-- build:js js/vendor.js -->
-    <script src="../vendor/jquery/dist/jquery.js"></script>
-    <script src="../vendor/toastr/toastr.js"></script>
-    <script src="../vendor/lodash/dist/lodash.js"></script>
-    <script src="../vendor/angular/angular.js"></script>
-    <script src="../vendor/angular-animate/angular-animate.js"></script>
-    <script src="../vendor/angular-messages/angular-messages.js"></script>
-    <script src="../vendor/ui-router/release/angular-ui-router.js"></script>
-    <script src="../vendor/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="../vendor/angular-ui-select/dist/select.js"></script>
-    <script src="../vendor/angular-ui-utils/validate.js"></script>
-    <script src="../vendor/angular-translate/angular-translate.js"></script>
-    <script src="../vendor/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
-    <script src="../vendor/restangular/dist/restangular.js"></script>
-    <!-- endbuild -->
-
-    <!-- build:js js/app.js -->
-    <script src="utils.js"></script>
-    <script src="ngBootstrapper.js"></script>
-    <script src="app.js"></script>
-    <script src="lodash/lodash-factory.js"></script>
-    <script src="app/app-controller.js"></script>
-    <script src="users/usertypes-service.js"></script>
-    <script src="users/usertype-select-directive.js"></script>
-    <script src="users/useractions-service.js"></script>
-    <script src="users/userstatus-service.js"></script>
-    <script src="datagroups/datagroups-service.js"></script>
-    <script src="adduser/adduser-controller.js"></script>
-    <script src="userlist/userlist-controller.js"></script>
-    <script src="userlist/userfilter-service.js"></script>
-    <script src="userlist/pagination-service.js"></script>
-    <script src="userlist/userlist-service.js"></script>
-    <script src="user-roles/user-roles-service.js"></script>
-    <script src="pepfar/agency-select-directive.js"></script>
-    <script src="pepfar/agencies-service.js"></script>
-    <script src="pepfar/partner-select-directive.js"></script>
-    <script src="pepfar/partners-service.js"></script>
-    <script src="language/locale-service.js"></script>
-    <script src="language/locale-select-directive.js"></script>
-    <script src="adduser/usertype-controller.js"></script>
-    <script src="edituser/edituser-controller.js"></script>
-    <script src="users/user-service.js"></script>
-    <script src="errorhandler/errorhandler-service.js"></script>
-    <script src="users/currentuser-service.js"></script>
-    <script src="noaccess/noaccess-controller.js"></script>
-    <script src="categories/categories-service.js"></script>
-    <script src="headerbar/headerbar-directive.js"></script>
-    <script src="notify/notify-service.js"></script>
-    <script src="users/interagency-service.js"></script>
-    <script src="userform/userform-service.js"></script>
-    <script src="userstatus/userstatus-directive.js"></script>
-    <script src="organisationunits/organisationunit-service.js"></script>
-    <script src="organisationunits/organisationunit-select-directive.js"></script>
-    <script src="users/userutils-service.js"></script>
-    <script src="dataentry/dataentry-directive.js"></script>
-    <script src="dataentry/dataentry-service.js"></script>
-    <script src="globaluserinvite/globaluserinvite-controller.js"></script>
-    <script src="globaluserinvite/globaluser-service.js"></script>
-    <script src="globaluseredit/globaluseredit-controller.js"></script>
-    <!-- endbuild -->
+    <script src="jquery.min.js"></script>
+    <script>
+        if (!('jQuery' in window)) {
+            document.write('<script src="https://code.jquery.com/jquery-2.1.4.js"><\/script>');
+        }
+    </script>
+    <script src="index.js"></script>
 
 </body>
 </html>

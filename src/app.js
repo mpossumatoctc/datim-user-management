@@ -193,6 +193,9 @@ angular.module('PEPFAR.usermanagement').config(['$compileProvider', function ($c
 angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifest) {
     var baseUrl = [webappManifest.activities.dhis.href, 'api'].join('/');
     Restangular.setBaseUrl(baseUrl);
+
+    // set default header "token"
+    Restangular.setDefaultHeaders({Authorization: `Basic ${btoa('admin:district')}`});
 });
 
 //==================================================================================

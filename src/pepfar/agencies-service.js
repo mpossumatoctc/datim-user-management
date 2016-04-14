@@ -46,7 +46,7 @@ function agenciesService($q, Restangular, errorHandler, _) {
 
     function getAgencyObjects(cogsId) {
         var queryParams = {
-            fields: 'categoryOptionGroups',
+            fields: 'categoryOptionGroups[id,name,code]',
             paging: 'false'
         };
 

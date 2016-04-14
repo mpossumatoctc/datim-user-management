@@ -88,7 +88,7 @@ function partnersService($q, Restangular, errorHandler, _) {
 
     function getPartnersFromApi(cogsId) {
         var queryParams = {
-            fields: 'categoryOptionGroups',
+            fields: 'categoryOptionGroups[id,name,code]',
             paging: 'false'
         };
 

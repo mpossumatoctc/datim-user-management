@@ -44,4 +44,9 @@ function flatten() {
         return (current || []).concat(items);
     };
 }
+
+window.hasAll = hasAll;
+window.has = has;
+window.pick = pick;
+window.flatten = flatten;
 /* jshint unused:true */

@@ -9,7 +9,8 @@ function organisationUnitService(Restangular, _) {
         return Restangular
             .one('organisationUnits').withHttpConfig({cache: true})
             .get({
-                level: level || 1
+                level: level || 1,
+                fields: 'id,name,displayName'
             })
             .then(function (response) {
                 return response.organisationUnits || [];

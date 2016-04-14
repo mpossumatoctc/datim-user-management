@@ -22,6 +22,6 @@ function categoriesService(Restangular, $q) {
         if (Array.isArray(response.categories) && response.categories.length === 1) {
             return response.categories[0];
         }
-        return $q.reject('More than 1 category with Funding Mechanism found');
+        return $q.reject('More or less than 1 category with the name Funding Mechanism found');
     }
 }

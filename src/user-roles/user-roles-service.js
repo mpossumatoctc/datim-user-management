@@ -11,7 +11,7 @@ function userRolesService(Restangular, errorHandler) {
                 .one('userRoles')
                 .withHttpConfig({cache: true})
                 .get({
-                    fields: ['id', 'name', 'displayName'].join(','),
+                    fields: ['id', 'name'].join(','),
                     paging: false
                 })
                 .then(function (response) {

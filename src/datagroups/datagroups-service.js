@@ -29,6 +29,8 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
             });
 
             resultingDataStreams = dataGroups.filter(function (dataGroup) {
+                console.log(currentUser);
+
                 var userGroups = dataGroup.userGroups || [];
                 return currentUser.hasAllAuthority() || userGroups.some(function (userGroup) {
                     return currentUserGroupIds.indexOf(userGroup.id) >= 0;

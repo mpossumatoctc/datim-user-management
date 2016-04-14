@@ -18,3 +18,5 @@ coverage
 src/main/_manifest.webapp
 
 dhis.json
+
+src/jquery.min.js
