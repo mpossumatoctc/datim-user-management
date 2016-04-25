@@ -95,7 +95,7 @@ function agenciesService($q, Restangular, errorHandler, _) {
         queryParams = {
             fields: 'id,name',
             filter: [
-                ['name', 'like', [organisationUnitName.trim(), 'Agency'].join(' ')].join(':')
+                ['name', 'ilike', [organisationUnitName.trim(), 'Agency'].join(' ')].join(':')
             ],
             paging: false
         };

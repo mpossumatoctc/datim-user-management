@@ -36,7 +36,7 @@ function interAgencyService($q, Restangular, errorHandler) {
     }
 
     function getUserUserGroup(organisationUnitName) {
-        var filter = ['name', 'like', ['OU', organisationUnitName, 'Country', 'team'].join(' ')].join(':');
+        var filter = ['name', 'ilike', ['OU', organisationUnitName, 'Country', 'team'].join(' ')].join(':');
         var filterRegEx = new RegExp(['OU', '.+?', 'Country', 'team'].join(' '), 'i');
 
         return requestUserGroups(filter)
@@ -46,7 +46,7 @@ function interAgencyService($q, Restangular, errorHandler) {
     }
 
     function getAdminUserGroup(organisationUnitName) {
-        var filter = ['name', 'like', ['OU', organisationUnitName, 'user', 'administrators'].join(' ')].join(':');
+        var filter = ['name', 'ilike', ['OU', organisationUnitName, 'user', 'administrators'].join(' ')].join(':');
         var filterRegEx = new RegExp(['OU', '.+?', 'user', 'administrators'].join(' '), 'i');
 
         return requestUserGroups(filter)
@@ -56,7 +56,7 @@ function interAgencyService($q, Restangular, errorHandler) {
     }
 
     function getMechUserGroup(organisationUnitName) {
-        var filter = ['name', 'like', ['OU', organisationUnitName, 'all', 'mechanisms'].join(' ')].join(':');
+        var filter = ['name', 'ilike', ['OU', organisationUnitName, 'all', 'mechanisms'].join(' ')].join(':');
         var filterRegEx = new RegExp(['OU', '.+?', 'all', 'mechanisms'].join(' '), 'i');
 
         return requestUserGroups(filter)

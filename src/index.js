@@ -56,5 +56,6 @@ require("./globaluseredit/globaluseredit-controller.js");
 
 // When in dev mode we need to set up CORS authentication
 if (process.env.NODE_ENV !== 'production') {
-    require("../dev_cors_auth")
+    require("../dev_cors_auth");
+    jQuery('head').append(`<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">`);
 }

@@ -264,7 +264,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                 id: new Date().toString(),
                 type: undefined,
                 value: undefined,
-                comparator: 'like'
+                comparator: 'ilike'
             });
         }
     }
@@ -280,7 +280,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
                     id: new Date().toString(),
                     type: undefined,
                     value: undefined,
-                    comparator: 'like'
+                    comparator: 'ilike'
                 };
 
                 temp.type = userFilter.reduce(function (current, filter) {

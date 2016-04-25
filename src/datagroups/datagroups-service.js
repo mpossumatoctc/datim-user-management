@@ -50,7 +50,7 @@ function dataGroupsService($q, Restangular, currentUserService, _, errorHandler)
     function loadUserGroups() {
         return Restangular.one('userGroups').withHttpConfig({cache: true}).get({
             fields: ['id', 'name'].join(','),
-            filter: 'name:like:Data',
+            filter: 'name:ilike:Data',
             paging: false
         }).then(function (response) {
             var userGroups = response.userGroups;

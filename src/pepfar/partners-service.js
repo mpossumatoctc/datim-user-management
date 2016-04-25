@@ -135,7 +135,7 @@ function partnersService($q, Restangular, errorHandler, _) {
         var queryParams = {
             fields: 'id,name',
             filter: [
-                ['name', 'like', [organisationUnitName, 'partner'].join(' ')].join(':')
+                ['name', 'ilike', [organisationUnitName, 'Partner'].join(' ')].join(':')
             ],
             paging: false
         };

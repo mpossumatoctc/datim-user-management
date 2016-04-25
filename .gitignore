@@ -21,3 +21,5 @@ dhis.json
 
 src/jquery.min.js
 dev_cors_auth.js
+
+npm-debug.log

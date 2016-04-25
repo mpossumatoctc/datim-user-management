@@ -57,6 +57,7 @@ function appController($scope, Restangular, webappManifest, errorHandler, curren
 
         currentUserService.getCurrentUser()
             .then(function (currentUser) {
+                console.log(currentUser);
                 if (currentUser.isGlobalUser() && currentUser.isUserAdministrator()) {
                     vm.isGlobalUser = true;
                 }

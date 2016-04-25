@@ -30,7 +30,7 @@ function globalUserService($q, Restangular, errorHandler) {
     }
 
     function getUserUserGroup() {
-        var filter = ['name', 'like', 'Global Users'].join(':');
+        var filter = ['name', 'ilike', 'Global Users'].join(':');
         var filterRegEx = new RegExp(['Global Users'].join(' '), 'i');
 
         return requestUserGroups(filter)
@@ -40,7 +40,7 @@ function globalUserService($q, Restangular, errorHandler) {
     }
 
     function getAdminUserGroup() {
-        var filter = ['name', 'like', 'Global User Administrators'].join(':');
+        var filter = ['name', 'ilike', 'Global User Administrators'].join(':');
         var filterRegEx = new RegExp(['Global User Administrators'].join(' '), 'i');
 
         return requestUserGroups(filter)
@@ -50,7 +50,7 @@ function globalUserService($q, Restangular, errorHandler) {
     }
 
     function getMechUserGroup() {
-        var filter = ['name', 'like', 'Global all mechanisms'].join(':');
+        var filter = ['name', 'ilike', 'Global all mechanisms'].join(':');
         var filterRegEx = new RegExp(['Global all mechanisms'].join(' '), 'i');
 
         return requestUserGroups(filter)
