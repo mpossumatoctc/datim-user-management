@@ -129,7 +129,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
         userService.updateUser(userToEdit)
             .then(function () {
-                if ($scope.user.locale && $scope.user.locale.name) {
+                if ($scope.user.locale && $scope.user.locale.code) {
                     saveUserLocale()
                         .then(notifyUserOfSuccessfullSave)
                         .catch(notifyUserOfFailedLocaleSave);
@@ -241,7 +241,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function saveUserLocale() {
-        return userService.saveUserLocale(userToEdit.userCredentials.username, $scope.user.locale.name);
+        return userService.saveUserLocale(userToEdit.userCredentials.username, $scope.user.locale.code);
     }
 
     function getUserType() {

@@ -151,8 +151,8 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         //TODO: Clean this up
         userService.inviteUser(vm.userInviteObject)
             .then(function (newUser) {
-                if (newUser.userCredentials && angular.isString(newUser.userCredentials.username) && $scope.user.locale && $scope.user.locale.name) {
-                    userService.saveUserLocale(newUser.userCredentials.username, $scope.user.locale.name)
+                if (newUser.userCredentials && angular.isString(newUser.userCredentials.username) && $scope.user.locale && $scope.user.locale.code) {
+                    userService.saveUserLocale(newUser.userCredentials.username, $scope.user.locale.code)
                         .then(function () {
                             notify.success('User invitation sent');
                             $scope.user = userService.getUserObject();
