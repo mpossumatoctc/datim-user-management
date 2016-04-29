@@ -20,8 +20,8 @@ function localeSelectDirective(localeService, $translate, _) {
         localeService.getUiLocales().then(function (uiLocales) {
             scope.selectbox.items = _.map(uiLocales, function (uiLocale) {
                 return {
-                    name: uiLocale,
-                    code: uiLocale
+                    name: uiLocale.name,
+                    code: uiLocale.locale,
                 };
             });
         });

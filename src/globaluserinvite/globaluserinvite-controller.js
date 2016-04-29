@@ -65,8 +65,8 @@ function globalUserInviteController(dataGroups, currentUser,
 
         userService.inviteUser(userObject)
             .then(function (newUser) {
-                if (newUser.userCredentials && angular.isString(newUser.userCredentials.username) && vm.user.locale && vm.user.locale.name) {
-                    userService.saveUserLocale(newUser.userCredentials.username, vm.user.locale.name)
+                if (newUser.userCredentials && angular.isString(newUser.userCredentials.username) && vm.user.locale && vm.user.locale.code) {
+                    userService.saveUserLocale(newUser.userCredentials.username, vm.user.locale.code)
                         .then(function () {
                             notify.success('User invitation sent');
                             $state.go('globalAdd', {}, {reload: true});

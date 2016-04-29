@@ -75,7 +75,7 @@ function globalUserEditController(notify, userGroups, userActions, userToEdit, u
 
         vm.isProcessing = true;
 
-        $q.all([userToEdit.save(), vm.user.locale && vm.user.locale.name && userService.saveUserLocale(userToEdit.userCredentials.username, vm.user.locale && vm.user.locale.name)])
+        $q.all([userToEdit.save(), vm.user.locale && vm.user.locale.code && userService.saveUserLocale(userToEdit.userCredentials.username, vm.user.locale && vm.user.locale.code)])
             .then(function (responses) {
                 window.console.log(responses);
                 notify.success('User updated');
