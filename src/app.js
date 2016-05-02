@@ -193,13 +193,22 @@ angular.module('PEPFAR.usermanagement').config(['$compileProvider', function ($c
 angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifest) {
     var baseUrl = [webappManifest.activities.dhis.href, 'api'].join('/');
 
-    Restangular.setBaseUrl(baseUrl);
+    if (process.env.NODE_ENV !== 'production') {
+        Restangular.setBaseUrl('http://localhost:8080/dhis/api');
+    } else {
+        Restangular.setBaseUrl(baseUrl);
+    }
+
 });
 
 //==================================================================================
 // Bootstrap the app manually
 //
 function basePathResolver(url, injectables) {
+    if (process.env.NODE_ENV !== 'production') {
+        return ['http://localhost:8080/dhis', url].join('/');
+    }
+
     return [injectables.webappManifest.activities.dhis.href, url].join('/');
 }
 
@@ -209,7 +218,14 @@ window.getBootstrapper('PEPFAR.usermanagement', document)
     .execute(function (injectables) {
         window.dhis2 = window.dhis2 || {};
         window.dhis2.settings = window.dhis2.settings || {};
-        window.dhis2.settings.baseUrl = injectables.webappManifest.activities.dhis.href.replace(window.location.origin, '').replace(/^\//, '');
+
+        if (process.env.NODE_ENV !== 'production') {
+            window.dhis2.settings.baseUrl = 'http://localhost:8080/dhis';
+        } else {
+            window.dhis2.settings.baseUrl = injectables.webappManifest.activities.dhis.href.replace(window.location.origin, '').replace(/^\//, '');
+        }
+
+        console.log(window.dhis2.settings.baseUrl);
     })
     .loadStylesheet('/dhis-web-commons/css/menu.css')
     .loadScript('/dhis-web-commons/javascripts/dhis2/dhis2.translate.js')

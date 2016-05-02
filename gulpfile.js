@@ -192,6 +192,7 @@ gulp.task('min', ['sass'], function () {
     var minifyCss = require('gulp-minify-css');
     var rev = require('gulp-rev');
     var replaceRev = require('gulp-rev-replace');
+    var webpack = require('gulp-webpack');
 
     var assets = useref.assets();
 
@@ -206,9 +207,7 @@ gulp.task('min', ['sass'], function () {
             single_quotes: true,
             stats: true
         })))
-        .pipe(gulpif('*.js', uglify({
-            mangle: mangleJS
-        })))
+        .pipe(webpack())
         .pipe(gulpif('!**/index.html', rev()))
         .pipe(replaceRev())
         .pipe(gulp.dest(buildDirectory));
@@ -224,8 +223,56 @@ gulp.task('copy-fonts', function () {
         .pipe(gulp.dest(buildDirectory));
 });
 
+gulp.task('copy-jquery', function () {
+    return gulp.src(['vendor/jquery/dist/jquery.min.js'])
+        .pipe(gulp.dest(buildDirectory));
+});
+
+var rev = require('gulp-rev');
+var pckg = require('./package');
+
+gulp.task('build-html', function () {
+    var htmlReplace = require('gulp-html-replace');
+    var gulp = require('gulp');
+    var webpack = require('webpack-stream');
+
+    return gulp.src('src/**/*.html')
+        .pipe(htmlReplace({
+            js: `user-maintenance-${pckg.version}.js`,
+            css: `css/user-maintenance-${pckg.version}.css`,
+        }))
+        .pipe(gulp.dest(buildDirectory));
+});
+
+gulp.task('build-webpack', ['build-html'], function () {
+    var webpack = require('gulp-webpack');
+
+    return gulp.src('src/index.js')
+        .pipe(webpack(require('./webpack.config.prod.js')))
+        .pipe(gulp.dest(buildDirectory));
+
+});
+
+gulp.task('replace-rev', ['build-webpack', 'build-html', 'build-css'], function () {
+    var replaceRev = require('gulp-rev-replace');
+
+    return gulp.src(`${buildDirectory}/user-maintenance-${pckg.version}.js`)
+        .pipe(replaceRev({manifest: rev.manifest()}))
+        .pipe(gulp.dest(buildDirectory));
+});
+
+gulp.task('build-css', function () {
+    var minifyCss = require('gulp-minify-css');
+    var rename = require('gulp-rename');
+
+    return gulp.src('src/css/app.css', { base: './src/' })
+        .pipe(minifyCss())
+        .pipe(rename(`css/user-maintenance-${pckg.version}.css`))
+        .pipe(gulp.dest('build'));
+});
+
 gulp.task('build', function (cb) {
-    runSequence('clean', 'test', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', cb);
+    runSequence('clean', 'i18n', 'manifest', 'images', 'build-html', 'build-css', 'build-webpack', 'copy-files', 'copy-fonts', 'copy-jquery', cb);
 });
 
 gulp.task('build-prod', function (cb) {
@@ -269,7 +316,7 @@ gulp.task('copy-app', function () {
 });
 
 gulp.task('copy-to-dev', function () {
-    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', 'modify-manifest', 'copy-app');
+    return runSequence('clean', 'i18n', 'manifest', 'images', 'jshint', 'jscs', 'min', 'copy-files', 'copy-fonts', 'copy-jquery', 'modify-manifest', 'copy-app');
 });
 
 gulp.task('travis', function () {

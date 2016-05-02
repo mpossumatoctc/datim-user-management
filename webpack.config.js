@@ -8,22 +8,6 @@ module.exports = {
         path: path.join(__dirname, '/build'),
         filename: 'index.js',
     },
-    //module: {
-    //    loaders: [
-    //        {
-    //            test: /\.jsx?$/,
-    //            exclude: [/(node_modules)/, /d2\-ui/],
-    //            loader: 'babel',
-    //            query: {
-    //                stage: 0,
-    //            },
-    //        },
-    //        {
-    //            test: /\.css$/,
-    //            loader: 'style-loader!css-loader',
-    //        },
-    //    ],
-    //},
     resolve: {
         alias: {
             jquery: path.resolve('./vendor/jquery/dist/jquery.js'),

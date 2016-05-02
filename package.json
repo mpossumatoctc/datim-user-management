@@ -1,12 +1,14 @@
 {
   "name": "pepfar-user-management",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "PEPFAR User management app",
   "main": "index.js",
   "repository": "https://github.com/dhis2/user-management-pepfar.git",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "build": "gulp build",
+    "package": "gulp build-prod"
   },
   "author": "Mark Polak",
   "license": "BSD",
@@ -42,16 +44,20 @@
     "run-sequence": "^1.0.1"
   },
   "devDependencies": {
+    "gulp-html-replace": "^1.5.5",
     "gulp-jscs": "^1.4.0",
     "gulp-jshint": "^1.9.0",
+    "gulp-rename": "^1.2.2",
     "gulp-rev": "^2.0.1",
     "gulp-ruby-sass": "^0.7.1",
     "gulp-sass": "^1.2.4",
     "gulp-uglify": "^1.0.2",
     "gulp-usemin": "^0.3.8",
+    "gulp-webpack": "^1.5.0",
     "jscs": "^1.9.0",
     "sass": "^0.5.0",
     "webpack": "^1.12.15",
-    "webpack-dev-server": "^1.14.1"
+    "webpack-dev-server": "^1.14.1",
+    "webpack-stream": "^3.2.0"
   }
 }
