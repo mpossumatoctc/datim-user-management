@@ -38,7 +38,7 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
             userType: undefined,
             userEntity: undefined,
             email: undefined,
-            locale: {name: 'en'},
+            locale: {name: 'en', code: 'en'},
             userActions: {},
             userGroups: [],
             userRoles: [],
