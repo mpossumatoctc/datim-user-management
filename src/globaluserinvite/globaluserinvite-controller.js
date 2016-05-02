@@ -23,7 +23,7 @@ function globalUserInviteController(dataGroups, currentUser,
     //Properties
     vm.isProcessing = false;
     vm.user = {
-        locale: {name: 'en'},
+        locale: {name: 'en', code: 'en'},
         userActions: {
             'Manage users': false
         },
