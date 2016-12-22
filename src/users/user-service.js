@@ -191,6 +191,10 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
             .all('invite')
             .post(inviteData)
             .then(function (response) {
+                if (!response || !response.uid) {
+                    return $q.reject(new Error('Invite response not as expected'));
+                }
+
                 return Restangular
                     .all('users')
                     .get(response.uid, {fields: ':owner,userCredentials[:owner]'});
