@@ -191,18 +191,12 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
             .all('invite')
             .post(inviteData)
             .then(function (response) {
-                if (response.status !== 'SUCCESS' ||
-                    response.importCount.imported !== 1 ||
-                    response.importCount.updated !== 0 ||
-                    response.importCount.ignored !== 0 ||
-                    response.importCount.ignored !== 0) {
-                    return $q.reject('Invite response not as expected');
-                }
                 return Restangular
                     .all('users')
-                    .get(response.lastImported, {fields: ':owner,userCredentials[:owner]'});
+                    .get(response.uid, {fields: ':owner,userCredentials[:owner]'});
             })
             .catch(function (error) {
+
                 if (angular.isString(error)) {
                     return $q.reject(error);
                 }
