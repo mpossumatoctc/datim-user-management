@@ -285,7 +285,11 @@ function userService($q, Restangular, userUtils, partnersService, agenciesServic
         return Restangular
             .all('users')
             .get(userId, {
-                fields: [':all', 'userCredentials[id,username,disabled,userRoles,catDimensionConstraints,cogsDimensionConstraints]'].join(',')
+                fields: [
+                    ':all',
+                    'organisationUnits[id,name,displayName],userGroups[id,displayName,name]',
+                    'userCredentials[id,username,disabled,userRoles[id,name,displayName],catDimensionConstraints,cogsDimensionConstraints]'
+                ].join(',')
             });
     }
 
