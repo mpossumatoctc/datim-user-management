@@ -82,6 +82,13 @@
     <!--</form>-->
     </div>
     <div class="row search-result-header">
+        <div class="tabs-container">
+            <ul class="nav nav-tabs">
+                <li ng-class="{ active: userList.disabledUserFilter === null }"><a ng-click="userList.setDisabledUserFilter()">All Users</a></li>
+                <li ng-class="{ active: userList.disabledUserFilter === false }"><a ng-click="userList.setDisabledUserFilter(false)">Active Users</a></li>
+                <li ng-class="{ active: userList.disabledUserFilter === true }"><a ng-click="userList.setDisabledUserFilter(true)">Disabled Users</a></li>
+            </ul>
+        </div>
         <div class="col-sm-6">
             <h3 ng-hide="userList.listIsLoading"
                ng-pluralize count="userList.pagination.getTotalItemCount()"
@@ -90,7 +97,7 @@
                'other': '{} Users found'
                }"></h3>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-6 header-buttons">
             <div class="button-group">
                 <a ng-show="userList.users.length > 0"
                    ng-href='{{userList.getCSVUrl()}}'
