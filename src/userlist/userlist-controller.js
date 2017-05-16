@@ -15,6 +15,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     };
 
     vm.detailsOpen = false;
+    vm.disabledUserFilter = null;
     vm.users = [];
     vm.pagination = userListService.pagination;
     vm.processing = {};
@@ -42,6 +43,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.resetFilters = resetFilters;
     vm.canEditUser = canEditUser;
     vm.getCSVUrl = getCSVUrl;
+    vm.setDisabledUserFilter = setDisabledUserFilter;
 
     vm.search = {
         options: userFilter,
@@ -53,7 +55,6 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
         placeHolderText: [],
         hasSecondaryFilter: hasSecondaryFilter,
         getSecondaryFilter: getSecondaryFilter
-
     };
 
     initialise();
@@ -220,6 +221,10 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
         userListService.resetFilters();
 
+        if (vm.disabledUserFilter !== null) {
+            userListService.setFilter('userCredentials.disabled:eq:' + vm.disabledUserFilter);
+        }
+
         vm.search.activeFilters.forEach(function (filterDefinition) {
             var filter;
 
@@ -343,5 +348,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function getCSVUrl() {
         return userListService.getCSVUrl();
+    }
+
+    function setDisabledUserFilter(disabledUsersOnly) {
+        var filter = (typeof disabledUsersOnly === 'boolean' ? disabledUsersOnly : null);
+        if (vm.disabledUserFilter !== filter) {
+            vm.disabledUserFilter = filter;
+            doSearch();
+        }
     }
 }
