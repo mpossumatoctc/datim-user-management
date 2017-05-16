@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').controller('userListController', userListController);
 
-function userListController(userFilter, currentUser, userTypesService, dataGroupsService, userListService,  //jshint ignore:line
+function userListController(userFilter, currentUser, schemaService, dataGroupsService, userListService,  //jshint ignore:line
                             userStatusService, $state, errorHandler, userActions, userService, _) {
     var vm = this;
     var searchFieldNames = {
@@ -44,6 +44,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     vm.canEditUser = canEditUser;
     vm.getCSVUrl = getCSVUrl;
     vm.setDisabledUserFilter = setDisabledUserFilter;
+    vm.selectedUserMap = {};
+    vm.selectedUsers = [];
+    vm.isAllUsersSelected = false;
+    vm.toggleSelectAll = toggleSelectAll;
+    vm.onSelectedUsersChanged = onSelectedUsersChanged;
+    vm.disableSelected = disableSelected;
+    vm.enableSelected = enableSelected;
 
     vm.search = {
         options: userFilter,
@@ -79,6 +86,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
 
     function setUserList(users) {
         vm.listIsLoading = false;
+        resetSelectedUsers();
         vm.users = users;
     }
 
@@ -132,7 +140,9 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     //      Very nice solution provided by Paul but we should move it into a directive.
     //TODO: Perhaps it would also be nice to never have it be out of sight if it is available?
     var detailsBlock = jQuery('.user-details-view');
-    function showDetails(user) {
+    function showDetails(user, $event) {
+        if ($event && $event.target && $event.target.nodeName === 'INPUT') { return; }
+
         var detailsRow = jQuery('.user-list li[user-id=' + user.id + ']');
         var detailsWrap = detailsRow.parent();
         var parentHeight = detailsWrap.innerHeight();
@@ -153,7 +163,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             vm.detailsUser = user;
             vm.detailsOpen = true;
             vm.getDataGroupsForUser(user);
-            vm.detailsUserUserType = userTypesService.getUserType(user);
+            vm.detailsUserUserType = schemaService.store.get('User Types', true).fromUser(user);
 
             vm.detailsUserEntity = {};
             userService.getUserEntity(user)
@@ -179,26 +189,9 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function getDataGroupsForUser(user) {
-        dataGroupsService.getDataGroupsForUser(user)
-            .then(function (dataGroups) {
-                dataGroups.forEach(function (dataGroup) {
-                    var exactMatch = new RegExp('^Data Entry ' + dataGroup.name + '$', 'i');
-                    var startMatch = new RegExp('^Data Entry ' + dataGroup.name + ' .+$', 'i');
-
-                    var userRoles = (user.userCredentials && user.userCredentials.userRoles) || [];
-
-                    var hasDataEntryForGroup = userRoles.some(function (userRole) {
-                        return exactMatch.test(userRole.name) || startMatch.test(userRole.name);
-                    });
-
-                    dataGroup.entry = hasDataEntryForGroup;
-                });
-
-                vm.detailsUserDataGroups = dataGroups;
-            })
-            .catch(function () {
-                errorHandler.warning('Failed to load datagroups for user');
-            });
+        schemaService.store.get('Data Groups').then(function (dataGroups) {
+            vm.detailsUserDataGRoups = dataGroups.fromUser(user);
+        });
     }
 
     function updatePlaceholder($index) {
@@ -325,7 +318,7 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function editUser(user) {
-        if (userTypesService.getUserType(user) === 'Global') {
+        if (schemaService.store.get('User Types', true).fromUser(user) === 'Global') {
             $state.go('globalEdit', {userId: user.id, username: user.userCredentials.username});
             return;
         }
@@ -336,11 +329,13 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
     }
 
     function canEditUser(user) {
-        if (currentUser.isGlobalUser() && !currentUser.hasAllAuthority() && userTypesService.getUserType(user) !== 'Global') {
+        var userType = schemaService.store.get('User Types', true).fromUser(user);
+
+        if (currentUser.isGlobalUser() && !currentUser.hasAllAuthority() && userType !== 'Global') {
             return false;
         }
 
-        if (user && user.id && (user.id !== currentUser.id) && userTypesService.getUserType(user) !== 'Unknown type') {
+        if (user && user.id && (user.id !== currentUser.id) && userType !== 'Unknown type') {
             return true;
         }
         return false;
@@ -356,5 +351,44 @@ function userListController(userFilter, currentUser, userTypesService, dataGroup
             vm.disabledUserFilter = filter;
             doSearch();
         }
+    }
+
+    function onSelectedUsersChanged() {
+        vm.selectedUsers.length = 0;
+        vm.selectedUsers = Object.keys(vm.selectedUserMap).reduce(function (selectedUsers, index) {
+            if (vm.selectedUserMap[index] === true) {
+                selectedUsers.push(vm.users[index]);
+            }
+            return selectedUsers;
+        }, vm.selectedUsers);
+
+        vm.isAllUsersSelected = (vm.selectedUsers.length === vm.users.length);
+    }
+
+    function toggleSelectAll() {
+        if (!vm.isAllUsersSelected) {
+            resetSelectedUsers();
+        }
+        else {
+            vm.selectedUsers.length = 0;
+            vm.users.forEach(function (user, index) {
+                vm.selectedUserMap[index] = true;
+                vm.selectedUsers.push(user);
+            });
+        }
+    }
+
+    function resetSelectedUsers() {
+        vm.selectedUserMap = {};
+        vm.selectedUsers.length = 0;
+        vm.isAllUsersSelected = false;
+    }
+
+    function disableSelected() {
+        vm.selectedUsers.filter(function (user) { return !user.userCredentials.disabled && user.id !== currentUser.id; }).forEach(deactivateUser);
+    }
+
+    function enableSelected() {
+        vm.selectedUsers.filter(function (user) { return user.userCredentials.disabled && user.id !== currentUser.id; }).forEach(activateUser);
     }
 }

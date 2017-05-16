@@ -1,8 +1,8 @@
 /* globals has, pick, flatten */
 angular.module('PEPFAR.usermanagement').factory('userActionsService', userActionsService);
 
-function userActionsService(Restangular, $q, userTypesService,
-                            currentUserService, errorHandler, dataEntryService) {
+function userActionsService(Restangular, $q,
+                            schemaService, errorHandler, dataEntryService) {
     var availableAgencyActions = [
         'Accept data', 'Submit data'
     ];
@@ -142,7 +142,7 @@ function userActionsService(Restangular, $q, userTypesService,
     }
 
     function getActions() {
-        return $q.all([actionRolesLoaded, currentUserService.getCurrentUser()])
+        return $q.all([actionRolesLoaded, schemaService.store.get('Current User')])
             .then(function (responses) {
                 currentUser = responses[1];
                 currentUserUserRoles = (currentUser && currentUser.userCredentials.userRoles) || [];
@@ -224,16 +224,22 @@ function userActionsService(Restangular, $q, userTypesService,
     }
 
     function getActionsForUser(user) {
-        var actions = getActionsForUserType(userTypesService.getUserType(user));
+        var userType = schemaService.store.get('User Types', true).fromUser(user);
+        var actions = [].concat(getActionsForUserType(userType));
         var userRoles = (user && user.userCredentials && user.userCredentials.userRoles) || [];
         var userRoleIds = userRoles.map(pick('id'));
 
-        return actionRolesLoaded.then(function () {
-            actions.forEach(function (action) {
-                action.hasAction = hasUserRoleFor(userRoleIds, action);
+        return $q.all([schemaService.authorization.getActionsForUser(user), actionRolesLoaded])
+            .then(function (responses) {
+                var authorizationsActions = responses[0];
+
+                actions.forEach(function (action) {
+                    action.hasAction = hasUserRoleFor(userRoleIds, action);
+                });
+
+                actions = actions.concat(authorizationsActions);
+                return $q.when(actions);
             });
-            return $q.when(actions);
-        });
     }
 
     function hasUserRoleFor(userRoleIds, action) {

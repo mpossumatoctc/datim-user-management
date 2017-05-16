@@ -25,14 +25,14 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 userFilter: function (userFilterService) {
                     return userFilterService.getUserFilter();
                 },
-                currentUser: function (currentUserService) {
-                    return currentUserService.getCurrentUser();
+                currentUser: function (schemaService) {
+                    return schemaService.store.get('Current User');
                 },
                 userActions: function (userActionsService) {
                     return userActionsService.getActions();
                 },
-                dataGroups: function (dataGroupsService) {
-                    return dataGroupsService.getDataGroups();
+                dataGroups: function (schemaService) {
+                    return schemaService.store.get('Data Groups');
                 }
             }
         })
@@ -41,20 +41,20 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             templateUrl: 'adduser/add.html',
             controller: 'addUserController as addUser',
             resolve: {
-                userTypes: function (userTypesService) {
-                    return userTypesService.getUserTypes();
+                userTypes: function (schemaService) {
+                    return schemaService.store.get('User Types');
                 },
                 userActions: function (userActionsService) {
                     return userActionsService.getActions();
                 },
-                dataGroups: function (dataGroupsService) {
-                    return dataGroupsService.getDataGroups();
+                dataGroups: function (schemaService) {
+                    return schemaService.store.get('Data Groups');
                 },
-                currentUser: function (currentUserService) {
-                    return currentUserService.getCurrentUser();
+                currentUser: function (schemaService) {
+                    return schemaService.store.get('Current User');
                 },
-                dimensionConstraint: function (categoriesService) {
-                    return categoriesService.getDimensionConstraint();
+                dimensionConstraint: function (schemaService) {
+                    return schemaService.store.get('Category Dimension Constraint');
                 }
             }
         })
@@ -63,20 +63,20 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             templateUrl: 'edituser/edit.html',
             controller: 'editUserController as editUser',
             resolve: {
-                userTypes: function (userTypesService) {
-                    return userTypesService.getUserTypes();
+                userTypes: function (schemaService) {
+                    return schemaService.store.get('User Types');
                 },
-                dataGroups: function (dataGroupsService) {
-                    return dataGroupsService.getDataGroups();
+                dataGroups: function (schemaService) {
+                    return schemaService.store.get('Data Groups');
                 },
                 userActions: function (userActionsService) {
                     return userActionsService.getActions();
                 },
-                currentUser: function (currentUserService) {
-                    return currentUserService.getCurrentUser();
+                currentUser: function (schemaService) {
+                    return schemaService.store.get('Current User');
                 },
-                dimensionConstraint: function (categoriesService) {
-                    return categoriesService.getDimensionConstraint();
+                dimensionConstraint: function (schemaService) {
+                    return schemaService.store.get('Category Dimension Constraint');
                 },
                 userToEdit: function ($stateParams, userService) {
                     return userService.getUser($stateParams.userId);
@@ -101,14 +101,14 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             templateUrl: 'globaluserinvite/globaluser-invite.html',
             controller: 'globalUserInviteController as globalUserCtrl',
             resolve: {
-                dataGroups: function (dataGroupsService) {
-                    return dataGroupsService.getDataGroups();
+                dataGroups: function (schemaService) {
+                    return schemaService.store.get('Data Groups');
                 },
                 userActions: function (userActionsService) {
                     return userActionsService.getActions();
                 },
-                currentUser: function (currentUserService) {
-                    return currentUserService.getCurrentUser();
+                currentUser: function (schemaService) {
+                    return schemaService.store.get('Current User');
                 },
                 userGroups: function (globalUserService) {
                     return globalUserService.getUserGroups();
@@ -120,22 +120,22 @@ function routerConfig($stateProvider, $urlRouterProvider) {
             templateUrl: 'globaluseredit/globaluser-edit.html',
             controller: 'globalUserEditController as globalUserCtrl',
             resolve: {
-                dataGroups: function (dataGroupsService) {
-                    return dataGroupsService.getDataGroups();
+                dataGroups: function (schemaService) {
+                    return schemaService.store.get('Data Groups');
                 },
                 userActions: function (userActionsService) {
                     return userActionsService.getActions();
                 },
-                currentUser: function (currentUserService) {
-                    return currentUserService.getCurrentUser();
+                currentUser: function (schemaService) {
+                    return schemaService.store.get('Current User');
                 },
                 userGroups: function (globalUserService) {
                     return globalUserService.getUserGroups();
                 },
-                userToEdit: function ($stateParams, userService, userTypesService, notify) {
+                userToEdit: function ($stateParams, userService, schemaService, notify) {
                     return userService.getUser($stateParams.userId)
                         .then(function (userToEdit) {
-                            if (userTypesService.getUserType(userToEdit) === 'Global') {
+                            if (schemaService.store.get('User Types', true).fromUser(userToEdit) === 'Global') {
                                 return userToEdit;
                             }
                             notify.warning('Given user id does not seem to correspond with a Global user');
@@ -144,6 +144,12 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 },
                 userLocale: function ($stateParams, userService) {
                     return userService.getUserLocale($stateParams.username);
+                },
+                authorizationActions: function ($stateParams, schemaAuthorizationsService, userService) {
+                    return userService.getUser($stateParams.userId)
+                        .then(function (user) {
+                            return schemaAuthorizationsService.getActionsForUser(user);
+                        });
                 }
             }
         })
@@ -192,6 +198,8 @@ angular.module('PEPFAR.usermanagement').config(['$compileProvider', function ($c
 //
 angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifest) {
     var baseUrl = [webappManifest.activities.dhis.href, 'api'].join('/');
+    baseUrl = 'http://localhost:8011/api';
+    console.log('configuring restangular ... baseUrl = ', baseUrl);
 
     if (process.env.NODE_ENV !== 'production') {
         Restangular.setBaseUrl('http://localhost:8080/dhis/api');

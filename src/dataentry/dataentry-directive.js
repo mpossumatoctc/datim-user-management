@@ -16,7 +16,7 @@ function dataEntryDirective() {
         templateUrl: 'dataentry/dataentry.html'
     };
 
-    function umDataEntryController($q, $scope, userActionsService, currentUserService, userService,
+    function umDataEntryController($q, $scope, userActionsService, schemaService, userService,
                                    userUtils, notify, errorHandler, dataEntryService) {
         var vm = this;
 
@@ -51,7 +51,7 @@ function dataEntryDirective() {
         }
 
         function initialise() {
-            $q.all([currentUserService.getCurrentUser(), userActionsService.getActions()])
+            $q.all([schemaService.store.get('Current User'), userActionsService.getActions()])
                 .then(function (responses) {
                     vm.currentUser = responses[0];
                     vm.userActions = responses[1];

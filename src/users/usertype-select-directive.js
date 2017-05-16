@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').directive('selectUsertype', userTypeSelectDirective);
 
-function userTypeSelectDirective(partnersService, agenciesService, interAgencyService, errorHandler) {
+function userTypeSelectDirective(agenciesService, schemaService, errorHandler) {
     var directive = {
         restrict: 'E',
         replace: true,
@@ -34,7 +34,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
         function loadValues(orgUnit) {
             scope.selectbox.items = [];
 
-            interAgencyService.getUserGroups(orgUnit).then(function (interAgency) {
+            schemaService.store.get('Interagency Groups', orgUnit).then(function (interAgency) {
                 scope.userTypes.forEach(function (item) {
                     if (item.name === 'Inter-Agency' &&
                         (interAgency.userUserGroup || interAgency.userUserGroup)) {
@@ -43,6 +43,7 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
                 });
             });
 
+            // TODO: This looks like a bug?  getAgencies but do nothing with them?
             agenciesService.getAgencies(orgUnit).then(function () {
                 scope.userTypes.forEach(function (item) {
                     if (item.name === 'Agency') {
@@ -51,7 +52,8 @@ function userTypeSelectDirective(partnersService, agenciesService, interAgencySe
                 });
             });
 
-            partnersService.getPartners(orgUnit).then(function () {
+            // TODO: This looks like a bug?  getPartners but do nothing with them?
+            schemaService.store.get('Partners in Organisation', orgUnit).then(function () {
                 scope.userTypes.forEach(function (item) {
                     if (item.name === 'Partner') {
                         scope.selectbox.items.push(item);

@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('editUserController', editUse
 
 function editUserController($scope, $state, currentUser, dataGroups, dataGroupsService, userToEdit, //jshint maxstatements: 55
                             userLocale, userFormService, userActions, dataEntryService,
-                            notify, userService, userTypesService, userUtils, errorHandler, userEntity) {
+                            notify, userService, schemaService, userUtils, errorHandler, userEntity) {
     var vm = this;
     var validations = userFormService.getValidations();
 
@@ -49,7 +49,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         //Reset data entry service state
         dataEntryService.reset();
 
-        dataGroupsService.getDataGroupsForUser(userToEdit)
+        schemaService.store.get('Data Groups').then(function (dataGroups) {
+                return dataGroups.fromUser(userToEdit);
+            })
             .then(correctUserRolesForType)
             .then(createDataGroupsObject);
 
@@ -245,7 +247,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function getUserType() {
-        return userTypesService.getUserType(userToEdit);
+        return schemaService.store.get('User Types', true).fromUser(userToEdit);
     }
 
     function changeUserStatus() {
