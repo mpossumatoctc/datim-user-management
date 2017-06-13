@@ -1,4 +1,4 @@
-# DATIM User Management Schema Definition
+# Generic Schema Definition
 
 The schema defines static data within the Datim User Management application.  It also defines how data structures are defined, retrieved, their relationships to one another, and logic associated with the data.
 
@@ -40,7 +40,7 @@ Defined the data sets used within the application that can be either static data
   - fn - JavaScript function expression [or]
   - get - JavaScript function expression to be used as a getter
   - args - array of arguments bound to the fn defined (cannot be used with "get")
-+ filter - array or string representing JavaScript expression(s) that will run against the dataset
++ filter - array or string representing JavaScript expression(s) that will run against the dataset.  The value returned will become the new dataset - a value must be returned if using a filter expression
 
 ### Static Data Set (type = "static")
 Defines static data to be used within the application
@@ -91,3 +91,121 @@ stores: [{
 The above data store retrieves the organisationUnits at a specific level.  In order to get data the user / app must also pass in a "level" argument.  This data is then bound to the "level" field when making the get request to the server.  After retrieving the data, a lodash sort is executed ("filter") and the resulting dataset is returned.
 
 Multiple data sets can be returned as well.  They must be keyed and the data returned is an Object that has properties named by the name of each config block.
+
+```
+stores: [{
+    "name": "Multiple Data Sets",
+    "config": [{
+        "name": "dataSet1",
+        "datamodel": "userGroups",
+        "get": {
+            "filter": "name:ilike:OU Data Set 1"
+        }
+    }, {
+        "name": "dataSet2",
+        "datamodel": "userGroups",
+        "get": {
+            "filter": "name:ilike:OU Data Set 2"
+        }
+    }, {
+        "name": "dataSet3",
+        "datamodel": "userGroups",
+        "get": {
+            "filter": "name:ilike:OU Data Set 3"
+        }
+    }]
+}]
+```
+
+The above will query the DHIS2 API (userGroups) with three different filter queries.  The results will then be assigned to and object containing a property equal to the "name" value specified.  The above example would yield the following result:
+
+```
+{
+    "dataSet1": [
+        /* user groups */
+    ],
+    "dataSet2": [
+        /* user groups */
+    ],
+    "dataSet3": [
+        /* user groups */
+    ]
+}
+```
+
+### Extending stores with custom getters and functions with optional arguments
+
+All data stores can have logic defined within the "extend" object of the definition.  The property defined within the extend object will yield the name of the function or getter.  The function has contextual access to "this" (the data store data) as well as "requires" (the required data stores) and the arguments if they were defined for the function.  All getters and functions automatically have return prefixed.  To define a getter and/or function:
+
+```
+stores: [{
+    "name": "Static Data Store",
+    "type": "static",
+    "config": [
+        { "name": "Test", "value": "Test Value", "isActive": true },
+        { "name": "Another", "value": "Another Value", "isActive": false },
+        { "name": "Third", "value": "Third Value", "isActive": false }
+    ],
+    "extend": {
+        "active": {
+            "get": "this.filter(function (data) { return data.isActive; })"
+        },
+        "getByName: {
+            "args": [ "name" ],
+            "fn": "this.filter(function (data) { return data.name === name; })"
+        }
+    }
+}]
+```
+
+The above definition is the functional equivalent of:
+
+```
+var StaticDataStore = [
+    { "name": "Test", "value": "Test Value", "isActive": true },
+    { "name": "Another", "value": "Another Value", "isActive": false },
+    { "name": "Third", "value": "Third Value", "isActive": false }
+];
+
+Object.defineProperty(StaticDataStore, "active", {
+    enumerable: false,
+    configurable: true,
+    get: function () {
+        return this.filter(function (data) { return data.isActive; });
+    }
+});
+
+Object.defineProperty(StaticDataStore, "getByName", {
+    enumerable: false,
+    configurable: true,
+    value: function (name) {
+        return this.filter(function (data) { return data.name === name; });
+    }
+});
+
+var activeEntries = StaticDataStore.active;
+var testEntries = StaticDataStore.getByName('Test');
+```
+
+# DATIM User Management Schema Definition
+
+The DATIM User Management application relies on data stores being present in order to operate.  It also requires that certain data stores implement particular methods and/or structure data in a particular fashion.
+
+## Current User
+
+A store must exist named "Current User" which returns a DHIS2 user entity object.  The object must be complete and contain the following:
+
++ authorities: array of authorities
++ hasAllAuthority: function returns Boolean
++ isUserAdministrator: function returns Boolean
++ isGlobalUser: function returns Boolean
+
+## User Roles
+
+A store containing all User Roles
+
+## User Types
+
+A store defining all of the user types in the system
+
++ fromUser: function that takes a user entity and returns the user type associated with that user
