@@ -1,37 +1,56 @@
 angular.module('PEPFAR.usermanagement').factory('schemaStoresService', schemaStoresService);
 
 function schemaStoresService(Restangular, errorHandler, schemaExtensionsService, $q, _) {
-    // TODO: Debug - should originate from the DHIS2 data store
-    var storeData = require('./schema').stores;
-
+    var storeData = null;
     var storeMap = {};
-    var stores = Promise.resolve(storeData).then(loadStores);
+
+    var loader = Restangular.one('dataStore')
+        .one('datim-user-management')
+        .one('stores')
+        .get()
+        .then(function (storesConfig) {
+            return (storeData = storesConfig);
+        })
+        .catch(function (err) {
+            var status = err.statusText || (err.status === 404 ? 'datim-user-management/stores does not exist in the DHIS2 data store' : err.status);
+            errorHandler.error('Error retrieving schema stores: ' + status);
+        })
+        .then(function (data) {
+            return loadStores(data || []);
+        });
 
     var api = {
-        get: getStoreByName
+        get: function getStore(name, context, synchronous) {
+            if ((arguments.length === 2 && context === true) || synchronous === true) {
+                return getStoreByName(name, context, synchronous);
+            }
+
+            return loader.then(function () {
+                return getStoreByName(name, context, synchronous);
+            });
+        }
     };
 
     window.schemaStore = api;
 
     return api;
 
-    function getContext(store, args) {
-        var context = { requires: {} };
-
-        (store.args || []).reduce(function (context, argName, argIndex) {
-            context[argName] = args[argIndex];
-            return context;
-        }, context);
-
-        if (!store.requires) { return $q.when(context); }
+    function getRequiredStores(store) {
+        if (!store.requires) { return $q.when({}); }
 
         return $q.all(store.requires.map(function (name) { return storeMap[name]; })).then(function (stores) {
-            store.requires.reduce(function (requires, name, index) {
+            return store.requires.reduce(function (requires, name, index) {
                 requires[name] = stores[index];
                 return requires;
-            }, context.requires);
-            return context;
+            }, {});
         });
+    }
+
+    function getArgumentContext(store, args) {
+        return (store.args || []).reduce(function (context, argName, argIndex) {
+            context[argName] = args[argIndex];
+            return context;
+        }, {});
     }
 
     function loadStores(stores) {
@@ -39,32 +58,25 @@ function schemaStoresService(Restangular, errorHandler, schemaExtensionsService,
             if (store.type === 'dynamic') {
                 storeMap[store.name] = store;
             }
-            else if (store.requires) {
-                storeMap[store.name] = getContext(store).then(function (context) {
+            else {
+                storeMap[store.name] = getRequiredStores(store).then(function (requires) {
+                    var localContext = { requires: requires };
                     var clone = angular.fromJson(angular.toJson(store));
+
                     if (clone.config) {
                         if (clone.config.get) {
                             Object.keys(clone.config.get).forEach(function (key) {
-                                clone.config.get[key] = _.template(clone.config.get[key])(context);
+                                clone.config.get[key] = _.template(clone.config.get[key])(localContext);
                             });
                         }
                         if (clone.config.endpoint) {
-                            clone.config.endpoint = _.template(clone.config.endpoint)(context);
+                            clone.config.endpoint = _.template(clone.config.endpoint)(localContext);
                         }
                     }
 
-                    return $q.all(loadStore(clone, context)).then(function (data) {
-                        store.data = data.pop();
-                        bindExtensions(store, context.requires);
-                        return store.data;
+                    return loadStore(clone, {}, localContext).then(function (data) {
+                        return store.data = data || [];
                     });
-                });
-            }
-            else {
-                storeMap[store.name] = $q.all(loadStore(store)).then(function (data) {
-                    store.data = data.pop();
-                    bindExtensions(store, {});
-                    return store.data;
                 });
             }
         });
@@ -72,103 +84,112 @@ function schemaStoresService(Restangular, errorHandler, schemaExtensionsService,
         return storeMap;
     }
 
-    function loadStore(store, context) {
+    function loadStore(store, context, localContext) {
         var name = store.name;
         var type = (store.type || 'REST').toLowerCase();
         var storeConfig = store.config;
 
-        var promises = getAsyncExtensions(store);
+        if (type === 'static') {
+            return $q.when(evalFilter(storeConfig || [], store.filter));
+        }
+        else if (type === 'rest') {
+            var datamodel = storeConfig.datamodel;
+            var endpoint = storeConfig.endpoint || datamodel;
+            var httpConfig = angular.extend({ cache: true }, storeConfig.httpConfig);
+
+            var getParams = angular.extend({ fields: 'id,name', paging: false }, storeConfig.get);
+            var getArgs = [getParams];
+            if (getParams.id) {
+                getArgs.splice(0, 0, getParams.id);
+                delete getParams.id;
+            }
+
+            if (storeConfig.get === null) {
+                getArgs.length = 0;
+            }
+
+            return Restangular[(getArgs.length > 1 ? 'all' : 'one')](endpoint)
+                .withHttpConfig(httpConfig)
+                .get(getArgs[0], getArgs[1])
+                .then(function (response) {
+                    if (!response) {
+                        errorHandler.warning('No data returned for "' + name + '"');
+                    }
+
+                    var data = response || [];
+                    if (!angular.isArray(data) && datamodel && datamodel in data) {
+                        data = data[datamodel];
+                    }
+
+                    return evalFilter(data, storeConfig.filter) || [];
+                })
+                .catch(function (err) {
+                    var errorMessage = 'Unable to load "' + (name || endpoint) + '": ' +
+                        (err.message || (err.data || {}).message || err.statusText || err);
+                    errorHandler.error(errorMessage);
+                });
+        }
+        else {
+            throw 'type ' + type + ' is not supported.';
+        }
 
         function evalFilter(data, filter) {
+            if (data) {
+                bindExtensions(store.extend, data, localContext);
+            }
+
             if (!filter) { return data; }
 
             (angular.isArray(filter) ? filter : [ filter ]).forEach(function (filter) {
                 try {
                     var argNames = Object.keys(context || {});
                     var argValues = argNames.map(function (name) { return context[name]; });
+                    var oldData = data;
 
                     data = schemaExtensionsService
-                        .bind(data, 'getFiltered', { type: 'function', config: filter, args: argNames })
+                        .bind(data, 'getFiltered', { fn: filter, args: argNames }, localContext)
                         .getFiltered.apply(data, argValues);
 
-                    if (data && data.getFiltered) {
+                    errorHandler.debug('filter expression for "' + filter + '" returned data: ', data, ' with input data', oldData);
+
+                    if (oldData != data) {
+                        bindExtensions(store.extend, data, localContext);
+                        delete oldData.getFiltered;
+                    }
+                    else if (data && data.getFiltered) {
                         delete data.getFiltered;
                     }
                 } catch (err) {
-                    console.log('schema-stores-service: loadStore.evalFilter failed to invoke for store [' + store.name + '] filter: ' + filter);
-                    console.error(err);
+                    errorHandler.warning('schema-stores-service: loadStore.evalFilter failed to invoke for store [' + store.name + '] filter: ' + filter);
                     throw err;
                 }
             });
 
             return data;
         }
-
-        var promise = null;
-
-        switch (type) {
-            case 'static':
-                promise = $q.when(evalFilter(storeConfig || [], store.filter));
-                break;
-            case 'rest':
-                var datamodel = storeConfig.datamodel;
-                var endpoint = storeConfig.endpoint || datamodel;
-                var httpConfig = angular.extend({ cache: true }, storeConfig.httpConfig);
-
-                var getParams = angular.extend({ fields: 'id,name', paging: false }, storeConfig.get);
-                var getArgs = [getParams];
-                if (getParams.id) {
-                    getArgs.splice(0, 0, getParams.id);
-                    delete getParams.id;
-                }
-
-                if (storeConfig.get === null) {
-                    getArgs.length = 0;
-                }
-
-                promise = Restangular[(getArgs.length > 1 ? 'all' : 'one')](endpoint)
-                    .withHttpConfig(httpConfig)
-                    .get(getArgs[0], getArgs[1])
-                    .then(function (response) {
-                        var data = response;
-                        if (!angular.isArray(data) && datamodel && datamodel in response) {
-                            data = response[datamodel];
-                        }
-
-                        return evalFilter(data, storeConfig.filter) || [];
-                    })
-                    .catch(function (err) {
-                        errorHandler.error('Unable to load ' + name + ': ' + err.message ? err.message : err);
-                    });
-                break;
-            default:
-                throw 'type ' + type + ' is not supported.';
-                break;
-        }
-
-        if (promise) {
-            promises.push(promise);
-        }
-
-        return promises;
     }
 
     function loadDynamicStore(store) {
-        var args = safeCloneArguments(arguments, 1);
+        var args = Array.prototype.slice.call(arguments, 1);
 
         if (store.preflight && !schemaExtensionsService.isTruthy(store.preflight, store.args, args)) {
             return $q.reject('preflight failed - the arguments and / or condition [' + store.preflight + '] is invalid');
         }
 
-        return getContext(store, args).then(function (context) {
+        return getRequiredStores(store).then(function (requires) {
+            var localContext = { requires: requires };
+            var argumentContext = getArgumentContext(store, args);
+            var templateContext = angular.extend({}, localContext, argumentContext);
+
             var configs = angular.isArray(store.config) ? store.config : [store.config];
             configs = angular.fromJson(angular.toJson(configs));
 
             var promises = configs.map(function (config) {
                 Object.keys(config.get || {}).forEach(function (key) {
-                    config.get[key] = _.template(config.get[key])(context);
+                    config.get[key] = _.template(config.get[key])(templateContext);
                 });
-                return loadStore({ name: config.name, type: 'REST', config: config }, context);
+                var configStore = { name: config.name || store.name, type: 'REST', config: config, extend: store.extend };
+                return loadStore(configStore, argumentContext, localContext);
             }).reduce(function (arr, promises) { return arr.concat(promises); }, []);
 
             return $q.all(promises).then(function (results) {
@@ -182,62 +203,50 @@ function schemaStoresService(Restangular, errorHandler, schemaExtensionsService,
         });
     }
 
-    function getAsyncExtensions(store) {
-        return Object.keys(store.extend || {}).filter(function (key) {
-            return (store.extend[key].type || '').toLowerCase() === 'rest';
-        }).map(function (key) {
-            var restStore = store.extend[key];
-            restStore.name = key;
+    function bindExtensions(extendObject, dataObject, localContext) {
+        if (!dataObject) { return; }
 
-            return $q.all(loadStore(restStore)).then(function (data) {
-                return restStore.data = data.pop();
-            });
-        });
-    }
-
-    function bindExtensions(store, requires) {
-        Object.keys(store.extend || {}).forEach(function (key) {
-            var target = store.extend[key].target || 'collection';
-            if (target === 'item' && angular.isArray(store.data)) {
-                store.data.forEach(function (data) {
-                    schemaExtensionsService.bind(data, key, store.extend[key], requires);
+        Object.keys(extendObject || {}).forEach(function (key) {
+            var target = extendObject[key].target || 'collection';
+            if (target === 'item' && angular.isArray(dataObject)) {
+                dataObject.forEach(function (data) {
+                    schemaExtensionsService.bind(data, key, extendObject[key], localContext);
                 });
             }
             else {
-                schemaExtensionsService.bind(store.data, key, store.extend[key], requires);
+                schemaExtensionsService.bind(dataObject, key, extendObject[key], localContext);
             }
         });
     }
 
-    function safeCloneArguments(args, startAt) {
-        var clonedArgs = [];
-        for (var i = (startAt || 0); i < args.length; i++) {
-            clonedArgs.push(args[i]);
-        }
-        return clonedArgs;
-    }
-
     function getStoreByName(name, context, synchronous) {
-        var args = safeCloneArguments(arguments, 1);
+        var args = Array.prototype.slice.call(arguments, 1);
 
-        if (arguments.length === 2 && typeof context === 'boolean') {
+        if (arguments.length === 3 && typeof context === 'boolean') {
             synchronous = context;
             context = undefined;
         }
 
         if (synchronous === true) {
             var store = _.find(storeData, { name: name });
+            store = notifyIfStoreMissing(store, name);
             return (!store ? null : store.data || null);
         }
 
-        return stores.then(function (map) {
-            var store = map[name];
-            if (!store || store.type !== 'dynamic') {
-                return store;
-            }
+        var store = storeMap[name];
+        notifyIfStoreMissing(store, name);
+        if (!store || store.type !== 'dynamic') {
+            return store;
+        }
 
-            args.splice(0, 0, store);
-            return loadDynamicStore.apply(this, args);
-        });
+        args.splice(0, 0, store);
+        return loadDynamicStore.apply(this, args);
+    }
+
+    function notifyIfStoreMissing(store, name) {
+        if (!store) {
+            errorHandler.error('The requested store "' + name + '" has not been defined in the DHIS2 data store');
+        }
+        return store;
     }
 }

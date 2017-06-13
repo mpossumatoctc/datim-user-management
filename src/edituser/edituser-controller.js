@@ -47,6 +47,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         }
 
         //Reset data entry service state
+        dataEntryService.userActions = userActions;
         dataEntryService.reset();
 
         schemaService.store.get('Data Groups').then(function (dataGroups) {

@@ -6,10 +6,7 @@ window.PEPFARUSERMANAGEMENT = {
 // Config functions
 //
 function translateConfig($translateProvider) {
-    $translateProvider.useStaticFilesLoader({
-        prefix: 'i18n/',
-        suffix: '.json'
-    });
+    $translateProvider.useLoader('schemaI18nService');
     $translateProvider.preferredLanguage('en');
 }
 
@@ -110,8 +107,8 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 currentUser: function (schemaService) {
                     return schemaService.store.get('Current User');
                 },
-                userGroups: function (globalUserService) {
-                    return globalUserService.getUserGroups();
+                userGroups: function (schemaService) {
+                    return schemaService.store.get('Global User Groups');
                 }
             }
         })
@@ -129,27 +126,24 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 currentUser: function (schemaService) {
                     return schemaService.store.get('Current User');
                 },
-                userGroups: function (globalUserService) {
-                    return globalUserService.getUserGroups();
+                userGroups: function (schemaService) {
+                    return schemaService.store.get('Global User Groups');
                 },
                 userToEdit: function ($stateParams, userService, schemaService, notify) {
                     return userService.getUser($stateParams.userId)
                         .then(function (userToEdit) {
-                            if (schemaService.store.get('User Types', true).fromUser(userToEdit) === 'Global') {
-                                return userToEdit;
-                            }
-                            notify.warning('Given user id does not seem to correspond with a Global user');
-                            throw new Error('Not a global user');
+                            return schemaService.store.get('User Types').then(function (userTypes) {
+                                if (userTypes.fromUser(userToEdit) === 'Global') {
+                                    return userToEdit;
+                                }
+
+                                notify.warning('Given user id does not seem to correspond with a Global user');
+                                throw new Error('Not a global user');
+                            });
                         });
                 },
                 userLocale: function ($stateParams, userService) {
                     return userService.getUserLocale($stateParams.username);
-                },
-                authorizationActions: function ($stateParams, schemaAuthorizationsService, userService) {
-                    return userService.getUser($stateParams.userId)
-                        .then(function (user) {
-                            return schemaAuthorizationsService.getActionsForUser(user);
-                        });
                 }
             }
         })
@@ -198,15 +192,12 @@ angular.module('PEPFAR.usermanagement').config(['$compileProvider', function ($c
 //
 angular.module('PEPFAR.usermanagement').run(function (Restangular, webappManifest) {
     var baseUrl = [webappManifest.activities.dhis.href, 'api'].join('/');
-    baseUrl = 'http://localhost:8011/api';
-    console.log('configuring restangular ... baseUrl = ', baseUrl);
 
     if (process.env.NODE_ENV !== 'production') {
         Restangular.setBaseUrl('http://localhost:8080/dhis/api');
     } else {
         Restangular.setBaseUrl(baseUrl);
     }
-
 });
 
 //==================================================================================

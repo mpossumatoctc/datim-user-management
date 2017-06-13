@@ -68,6 +68,7 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
 
     function initialise() {
         if (!currentUser.hasAllAuthority() && !currentUser.isUserAdministrator()) {
+            console.log('YOU DO NOT HAVE ACCESS -> hasAll = ', currentUser.hasAllAuthority(), 'isAdmin = ', currentUser.isUserAdministrator(), ' currentUser = ', currentUser);
             return $state.go('noaccess', {message: 'Your user account does not seem to have the authorities to access this functionality.'});
         }
         reloadFilters();
@@ -190,7 +191,7 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
 
     function getDataGroupsForUser(user) {
         schemaService.store.get('Data Groups').then(function (dataGroups) {
-            vm.detailsUserDataGRoups = dataGroups.fromUser(user);
+            vm.detailsUserDataGroups = dataGroups.fromUser(user);
         });
     }
 

@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').directive('selectUsertype', userTypeSelectDirective);
 
-function userTypeSelectDirective(agenciesService, schemaService, errorHandler) {
+function userTypeSelectDirective(schemaService, errorHandler) {
     var directive = {
         restrict: 'E',
         replace: true,
@@ -44,7 +44,7 @@ function userTypeSelectDirective(agenciesService, schemaService, errorHandler) {
             });
 
             // TODO: This looks like a bug?  getAgencies but do nothing with them?
-            agenciesService.getAgencies(orgUnit).then(function () {
+            schemaService.store.get('Agencies in Organisation', orgUnit).then(function () {
                 scope.userTypes.forEach(function (item) {
                     if (item.name === 'Agency') {
                         scope.selectbox.items.push(item);

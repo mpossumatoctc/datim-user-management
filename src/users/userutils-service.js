@@ -1,9 +1,16 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').factory('userUtils', userUtilsService);
 
-function userUtilsService(errorHandler) {
+function userUtilsService(userActionsService, errorHandler) {
     var previousDataGroups;
     var previousUserActions;
+
+    var userActions;
+    userActionsService.getActions().then(function (actions) {
+        userActions = actions;
+
+        console.log('userutils-service ---> got userActions => ', userActions);
+    });
 
     return {
         getUserRestrictionsDifference: getUserRestrictionsDifference,
@@ -38,12 +45,20 @@ function userUtilsService(errorHandler) {
     }
 
     function getDataGroupsForUserType(dataGroups, getUserType) {
-        if (getUserType() === 'Partner') {
-            errorHandler.debug('Partner type found remove sims as datagroup');
-            return _.chain(dataGroups)
-                .reject({name: 'SIMS'})
-                .reject({name: 'SIMS Key Populations'})
-                .value();
+        var userType = getUserType();
+        if (userType === 'Partner') {
+            errorHandler.debug('Partner type found - cleaning groups');
+
+            var normalRoles = _.chain(userActions.dataEntryRestrictions[userType] || {}).values().flatten().value()
+            var managerRoles = _.chain(userActions.dataEntryRestrictionsUserManager[userType] || {}).values().flatten().value();
+            var allRoleNames = _.indexBy(normalRoles.concat(managerRoles), 'name');
+
+            return (dataGroups || []).filter(function (dataGroup) {
+                var roles = dataGroup.userRoles || [];
+                return (roles.length === 0 || roles.every(function (dataGroupRole) {
+                    return !!allRoleNames[dataGroupRole.name];
+                }));
+            });
         }
         return dataGroups || [];
     }
@@ -54,15 +69,14 @@ function userUtilsService(errorHandler) {
             return [];
         }
 
+        var currentUserRoleNames = _.indexBy(currentUser.userCredentials.userRoles, 'name');
+
         var userType = angular.isString(getUserType) ? getUserType : getUserType();
         var userEntryDataEntryStreams = userActions.getDataEntryRestrictionDataGroups(userType)
             .filter(function (streamName) {
-                return currentUser.hasAllAuthority() || currentUser.userCredentials.userRoles
-                        .map(pick('name'))
-                        .some(function (roleName) {
-                            return roleName === ['Data Entry', streamName].join(' ') ||
-                                (streamName === 'SI' && /^Data Entry SI(?: Country Team)?$/.test(roleName));
-                        });
+                return currentUser.hasAllAuthority || (userActions.dataEntryRestrictions[streamName] || []).some(function (requiredRole) {
+                    return !!currentUserRoleNames[requiredRole.name];
+                });
             });
 
         errorHandler.debug('The following data entry streams were found based on your userroles or ALL authority and the selected usertype: ', userEntryDataEntryStreams);

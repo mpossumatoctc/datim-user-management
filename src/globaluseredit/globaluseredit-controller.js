@@ -1,14 +1,11 @@
 angular.module('PEPFAR.usermanagement').controller('globalUserEditController', globalUserEditController);
 
-function globalUserEditController(notify, userGroups, userActions, userToEdit, userLocale, authorizationActions, userUtils, userService, schemaService, $q) {
+function globalUserEditController(notify, userGroups, userActions, userToEdit, userLocale, userUtils, userService, schemaService, $q) {
     'use strict';
     /*jshint validthis: true*/
     var vm = this;
 
-    var allUserActions = authorizationActions.reduce(function (actions, action) {
-        actions[action.name] = action.hasAction;
-        return actions;
-    }, { 'Manage users': userUtils.hasUserAdminRights(userToEdit) });
+    var allUserActions = { 'Manage users': userUtils.hasUserAdminRights(userToEdit) };
 
     //Properties
     vm.user = {
@@ -75,10 +72,6 @@ function globalUserEditController(notify, userGroups, userActions, userToEdit, u
                 });
             }
         }
-
-        authorizationActions.forEach(function (action) {
-            (vm.user.userActions[action.name] ? action.grant(userToEdit) : action.revoke(userToEdit));
-        });
 
         vm.isProcessing = true;
 

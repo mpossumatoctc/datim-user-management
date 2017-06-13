@@ -26,7 +26,6 @@ require('./userlist/userfilter-service.js');
 require('./userlist/pagination-service.js');
 require('./userlist/userlist-service.js');
 require('./pepfar/agency-select-directive.js');
-require('./pepfar/agencies-service.js');
 require('./pepfar/partner-select-directive.js');
 require('./language/locale-service.js');
 require('./language/locale-select-directive.js');
@@ -43,12 +42,10 @@ require('./users/userutils-service.js');
 require('./dataentry/dataentry-directive.js');
 require('./dataentry/dataentry-service.js');
 require('./globaluserinvite/globaluserinvite-controller.js');
-require('./globaluserinvite/globaluser-service.js');
 require('./globaluseredit/globaluseredit-controller.js');
 
-require('./schema/schema.js');
 require('./schema/schema-extensions-service.js');
-require('./schema/schema-authorizations-service.js');
+require('./schema/schema-i18n-service.js');
 require('./schema/schema-stores-service.js');
 require('./schema/schema-service.js');
 

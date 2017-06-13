@@ -1,8 +1,8 @@
 angular.module('PEPFAR.usermanagement').factory('schemaService', schemaService);
 
-function schemaService(schemaStoresService, schemaAuthorizationsService) {
+function schemaService(schemaStoresService, schemaI18nService) {
     return {
-        store: schemaStoresService,
-        authorization: schemaAuthorizationsService
+        i18n: schemaI18nService,
+        store: schemaStoresService
     };
 }

@@ -1,7 +1,7 @@
 angular.module('PEPFAR.usermanagement').controller('addUserController', addUserController);
 
 function addUserController($scope, userTypes, dataGroups, currentUser, dimensionConstraint, //jshint maxstatements: 60
-                           userActions, userService, $state, notify, interAgencyService,
+                           userActions, userService, $state, notify, schemaService,
                            userFormService, userUtils, dataEntryService, errorHandler) {
 
     errorHandler.debug(currentUser.isGlobalUser && currentUser.isGlobalUser() ? 'Is a global user' : 'Is not a global user');
@@ -28,7 +28,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
     vm.getUserManagerRoles = getUserManagerRoles;
-    vm.getUserManagerDataEntryRoles = getUserManagerDataEntryRoles;
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
     vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
     vm.getErrorString = getErrorString;
@@ -56,7 +55,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             vm.actions = userActions.filterActionsForCurrentUser(userActions.getActionsForUserType(newVal.name));
 
             if (newVal.name === 'Inter-Agency') {
-                interAgencyService.getUserGroups(getCurrentOrgUnit()).then(function (interAgencyUserGroups) {
+                schemaService.store.get('Interagency Groups', getCurrentOrgUnit()).then(function (interAgencyUserGroups) {
                     $scope.user.userEntity = interAgencyUserGroups;
                 });
             }
@@ -86,6 +85,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);
 
+        dataEntryService.userActions = userActions;
         vm.actions = userActions.getActionsForUserType();
     }
 
@@ -266,14 +266,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
         var dataEntryRoles = _.map(getUserManagerDataEntryRoles(), _.compose(renameProperty('userRoleId', 'id'), _.partialRight(_.pick, ['userRoleId'])));
         vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(dataEntryRoles);
-    }
-
-    function renameProperty(from, to) {
-        return function (item) {
-            item[to] = item[from];
-            delete item[from];
-            return item;
-        };
     }
 
     function getUserManagerDataAccessGroups() {

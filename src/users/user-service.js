@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userService', userService);
 
-function userService($q, Restangular, userUtils, agenciesService, schemaService, errorHandler, dataEntryService) {
+function userService($q, Restangular, userUtils, schemaService, errorHandler, dataEntryService) {
     var userInviteObjectStructure = {
         email:'',
         organisationUnits:[
@@ -97,6 +97,7 @@ function userService($q, Restangular, userUtils, agenciesService, schemaService,
         Object.keys(dataEntryService.dataEntryRoles)
             .filter(function (dataEntryKey) { return dataEntryService.dataEntryRoles[dataEntryKey] === true; })
             .forEach(function (dataEntryKey) {
+                var dataEntryRoles = schemaService.store.get('')
                 var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataEntryKey] || [];
                 dataEntryUserRoles.forEach(function (dataEntryUserRole) {
                     var userRoleId = dataEntryUserRole.userRoleId;
@@ -326,8 +327,7 @@ function userService($q, Restangular, userUtils, agenciesService, schemaService,
 
         return $q.all([
                 schemaService.store.get('Partners in Organisation', organisationUnit),
-                agenciesService.getAgencies(organisationUnit)
-                    .then(returnValue, returnEmptyArray),
+                schemaService.store.get('Agencies in Organisation', organisationUnit),
                 schemaService.store.get('Interagency Groups', organisationUnit)
             ])
             .then(function (responses) {
