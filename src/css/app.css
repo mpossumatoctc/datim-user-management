@@ -12517,54 +12517,58 @@ button.close {
   margin-top: 15px;
   margin-bottom: 15px;
 }
-/* line 54, ../user-groups/_usergroups.sass */
+/* line 55, ../user-groups/_usergroups.sass */
+.manage-user-groups .new-group .tabs-container .not-allowed a {
+  cursor: not-allowed !important;
+}
+/* line 57, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .tabs-container a {
   cursor: pointer;
 }
-/* line 57, ../user-groups/_usergroups.sass */
+/* line 60, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .name-container {
   display: table;
   padding: 4px;
   padding-top: 0px;
   width: 100%;
 }
-/* line 63, ../user-groups/_usergroups.sass */
+/* line 66, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .name-container > * {
   display: table-cell;
 }
-/* line 66, ../user-groups/_usergroups.sass */
+/* line 69, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .name-container label {
   width: 50px;
 }
-/* line 68, ../user-groups/_usergroups.sass */
+/* line 71, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .name-container span {
   width: 60px;
   padding-left: 4px;
 }
-/* line 72, ../user-groups/_usergroups.sass */
+/* line 75, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .users-container {
   padding-top: 4px;
   width: 100%;
 }
-/* line 76, ../user-groups/_usergroups.sass */
+/* line 79, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .users-container label {
   padding-left: 4px;
   width: 55px;
   float: left;
 }
-/* line 81, ../user-groups/_usergroups.sass */
+/* line 84, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .users-container .user-container {
   padding-bottom: 4px;
 }
-/* line 84, ../user-groups/_usergroups.sass */
+/* line 87, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .users-container .user-container > * {
   display: inline-block;
 }
-/* line 87, ../user-groups/_usergroups.sass */
+/* line 90, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .users-container .user-container i.readonly {
   visibility: hidden;
 }
-/* line 90, ../user-groups/_usergroups.sass */
+/* line 93, ../user-groups/_usergroups.sass */
 .manage-user-groups .new-group .action-container {
   clear: both;
   text-align: center;

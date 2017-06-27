@@ -24,7 +24,7 @@
                 <div class="tabs-container">
                     <ul class="nav nav-tabs">
                         <li ng-class="{ active: userGroupsCtrl.isCreating() }" class="active"><a ng-click="userGroupsCtrl.setSelectedGroup(null)">Create New Group</a></li>
-                        <li ng-class="{ active: !userGroupsCtrl.isCreating() }"><a>Edit Group</a></li>
+                        <li ng-class="{ active: !userGroupsCtrl.isCreating(), 'not-allowed': userGroupsCtrl.isCreating() }"><a>Edit Group</a></li>
                     </ul>
                 </div>
                 <div class="name-container">
