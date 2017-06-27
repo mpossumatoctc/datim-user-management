@@ -147,6 +147,19 @@ function routerConfig($stateProvider, $urlRouterProvider) {
                 }
             }
         })
+        .state('manageUserGroups', {
+            url: '/userGroups/manage',
+            templateUrl: 'user-groups/manage-user-groups.html',
+            controller: 'userGroupsController as userGroupsCtrl',
+            resolve: {
+                currentUser: function (schemaService) {
+                    return schemaService.store.get('Current User');
+                },
+                userGroups: function (schemaService) {
+                    return schemaService.store.get('DATIM User Groups');
+                }
+            }
+        })
         .state('noaccess', {
             url: '/noaccess',
             templateUrl: 'noaccess/noaccess.html',

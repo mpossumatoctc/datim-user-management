@@ -32,6 +32,16 @@
         }
     }
 }, {
+    "name": "DATIM User Groups",
+    "config": {
+        "datamodel": "userGroups",
+        "get": {
+            "fields": "id,name,users[id,name]",
+            "filter": "name:like: (DATIM)"
+        }
+    },
+    "filter": "_.sortBy(this.filter(function (userGroup) { return userGroup.name.match(/\\(DATIM\\)$/); }), 'name')"
+}, {
     "name": "User Roles",
     "config": {
         "datamodel": "userRoles"

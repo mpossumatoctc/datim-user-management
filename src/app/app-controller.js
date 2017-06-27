@@ -21,7 +21,8 @@ function appController($scope, Restangular, webappManifest, errorHandler, schema
         edit: 'Edit user',
         noaccess: 'No access',
         globalAdd: 'Invite Global user',
-        globalEdit: 'Edit Global user'
+        globalEdit: 'Edit Global user',
+        manageUserGroups: 'Manage user groups'
     };
 
     initialise();

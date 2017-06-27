@@ -43,6 +43,8 @@ require('./dataentry/dataentry-directive.js');
 require('./dataentry/dataentry-service.js');
 require('./globaluserinvite/globaluserinvite-controller.js');
 require('./globaluseredit/globaluseredit-controller.js');
+require('./user-groups/user-groups-service.js');
+require('./user-groups/user-groups-controller.js');
 
 require('./schema/schema-extensions-service.js');
 require('./schema/schema-i18n-service.js');
