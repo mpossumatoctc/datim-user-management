@@ -12,12 +12,6 @@ fi
 #Gather DHIS credentials for `curl` calls:
 source dhis_config
 
-#Update Data Store
-#TODO: curl --data "@./i18n.json" -v -H "Content-Type: application/json" -u admin:district http://<server>/api/dataStore/datim-user-management/i18n
-#TODO: curl --data "@./stores.json" -v -H "Content-Type: application/json" -u admin:district http://<server>/api/dataStore/datim-user-management/stores
-#EX: curl -X POST -H "Content-Type: text/plain" -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/systemSettings/keyApprovalDataSetGroups" -d '[{"name": "MER Results","dataSets": ["STL4izfLznL","asHh1YkxBU5","i29foJcLY9Y","j1i6JjOpxEq","hIm0HGCKiPv","NJlAVhe4zjv","ovYEbELCknv","sCar694kKxH","j9bKklpTDBZ","ZaV4VSLstg7","vvHCWnhULAf","gZ1FgiGUlSj","xBRAscSmemV","VWdBdkfYntI"]},{"name": "MER Targets","dataSets": ["xJ06pxmxfU6","LBSk271pP7J","rDAUgkkexU1","IOarm0ctDVL","VjGqATduoEX","PHyD22loBQH","oYO9GvA05LE","xxo1G5V1JG2","AyFVOGbAvcH","tCIW2VFd8uu","JXKUYJqmyDd","qRvKHvlzNdv","lbwuIo56YoG","Om3TJBRH8G8"]}]'
-#Ex: curl -X POST -H "Content-Type: text/plain" -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/systemSettings/keyApprovalsDataSetDisplayRules" -d '[{"workflow":"MER Targets","matchPeriodOn":{"test":"^[0-9]{4}Oct$","comparator":"lt","value":"2016Oct"},"dataSets":["xJ06pxmxfU6","LBSk271pP7J","rDAUgkkexU1","IOarm0ctDVL","VjGqATduoEX","PHyD22loBQH","oYO9GvA05LE"]},{"workflow":"MER Targets","matchPeriodOn":{"test":"^[0-9]{4}Oct$","comparator":"gte","value":"2016Oct"},"dataSets":["xxo1G5V1JG2","AyFVOGbAvcH","tCIW2VFd8uu","JXKUYJqmyDd","qRvKHvlzNdv","lbwuIo56YoG","Om3TJBRH8G8"]},{"workflow":"MER Results","matchPeriodOn":{"test":"^[0-9]{4}Q[1-4]$","comparator":"lte","value":"2016Q2"},"dataSets":["STL4izfLznL","asHh1YkxBU5","i29foJcLY9Y","j1i6JjOpxEq","hIm0HGCKiPv","NJlAVhe4zjv","ovYEbELCknv"]},{"workflow":"MER Results","matchPeriodOn":{"test":"^[0-9]{4}Q[1-4]$","comparator":"gte","value":"2016Q3"},"dataSets":["sCar694kKxH","j9bKklpTDBZ","ZaV4VSLstg7","vvHCWnhULAf","gZ1FgiGUlSj","xBRAscSmemV","VWdBdkfYntI"]}]'
-
 # Set the app to download and where to get it
 app_key='user-management'
 app_new_version='1.1.0'
@@ -31,6 +25,45 @@ app_folderName="$( dhis_api --quiet --api-request='apps' --quiet| jq --raw-outpu
 
 # Only proceed if the new version is different than the existing version
 if [[ $app_new_version != "$app_version" ]]; then
+  # Download data store
+  rm --force "/tmp/${app_folderName}_i18n.json"
+  rm --force "/tmp/${app_folderName}_stores.json"
+
+  app_store_i18n_dl=$(
+    curl "https://github.com/mpossumatoctc/datim-user-management/raw/schema-refactor/data/dataStore/datim-user-management/i18n.json" \
+      --silent \
+      --location \
+      --connect-timeout "30" \
+      --max-time "120" \
+      --header 'Accept: application/octet-stream' \
+      --output "/tmp/${app_folderName}_i18n.json" \
+      --write-out "%{http_code}"
+  )
+
+  app_store_stores_dl=$(
+    curl "https://github.com/mpossumatoctc/datim-user-management/raw/schema-refactor/data/dataStore/datim-user-management/stores.json" \
+      --silent \
+      --location \
+      --connect-timeout "30" \
+      --max-time "120" \
+      --header 'Accept: application/octet-stream' \
+      --output "/tmp/${app_folderName}_stores.json" \
+      --write-out "%{http_code}"
+  )
+
+  # Test http response and if file size is greater than 0 bytes
+  if [[ $app_store_i18n_dl -ne 200 ]] || [[ ! -s "/tmp/${app_folderName}_i18n.json" ]]; then
+    echo "ERROR: Unable to download i18n data store, exiting..." >&2
+    rm --force "/tmp/${app_folderName}_i18n.json" &>/dev/null
+    exit 1
+  fi
+
+  # Test http response and if file size is greater than 0 bytes
+  if [[ $app_store_stores_dl -ne 200 ]] || [[ ! -s "/tmp/${app_folderName}_stores.json" ]]; then
+    echo "ERROR: Unable to download stores data store, exiting..." >&2
+    rm --force "/tmp/${app_folderName}_stores.json" &>/dev/null
+    exit 1
+  fi
 
   # Download app as zip
   rm --force "/tmp/${app_folderName}.zip"
@@ -78,8 +111,14 @@ if [[ $app_new_version != "$app_version" ]]; then
       --api-request='apps' \
       --request='POST'
 
+  # Update Data Store
+  curl -X POST -H "Content-Type: application/json" -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/dataStore/datim-user-management/i18n" --data "@/tmp/${app_folderName}_i18n.json"
+  curl -X POST -H "Content-Type: application/json" -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/dataStore/datim-user-management/stores" --data "@/tmp/${app_folderName}_stores.json"
+
   # Cleanup
   rm --force "/tmp/${app_folderName}.zip"
+  rm --force "/tmp/${app_folderName}_i18n.json"
+  rm --force "/tmp/${app_folderName}_stores.json"
 
   # Clear cache
   dhis_api --request="POST" --api-request="maintenance/cache"
