@@ -97,7 +97,6 @@ function userService($q, Restangular, userUtils, schemaService, errorHandler, da
         Object.keys(dataEntryService.dataEntryRoles)
             .filter(function (dataEntryKey) { return dataEntryService.dataEntryRoles[dataEntryKey] === true; })
             .forEach(function (dataEntryKey) {
-                var dataEntryRoles = schemaService.store.get('')
                 var dataEntryUserRoles = dataEntryRestrictions[user.userType.name][dataEntryKey] || [];
                 dataEntryUserRoles.forEach(function (dataEntryUserRole) {
                     var userRoleId = dataEntryUserRole.userRoleId;
