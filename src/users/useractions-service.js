@@ -83,7 +83,7 @@ function userActionsService(Restangular, $q, errorHandler, dataEntryService, sch
         var availableActions = userActionsStore.actions[getPreferredNameFormat(userType)] || [];
 
         return actions.filter(function (action) {
-            return action.userRoleId && ((availableActions.indexOf(action.name) >= 0) || action.default);
+            return action.userRoleId && (availableActions.indexOf(action.name) >= 0);
         });
     }
 
