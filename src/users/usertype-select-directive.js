@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').directive('selectUsertype', userTypeSelectDirective);
 
-function userTypeSelectDirective(schemaService, errorHandler, $q) {
+function userTypeSelectDirective(schemaService, errorHandler, $q, _) {
     var directive = {
         restrict: 'E',
         replace: true,
@@ -56,6 +56,8 @@ function userTypeSelectDirective(schemaService, errorHandler, $q) {
                         // TODO: check "partners" variable for data?
                     }
                 });
+
+                scope.selectbox.items = _.sortBy(scope.selectbox.items, 'name');
             });
         }
     }
