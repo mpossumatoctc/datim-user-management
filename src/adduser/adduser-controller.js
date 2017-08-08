@@ -268,6 +268,14 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         vm.userInviteObject.userCredentials.userRoles = vm.userInviteObject.userCredentials.userRoles.concat(dataEntryRoles);
     }
 
+    function renameProperty(from, to) {
+        return function (item) {
+            item[to] = item[from];
+            delete item[from];
+            return item;
+        };
+    }
+
     function getUserManagerDataAccessGroups() {
         return _.chain(vm.dataGroups)
             .map('userGroups')
