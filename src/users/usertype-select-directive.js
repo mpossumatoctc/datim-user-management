@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').directive('selectUsertype', userTypeSelectDirective);
 
-function userTypeSelectDirective(schemaService, errorHandler) {
+function userTypeSelectDirective(schemaService, errorHandler, $q) {
     var directive = {
         restrict: 'E',
         replace: true,
@@ -34,29 +34,26 @@ function userTypeSelectDirective(schemaService, errorHandler) {
         function loadValues(orgUnit) {
             scope.selectbox.items = [];
 
-            schemaService.store.get('Interagency Groups', orgUnit).then(function (interAgency) {
-                scope.userTypes.forEach(function (item) {
-                    if (item.name === 'Inter-Agency' &&
-                        (interAgency.userUserGroup || interAgency.userUserGroup)) {
-                        scope.selectbox.items.push(item);
-                    }
-                });
-            });
+            $q.all([
+                schemaService.store.get('Interagency Groups', orgUnit),
+                schemaService.store.get('Agencies in Organisation', orgUnit),
+                schemaService.store.get('Partners in Organisation', orgUnit)
+            ]).then(function (results) {
+                var interAgency = results[0];
+                var agencies = results[1];
+                var partners = results[2];
 
-            // TODO: This looks like a bug?  getAgencies but do nothing with them?
-            schemaService.store.get('Agencies in Organisation', orgUnit).then(function () {
                 scope.userTypes.forEach(function (item) {
                     if (item.name === 'Agency') {
                         scope.selectbox.items.push(item);
+                        // TODO: check "agencies" variable for data?
                     }
-                });
-            });
-
-            // TODO: This looks like a bug?  getPartners but do nothing with them?
-            schemaService.store.get('Partners in Organisation', orgUnit).then(function () {
-                scope.userTypes.forEach(function (item) {
-                    if (item.name === 'Partner') {
+                    else if (item.name === 'Inter-Agency' && interAgency && (interAgency.userUserGroup || interAgency.userUserGroup)) {
                         scope.selectbox.items.push(item);
+                    }
+                    else if (item.name === 'Partner') {
+                        scope.selectbox.items.push(item);
+                        // TODO: check "partners" variable for data?
                     }
                 });
             });

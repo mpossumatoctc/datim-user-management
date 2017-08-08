@@ -137,7 +137,7 @@
         },
         "isDataEntryApplicableToUser": {
             "args": [ "entryName", "userEntity" ],
-            "fn": "(entryName === 'SI DOD' && userEntity.dodEntry) || (entryName === 'SI' && userEntity.normalEntry) || (entryName !== 'SI' && entryName !== 'SI DOD')"
+            "fn": "(entryName === 'SI DOD' && userEntity && userEntity.dodEntry) || (entryName === 'SI' && userEntity && userEntity.normalEntry) || (entryName !== 'SI' && entryName !== 'SI DOD')"
         },
         "getDataStreamKey": {
             "args": [ "dataEntryName" ],
