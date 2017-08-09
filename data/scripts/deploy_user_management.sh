@@ -14,7 +14,7 @@ source dhis_config
 
 # Set the app to download and where to get it
 app_key='user-management'
-app_new_version='1.1.0'
+app_new_version='1.1.2'
 app_new_url="https://github.com/mpossumatoctc/datim-user-management/raw/schema-refactor/releases/${app_new_version}/user-management.zip"
 
 # Gather information about existing version of the app; folderName ensures
@@ -112,6 +112,8 @@ if [[ $app_new_version != "$app_version" ]]; then
       --request='POST'
 
   # Update Data Store
+  curl -X DELETE -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/dataStore/datim-user-management/i18n"
+  curl -X DELETE -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/dataStore/datim-user-management/stores"
   curl -X POST -H "Content-Type: application/json" -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/dataStore/datim-user-management/i18n" --data "@/tmp/${app_folderName}_i18n.json"
   curl -X POST -H "Content-Type: application/json" -u "${DHIS_USERNAME:?}:${DHIS_PASSWORD:?}" "${DHIS_BASEURL:?}/api/dataStore/datim-user-management/stores" --data "@/tmp/${app_folderName}_stores.json"
 
