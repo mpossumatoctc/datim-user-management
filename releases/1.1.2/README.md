@@ -1,4 +1,4 @@
-# DATIM User Management v1.1.1
+# DATIM User Management v1.1.2
 
 Version 1.1.0 introduces the ability to configure the backend store that delivers the data to the application.
 
