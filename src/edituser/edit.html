@@ -74,8 +74,8 @@
                         <ul class="checkbox-group">
                             <li ng-repeat="action in editUser.actions">
                                 <input ng-model="user.userActions[action.name]"
-                                       ng-checked="action.hasAction"
-                                       ng-disabled="(action.default && action.hasAction) || editUser.isUserManager" id="userActions[{{::action.name}}]"
+                                       ng-checked="action.hasAction || action.default"
+                                       ng-disabled="(action.default) || editUser.isUserManager" id="userActions[{{::action.name}}]"
                                        name="userActions[{{::action.name}}]"
                                        type="checkbox">
                                 <label for="userActions[{{::action.name}}]">

@@ -127,9 +127,6 @@ function userUtilsService(errorHandler) {
         throwWhenNotArray(allActions, 'allActions');
 
         return _.chain(allActions)
-            .filter(function (action) {
-                return action.default && !includeDefaults ? false : true;
-            })
             .map(function (value) {
                 return value.name;
             })

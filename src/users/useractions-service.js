@@ -4,13 +4,13 @@ angular.module('PEPFAR.usermanagement').factory('userActionsService', userAction
 function userActionsService(Restangular, $q, userTypesService,
                             currentUserService, errorHandler, dataEntryService) {
     var availableAgencyActions = [
-        'Accept data', 'Submit data'
+        'Read data', 'Accept data', 'Submit data', 'View unapproved data'
     ];
     var availableInterAgencyActions = [
-        'Accept data', 'Submit data'
+        'Read data', 'Accept data', 'Submit data'
     ];
     var availablePartnerActions =  [
-        'Submit data'
+        'Read data', 'Submit data'
     ];
 
     /**
@@ -20,7 +20,8 @@ function userActionsService(Restangular, $q, userTypesService,
         {name: 'Accept data', userRole: 'Data Accepter', userRoleId: undefined},
         {name: 'Submit data', userRole: 'Data Submitter', userRoleId: undefined},
         {name: 'Manage users', userRole: 'User Administrator', userRoleId: undefined, userGroupRestriction: true},
-        {name: 'Read data', userRole: 'Read Only', userRoleId: undefined, default: true}
+        {name: 'Read data', userRole: 'Read Only', userRoleId: undefined, default: true},
+        {name: "View unapproved data", userRole: "Unapproved Data Viewer", userRoleId: undefined, default: true }
     ];
 
     /**
@@ -219,7 +220,7 @@ function userActionsService(Restangular, $q, userTypesService,
         var availableActions = getAvailableActionsForUserType(userType);
 
         return actions.filter(function (action) {
-            return action.userRoleId && ((availableActions.indexOf(action.name) >= 0) || action.default);
+            return action.userRoleId && (availableActions.indexOf(action.name) >= 0);
         });
     }
 
