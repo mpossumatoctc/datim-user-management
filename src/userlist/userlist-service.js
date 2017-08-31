@@ -1,8 +1,9 @@
 angular.module('PEPFAR.usermanagement').factory('userListService', userListService);
 
-function userListService(Restangular, paginationService, errorHandler, webappManifest) {
+function userListService($q, Restangular, paginationService, errorHandler, webappManifest) {
     var fields = ['id', 'firstName', 'surname', 'email', 'organisationUnits[name,displayName,id]', 'userCredentials[username,disabled,userRoles[id,name,displayName]]', 'userGroups[name,displayName,id]'];
     var filters = [];
+    var pendingRequest = null;
 
     return {
         getList: getList,
@@ -16,11 +17,26 @@ function userListService(Restangular, paginationService, errorHandler, webappMan
     };
 
     function getList() {
+        if (pendingRequest) {
+            pendingRequest.resolve();
+        }
+
+        pendingRequest = $q.defer();
+
         return Restangular.one('users')
+            .withHttpConfig({ timeout: pendingRequest.promise })
             .get(getRequestParams())
+            .then(function (data) {
+                pendingRequest = null;
+                return data;
+            })
             .then(setPagination)
             .then(extractUsers)
-            .catch(errorHandler.errorFn('Unable to get the list of users from the server'));
+            .catch(function (err) {
+                if (err && err.status !== 0) {
+                    errorHandler.error('Unable to get the list of users from the server');
+                }
+            });
     }
 
     function setPagination(response) {

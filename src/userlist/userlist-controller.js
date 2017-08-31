@@ -86,6 +86,10 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
     }
 
     function setUserList(users) {
+        if (users === null || users === undefined) {
+            return; // this was from a timeout, take no action
+        }
+
         vm.listIsLoading = false;
         resetSelectedUsers();
         vm.users = users;
