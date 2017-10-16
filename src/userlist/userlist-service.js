@@ -57,7 +57,7 @@ function userListService($q, Restangular, paginationService, errorHandler, webap
             page: paginationService.getCurrentPage(),
             pageSize: paginationService.getPageSize(),
             filter: filters,
-            manage: 'true'
+            canManage: 'true'
         };
     }
 

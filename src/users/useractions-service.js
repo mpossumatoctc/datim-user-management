@@ -73,7 +73,7 @@ function userActionsService(Restangular, $q, errorHandler, dataEntryService, sch
         }
 
         return _.filter(actions, function (action) {
-            return _.filter(currentUserUserRoles, function (userRole) {
+            return action.default === true || _.filter(currentUserUserRoles, function (userRole) {
                 return action.userRoleId === userRole.id;
             }).length;
         });
