@@ -59,7 +59,8 @@
         { "name": "Global", "regex": "^Global users" },
         { "name": "Inter-Agency", "value": "Country team", "regex": "^OU .+? Country team$" },
         { "name": "Agency", "regex": "^OU .+? Agency " },
-        { "name": "Partner", "regex": "^OU .+? Partner " }
+        { "name": "Partner", "regex": "^OU .+? Partner " },
+        { "name": "MOH", "regex": "^Data MOH access$" }
     ],
     "extend": {
         "fromUser": {
@@ -90,7 +91,8 @@
         "actions": {
             "Agency": [ "Read Data", "View unapproved data", "Accept data", "Submit data" ],
             "Inter-Agency": [ "Read Data", "Accept data", "Submit data" ],
-            "Partner": [ "Read Data", "Submit data" ]
+            "Partner": [ "Read Data", "Submit data" ],
+            "Moh": [ "Read Data" ]
         },
         "dataEntryRestrictions": {
             "normal": {
@@ -157,7 +159,8 @@
         { "name": "SI" },
         { "name": "EA" },
         { "name": "SIMS" },
-        { "name": "SIMS Key Populations" }
+        { "name": "SIMS Key Populations" },
+        { "name": "MOH" }
     ],
     "extend": {
         "getNames": {
@@ -205,6 +208,10 @@
         "fromUser": {
             "args": [ "user" ],
             "fn": "this.map(function (dg) { return _.assign(_.clone(dg), this.extendFromUser(dg, user)); }.bind(this))"
+        },
+        "filterByUserType": {
+            "args": [ "dataGroups", "userType" ],
+            "fn": "dataGroups.filter(function (dg) { return userType === 'MOH' ? dg.name === 'MOH' : dg.name !== 'MOH'; })"
         }
     },
     "filter": [

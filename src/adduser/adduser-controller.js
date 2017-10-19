@@ -212,6 +212,11 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function addUserGroupsForMechanismsAndUsers() {
         //Add the all mechanisms group from the user entity
+        var userType = getUserType();
+        if (userType === 'MOH') {
+            return true;
+        }
+
         if (userEntityHasValidUserGroups()) {
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
             vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
@@ -308,10 +313,14 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             return 'Please check if you selected a user type';
         }
         if (!$scope.user.userEntity) {
-            if (getUserType() === 'Partner') {
-                return 'Please check if you selected a ' + getUserType();
+            var userType = getUserType();
+            if (userType === 'MOH') { }
+            else if (userType === 'Partner') {
+                return 'Please check if you selected a ' + userType;
             }
-            return 'Please check if you selected an ' + getUserType();
+            else {
+                return 'Please check if you selected an ' + userType;
+            }
         }
         if (!$scope.user.email) {
             return 'Please check if you entered an e-mail address';

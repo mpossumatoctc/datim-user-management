@@ -60,7 +60,15 @@ function userUtilsService(userActionsService, errorHandler) {
                 }));
             });
         }
-        return dataGroups || [];
+
+        if (!dataGroups) {
+            return [];
+        }
+        else if (dataGroups.filterByUserType) {
+            return dataGroups.filterByUserType(dataGroups, userType) || [];
+        }
+
+        return dataGroups;
     }
 
     function getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType) {

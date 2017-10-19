@@ -51,7 +51,7 @@ function userTypeSelectDirective(schemaService, errorHandler, $q, _) {
                     else if (item.name === 'Inter-Agency' && interAgency && (interAgency.userUserGroup || interAgency.userUserGroup)) {
                         scope.selectbox.items.push(item);
                     }
-                    else if (item.name === 'Partner') {
+                    else if (item.name !== 'Global') {
                         scope.selectbox.items.push(item);
                         // TODO: check "partners" variable for data?
                     }
