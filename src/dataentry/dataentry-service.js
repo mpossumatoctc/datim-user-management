@@ -43,7 +43,7 @@ function dataEntryService() {
             }
         });
 
-        Object.keys(this.userActions.dataEntryRestrictions[userType])
+        Object.keys(this.userActions.dataEntryRestrictions[userType] || {})
             .forEach(function (name) {
                 // TODO: Verify - original logic also discriminated against userType
                 var isApplicable = this.userActions.isDataEntryApplicableToUser(name, userEntity);

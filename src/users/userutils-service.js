@@ -46,6 +46,10 @@ function userUtilsService(userActionsService, errorHandler) {
 
     function getDataGroupsForUserType(dataGroups, getUserType) {
         var userType = getUserType();
+
+        var filteredDataGroups = dataGroups;
+        var filterByUserTypeFn = dataGroups.filterByUserType;
+
         if (userType === 'Partner') {
             errorHandler.debug('Partner type found - cleaning groups');
 
@@ -53,7 +57,7 @@ function userUtilsService(userActionsService, errorHandler) {
             var managerRoles = _.chain(userActions.dataEntryRestrictionsUserManager[userType] || {}).values().flatten().value();
             var allRoleNames = _.indexBy(normalRoles.concat(managerRoles), 'name');
 
-            return (dataGroups || []).filter(function (dataGroup) {
+            filteredDataGroups = (dataGroups || []).filter(function (dataGroup) {
                 var roles = dataGroup.userRoles || [];
                 return (roles.length === 0 || roles.every(function (dataGroupRole) {
                     return !!allRoleNames[dataGroupRole.name];
@@ -61,14 +65,14 @@ function userUtilsService(userActionsService, errorHandler) {
             });
         }
 
-        if (!dataGroups) {
+        if (!filteredDataGroups) {
             return [];
         }
-        else if (dataGroups.filterByUserType) {
-            return dataGroups.filterByUserType(dataGroups, userType) || [];
+        else if (filterByUserTypeFn) {
+            return filterByUserTypeFn(filteredDataGroups, userType) || [];
         }
 
-        return dataGroups;
+        return filteredDataGroups;
     }
 
     function getDataEntryStreamNamesForUserType(currentUser, userActions, getUserType) {
