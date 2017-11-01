@@ -59,8 +59,7 @@
         { "name": "Global", "regex": "^Global users" },
         { "name": "Inter-Agency", "value": "Country team", "regex": "^OU .+? Country team$" },
         { "name": "Agency", "regex": "^OU .+? Agency " },
-        { "name": "Partner", "regex": "^OU .+? Partner " },
-        { "name": "MOH", "regex": "^Data MOH access$" }
+        { "name": "Partner", "regex": "^OU .+? Partner " }
     ],
     "extend": {
         "fromUser": {
@@ -92,8 +91,7 @@
             "Global": [ "Read Data", "Accept data", "Submit data", "Manage users" ],
             "Agency": [ "Read Data", "View unapproved data", "Accept data", "Submit data" ],
             "Inter-Agency": [ "Read Data", "Accept data", "Submit data" ],
-            "Partner": [ "Read Data", "Submit data" ],
-            "Moh": [ "Read Data" ]
+            "Partner": [ "Read Data", "Submit data" ]
         },
         "dataEntryRestrictions": {
             "normal": {
@@ -157,20 +155,15 @@
     "name": "Data Groups Definition",
     "type": "static",
     "config": [
-        { "name": "SI", "userTypes": [ "Agency", "Inter-Agency", "Partner" ] },
-        { "name": "EA", "userTypes": [ "Agency", "Inter-Agency", "Partner" ] },
-        { "name": "SIMS", "userTypes": [ "Agency", "Inter-Agency", "Partner" ] },
-        { "name": "SIMS Key Populations", "userTypes": [ "Agency", "Inter-Agency", "Partner" ] },
-        { "name": "MOH", "userTypes": [ "Agency", "Inter-Agency", "MOH" ] }
+        { "name": "SI" },
+        { "name": "EA" },
+        { "name": "SIMS" },
+        { "name": "SIMS Key Populations" }
     ],
     "extend": {
         "getNames": {
             "args": [ "prefix", "suffix" ],
             "fn": "this.map(function (dg) { return [prefix, dg.name, suffix].join(' ').trim(); })"
-        },
-        "getUserTypes": {
-            "args": [ "dataGroupName" ],
-            "fn": "(this.filter(function (dg) { return dg.name === dataGroupName; })[0] || {}).userTypes"
         }
     }
 }, {
@@ -213,10 +206,6 @@
         "fromUser": {
             "args": [ "user" ],
             "fn": "this.map(function (dg) { return _.assign(_.clone(dg), this.extendFromUser(dg, user)); }.bind(this))"
-        },
-        "filterByUserType": {
-            "args": [ "dataGroups", "userType" ],
-            "fn": "dataGroups.filter(function (dg) { var userTypes = requires['Data Groups Definition'].getUserTypes(dg.name); return !userType || !userTypes || userTypes.indexOf(userType) !== -1; })"
         }
     },
     "filter": [
