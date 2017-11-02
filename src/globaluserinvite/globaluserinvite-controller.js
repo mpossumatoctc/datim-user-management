@@ -6,8 +6,10 @@ function globalUserInviteController(dataGroups, currentUser,
     var vm = this;
 
     vm.getGlobalInviteObject = function () {
+        var actions = userActions.getActionsForUserType('Global');
+
         var userObject = userService.getUserInviteObject(
-            vm.user, dataGroups, userActions.actions, currentUser.organisationUnits, {}
+            vm.user, dataGroups, actions, currentUser.organisationUnits, {}
         );
 
         userObject.addEntityUserGroup(userGroups.userUserGroup);

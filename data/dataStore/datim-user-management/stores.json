@@ -76,7 +76,7 @@
             { "name": "Read Data", "userRole": "Read Only", "default": true },
             { "name": "Accept data", "userRole": "Data Accepter" },
             { "name": "Submit data", "userRole": "Data Submitter" },
-            { "name": "Manage user", "userRole": "User Administrator", "userGroupRestriction": true },
+            { "name": "Manage users", "userRole": "User Administrator", "userGroupRestriction": true },
             { "name": "View unapproved data", "userRole": "Unapproved Data Viewer", "default": true },
             { "name": "Data Deduplication", "userRole": "Data Deduplication" },
             { "name": "Data Entry EA", "userRole": "Data Entry EA" },
@@ -88,9 +88,10 @@
             { "name": "Tracker", "userRole": "Tracker" }
         ],
         "actions": {
-            "Agency": [ "Read Data", "View unapproved data", "Accept data", "Submit data" ],
-            "Inter-Agency": [ "Read Data", "Accept data", "Submit data" ],
-            "Partner": [ "Read Data", "Submit data" ]
+            "Global": [ "Read Data", "Accept data", "Submit data", "Manage users" ],
+            "Agency": [ "Read Data", "View unapproved data", "Accept data", "Submit data", "Manage users" ],
+            "Inter-Agency": [ "Read Data", "Accept data", "Submit data", "Manage users" ],
+            "Partner": [ "Read Data", "Submit data", "Manage users" ]
         },
         "dataEntryRestrictions": {
             "normal": {
