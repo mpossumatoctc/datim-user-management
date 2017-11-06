@@ -195,8 +195,9 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
     }
 
-    function addDimensionConstraintForType() {
-        if (getUserType() !== 'Inter-Agency') {
+    function addDimensionConstraintForType(dataGroups) {
+        var userType = getUserType();
+        if (userType !== 'Inter-Agency' && userType !== 'MOH') {
             vm.userInviteObject.addDimensionConstraint(dimensionConstraint);
         }
     }
