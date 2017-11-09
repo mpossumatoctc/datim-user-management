@@ -138,7 +138,7 @@ function dataEntryDirective() {
                     return userRole.id;
                 });
 
-                Object.keys(vm.userActions.dataEntryRestrictions[vm.userType]).forEach(function (dataEntryName) {
+                Object.keys(vm.userActions.dataEntryRestrictions[vm.userType] || {}).forEach(function (dataEntryName) {
                     var hasEntryRolesRequired = vm.userActions.dataEntryRestrictions[vm.userType][dataEntryName].every(function (expectedRole) {
                         return userRoleIds.indexOf(expectedRole.userRoleId) >= 0;
                     });

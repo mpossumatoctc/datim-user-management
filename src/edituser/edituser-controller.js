@@ -19,6 +19,7 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     vm.userEntityName = '';
     vm.isUserManager = userUtils.hasUserAdminRights(userToEdit);
 
+    vm.hasUserManagerRole = hasUserManagerRole;
     vm.validateDataGroups = validateDataGroups;
     vm.isRequiredDataStreamSelected = isRequiredDataStreamSelected;
     vm.editUser = editUser;
@@ -51,7 +52,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         dataEntryService.reset();
 
         schemaService.store.get('Data Groups').then(function (dataGroups) {
-                return dataGroups.fromUser(userToEdit);
+                var dataGroupsFromUser = dataGroups.fromUser(userToEdit);
+                schemaService.helpers.cloneFunctions(dataGroups, dataGroupsFromUser);
+                return dataGroupsFromUser;
             })
             .then(correctUserRolesForType)
             .then(createDataGroupsObject);
@@ -108,6 +111,10 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
 
     function updateDataEntry(streamName) {
         userUtils.updateDataEntry(getUserType(), userActions, streamName, $scope);
+    }
+
+    function hasUserManagerRole() {
+        return userActions.hasManageUsersAction(getUserType());
     }
 
     function validateDataGroups() {
@@ -306,7 +313,9 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
     }
 
     function getDataGroupsForUserType(dataGroups) {
-        return userUtils.getDataGroupsForUserType(dataGroups, getUserType);
+        var validGroups = userUtils.getDataGroupsForUserType(dataGroups, getUserType) || [];
+        schemaService.helpers.cloneFunctions(dataGroups, validGroups);
+        return validGroups;
     }
 
     function getUserManagerDataEntryRoles() {

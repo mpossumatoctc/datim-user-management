@@ -27,6 +27,7 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
     //Methods
     vm.addUser = addUser;
     vm.validateDataGroups = validateDataGroups;
+    vm.hasUserManagerRole = hasUserManagerRole;
     vm.getUserManagerRoles = getUserManagerRoles;
     vm.getUserManagerDataAccessGroups = getUserManagerDataAccessGroups;
     vm.checkAllBoxesForUserManager = checkAllBoxesForUserManager;
@@ -178,6 +179,10 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             [getCurrentOrgUnit()],
             userActions.dataEntryRestrictions
         );
+    }
+
+    function hasUserManagerRole() {
+        return userActions.hasManageUsersAction(getUserType());
     }
 
     function checkAllBoxesForUserManager() {

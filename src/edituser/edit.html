@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="form-controls-wrap row">
+            <div class="form-controls-wrap row" ng-if="editUser.hasUserManagerRole()">
                 <div class="col-sm-12">
                     <label for="usermanager">
                         <input id="usermanager" type="checkbox" ng-value="false" ng-model="editUser.isUserManager" ng-change="editUser.checkAllBoxesForUserManager()">

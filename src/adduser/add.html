@@ -20,7 +20,7 @@
         <locale-select user="user" required="true"></locale-select>
     </div>
 
-    <div class="form-controls-wrap row">
+    <div class="form-controls-wrap row" ng-show="addUser.hasUserManagerRole()">
         <div class="col-sm-12">
             <label for="usermanager">
                 <input id="usermanager" type="checkbox" ng-value="false" ng-model="addUser.isUserManager" ng-change="addUser.checkAllBoxesForUserManager()">

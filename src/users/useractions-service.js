@@ -51,6 +51,7 @@ function userActionsService(Restangular, $q, errorHandler, dataEntryService, sch
                     dataEntryRestrictions: dataEntryRestrictions,
                     dataEntryRestrictionsUserManager: dataEntryRestrictionsUserManager,
                     getDataEntryRestrictionDataGroups: getDataEntryRestrictionDataGroups,
+                    hasManageUsersAction: hasManageUsersAction,
                     getActionsForUserType: getActionsForUserType,
                     getActionsForUser: getActionsForUser,
                     getUserRolesForUser: getUserRolesForUser,
@@ -77,6 +78,11 @@ function userActionsService(Restangular, $q, errorHandler, dataEntryService, sch
                 return action.userRoleId === userRole.id;
             }).length;
         });
+    }
+
+    function hasManageUsersAction(userType) {
+        var availableActions = userActionsStore.actions[getPreferredNameFormat(userType)] || [];
+        return availableActions.indexOf('Manage users') !== -1;
     }
 
     function getActionsForUserType(userType) {
