@@ -60,6 +60,11 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
                     $scope.user.userEntity = interAgencyUserGroups;
                 });
             }
+            else if (newVal.name === 'MOH') {
+                schemaService.store.get('MOH Groups', getCurrentOrgUnit()).then(function (mohUserGroups) {
+                    $scope.user.userEntity = mohUserGroups;
+                });
+            }
 
             vm.dataGroups = getDataGroupsForUserType(dataGroups);
             $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);

@@ -93,7 +93,7 @@
             "Agency": [ "Read Data", "View unapproved data", "Accept data", "Submit data", "Manage users" ],
             "Inter-Agency": [ "Read Data", "Accept data", "Submit data", "Manage users" ],
             "Partner": [ "Read Data", "Submit data", "Manage users" ],
-            "Moh": [ "Read Data" ]
+            "Moh": [ "Read Data", "Manage users" ]
         },
         "dataEntryRestrictions": {
             "normal": {
@@ -411,5 +411,17 @@
             "filter": "name:in:[Global Users,Global User Administrators,Global all mechanisms]"
         },
         "filter": "this.reduce(function (obj, ug) { var key = (ug.name === 'Global Users' ? 'userUserGroup' : (ug.name === 'Global User Administrators' ? 'userAdminUserGroup' : 'mechUserGroup')); obj[key] = ug; return obj; }, {})"
+    }
+}, {
+    "name": "MOH Groups",
+    "type": "dynamic",
+    "args": [ "organisationUnit" ],
+    "preflight": "organisationUnit && !!organisationUnit.name",
+    "config": {
+        "datamodel": "userGroups",
+        "get": {
+            "filter": "name:ilike:OU ${organisationUnit.name} user administrators"
+        },
+        "filter": "{ userAdminUserGroup: this.reduce(function (current, ug) { return (/OU .+? user administrators/i).test(ug.name) ? ug : current; }, undefined) }"
     }
 }]
