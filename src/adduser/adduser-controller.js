@@ -89,6 +89,17 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
             return;
         }
 
+        // Filter the user type list for regular MOH users
+        var currentUserType = userTypes.fromUser(currentUser);
+        if (!currentUser.hasAllAuthority() && currentUserType === 'MOH') {
+            for (var i = $scope.userTypes.length - 1; i >= 0; i--) {
+                var userType = $scope.userTypes[i];
+                if (userType.name !== 'MOH') {
+                    $scope.userTypes.splice(i, 1);
+                }
+            }
+        }
+
         $scope.user.dataGroups = createUserGroupsObjectFromDataGroups(vm.dataGroups);
 
         dataEntryService.userActions = userActions;
@@ -222,20 +233,24 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
 
     function addUserGroupsForMechanismsAndUsers() {
         //Add the all mechanisms group from the user entity
-        var userType = getUserType();
-        if (userType === 'MOH') {
-            return true;
+        var entity = $scope.user.userEntity;
+
+        var hasMechUserGroup = entity && entity.mechUserGroup && entity.mechUserGroup.id;
+        var hasUserUserGroup = entity && entity.userUserGroup && entity.userUserGroup.id;
+
+        if (hasMechUserGroup) {
+            vm.userInviteObject.addEntityUserGroup(entity.mechUserGroup);
+        }
+        if (hasUserUserGroup) {
+            vm.userInviteObject.addEntityUserGroup(entity.userUserGroup);
         }
 
-        if (userEntityHasValidUserGroups()) {
-            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.mechUserGroup);
-            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userUserGroup);
-
-            return true;
+        if (!hasMechUserGroup && !hasUserUserGroup) {
+            notify.error('User groups for mechanism and users not found on selected entity');
+            return false;
         }
-
-        notify.error('User groups for mechanism and users not found on selected entity');
-        return false;
+        
+        return true;
     }
 
     function addUserGroupForUserAdmin() {
@@ -245,14 +260,6 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         }
         notify.error('User admin group can not be found');
         return false;
-    }
-
-    function userEntityHasValidUserGroups() {
-        return $scope.user.userEntity &&
-            $scope.user.userEntity.mechUserGroup &&
-            $scope.user.userEntity.userUserGroup &&
-            $scope.user.userEntity.mechUserGroup.id &&
-            $scope.user.userEntity.userUserGroup.id;
     }
 
     function getUserManagerRoles() {

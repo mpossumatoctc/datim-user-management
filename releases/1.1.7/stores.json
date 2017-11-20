@@ -417,11 +417,19 @@
     "type": "dynamic",
     "args": [ "organisationUnit" ],
     "preflight": "organisationUnit && !!organisationUnit.name",
-    "config": {
+    "config": [{
+        "name": "userUserGroup",
         "datamodel": "userGroups",
         "get": {
-            "filter": "name:ilike:OU ${organisationUnit.name} user administrators"
+            "filter": "name:eq:OU ${organisationUnit.name} MOH Users"
         },
-        "filter": "{ userAdminUserGroup: this.reduce(function (current, ug) { return (/OU .+? user administrators/i).test(ug.name) ? ug : current; }, undefined) }"
-    }
+        "filter": "this[0]"
+    }, {
+        "name": "userAdminUserGroup",
+        "datamodel": "userGroups",
+        "get": {
+            "filter": "name:eq:OU ${organisationUnit.name} MOH User administrators"
+        },
+        "filter": "this[0]"
+    }]
 }]
