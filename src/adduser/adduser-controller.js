@@ -141,13 +141,20 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         addUserManagerUserRoles();
         addAllAvailableDataStreams();
 
-        if (verifyUserInviteObject() &&
-            addUserGroupsForMechanismsAndUsers() &&
-            addUserGroupForUserAdmin()) {
+        var showError = function () { notify.error('Unable to invite user manager'); }
 
-            sendInvite();
-        } else {
-            notify.error('Unable to invite user manager');
+        if (verifyUserInviteObject() && addUserGroupsForMechanismsAndUsers()) {
+            addUserGroupForUserAdmin(function (success) {
+                if (success) {
+                    sendInvite();
+                }
+                else {
+                    showError();
+                }
+            });
+        }
+        else {
+            showError();
         }
     }
 
@@ -253,13 +260,44 @@ function addUserController($scope, userTypes, dataGroups, currentUser, dimension
         return true;
     }
 
-    function addUserGroupForUserAdmin() {
-        if ($scope.user.userEntity.userAdminUserGroup) {
-            vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
-            return true;
+    function addUserGroupForUserAdmin(callback) {
+        if (!$scope.user.userEntity.userAdminUserGroup) {
+            notify.error('User admin group can not be found');
+            return callback(false);
         }
-        notify.error('User admin group can not be found');
-        return false;
+
+        vm.userInviteObject.addEntityUserGroup($scope.user.userEntity.userAdminUserGroup);
+
+        var userType = getUserType();
+        var applicableUserTypes = schemaService.store.get('Data Groups Definition', true)
+            .getUserTypes('MOH') || [];
+        var shouldToggle = applicableUserTypes.indexOf(userType) !== -1;
+
+        if (applicableUserTypes) {
+            schemaService.store.get('MOH Groups', getCurrentOrgUnit()).then(function (mohUserGroups) {
+                var mohGroups = Object.keys(mohUserGroups).map(function (key) { return mohUserGroups[key]; });
+                mohGroups.forEach(function (mohGroup) {
+                    if (mohGroup && mohGroup.id) {
+                        var hasGroup = vm.userInviteObject.userGroups.filter(function (g) {
+                            return g.id === mohGroup.id;
+                        }).length > 0;
+
+                        if (!hasGroup) {
+                            vm.userInviteObject.addEntityUserGroup(mohGroup);
+                        }
+                    }
+                });
+
+                callback(true);
+            }).catch(function (err) {
+                notify.error('User admin cannot get MOH group data');
+                console.log('err => ', err);
+                callback(false);
+            });
+        }
+        else {
+            callback(true);
+        }
     }
 
     function getUserManagerRoles() {

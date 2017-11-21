@@ -132,23 +132,71 @@ function editUserController($scope, $state, currentUser, dataGroups, dataGroupsS
         userToEdit.userCredentials.userRoles = userActions.combineSelectedUserRolesWithExisting(vm.userToEdit, vm.user, vm.dataGroups, vm.actions, getUserType());
         userToEdit.userGroups = userGroups;
 
-        fixUserManagementRole();
-        addExtraUserManagementRoles();
+        toggleMohUserAdminGroup(function () {
+            fixUserManagementRole();
+            addExtraUserManagementRoles();
 
-        setProcessingTo(true);
+            setProcessingTo(true);
 
-        userService.updateUser(userToEdit)
-            .then(function () {
-                if ($scope.user.locale && $scope.user.locale.code) {
-                    saveUserLocale()
-                        .then(notifyUserOfSuccessfullSave)
-                        .catch(notifyUserOfFailedLocaleSave);
-                } else {
-                    notifyUserOfSuccessfullSave();
+            userService.updateUser(userToEdit)
+                .then(function () {
+                    if ($scope.user.locale && $scope.user.locale.code) {
+                        saveUserLocale()
+                            .then(notifyUserOfSuccessfullSave)
+                            .catch(notifyUserOfFailedLocaleSave);
+                    } else {
+                        notifyUserOfSuccessfullSave();
+                    }
+                })
+                .catch(errorHandler.errorFn('Failed to save user'))
+                .finally(setProcessingToFalse);
+        });
+    }
+
+    function toggleMohUserAdminGroup(callback) {
+        var userType = getUserType();
+        var orgUnit = userToEdit.organisationUnits && userToEdit.organisationUnits[0];
+
+        var applicableUserTypes = schemaService.store.get('Data Groups Definition', true)
+            .getUserTypes('MOH') || [];
+        var shouldToggle = applicableUserTypes.indexOf(userType) !== -1;
+
+        if (!shouldToggle) {
+            return callback();
+        }
+
+        schemaService.store.get('MOH Groups', orgUnit).then(function (mohUserGroups) {
+            var mohAdminGroup = mohUserGroups.userAdminUserGroup;
+            var mohUserGroup = mohUserGroups.userUserGroup;
+
+            var groupIds, groupIndex;
+
+            if (mohAdminGroup && mohAdminGroup.id) {
+                groupIds = userToEdit.userGroups.map(function (g) { return g.id; });
+                groupIndex = groupIds.indexOf(mohAdminGroup.id);
+
+                if (vm.isUserManager && groupIndex === -1) {
+                    userToEdit.userGroups.push(mohAdminGroup);
                 }
-            })
-            .catch(errorHandler.errorFn('Failed to save user'))
-            .finally(setProcessingToFalse);
+                else if (!vm.isUserManager && groupIndex > -1) {
+                    userToEdit.userGroups.splice(groupIndex, 1);
+                }
+            }
+
+            if (mohUserGroup && mohUserGroup.id) {
+                groupIds = userToEdit.userGroups.map(function (g) { return g.id; });
+                groupIndex = groupIds.indexOf(mohUserGroup.id);
+
+                if (vm.isUserManager && groupIndex === -1) {
+                    userToEdit.userGroups.push(mohUserGroup);
+                }
+                else if (!vm.isUserManager && userType !== 'MOH') {
+                    userToEdit.userGroups.splice(groupIndex, 1);
+                }
+            }
+
+            callback();
+        });
     }
 
     function fixUserManagementRole() {
