@@ -2,7 +2,7 @@ angular.module('PEPFAR.usermanagement').controller('globalUserInviteController',
 
 function globalUserInviteController(dataGroups, currentUser,
                                     userActions, userService, userGroups, notify,
-                                    $state, errorHandler) {
+                                    $state, errorHandler, _) {
     var vm = this;
 
     vm.getGlobalInviteObject = function () {
@@ -16,6 +16,11 @@ function globalUserInviteController(dataGroups, currentUser,
         userObject.addEntityUserGroup(userGroups.mechUserGroup);
 
         if (vm.user.userActions['Manage users'] === true) {
+            var manageUsersAction = _.find(userActions.actions, { name: 'Manage users' });
+            if (manageUsersAction && manageUsersAction.userRoleId) {
+                userObject.userCredentials.userRoles.push({ id: manageUsersAction.userRoleId });
+            }
+
             userObject.addEntityUserGroup(userGroups.userAdminUserGroup);
         }
 
