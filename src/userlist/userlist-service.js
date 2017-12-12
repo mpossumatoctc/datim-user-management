@@ -1,6 +1,6 @@
 angular.module('PEPFAR.usermanagement').factory('userListService', userListService);
 
-function userListService($q, Restangular, paginationService, errorHandler, webappManifest) {
+function userListService($q, Restangular, paginationService, userUtils, errorHandler, webappManifest) {
     var fields = ['id', 'firstName', 'surname', 'email', 'organisationUnits[name,displayName,id]', 'userCredentials[username,disabled,userRoles[id,name,displayName]]', 'userGroups[name,displayName,id]'];
     var filters = [];
     var pendingRequest = null;
@@ -13,7 +13,8 @@ function userListService($q, Restangular, paginationService, errorHandler, webap
         resetFilters: resetFilters,
         removeFilter: removeFilter,
         filters: filters,
-        getCSVUrl: getCSVUrl
+        getCSVUrl: getCSVUrl,
+        downloadAsCSV: downloadAsCSV
     };
 
     function getList() {
@@ -48,6 +49,71 @@ function userListService($q, Restangular, paginationService, errorHandler, webap
 
     function extractUsers(response) {
         return response.users || [];
+    }
+
+    function createCSVFromUsers(users) {
+        var actions = userUtils.getAllActions();
+        var getter = function (name, property, falseValue, trueValue) {
+            return function (user) {
+                if (!user) { return name; }
+
+                var val = typeof property === 'function' ? property(user) : user[property];
+
+                return (val ? (trueValue || val) : (falseValue || val)) || '';
+            };
+        };
+
+        var fields = [
+            getter('Last Updated', 'lastUpdated'),
+            getter('Created', 'created'),
+            getter('id', 'id'),
+            getter('First Name', 'firstName'),
+            getter('Surname', 'surname'),
+            getter('E-mail', 'email'),
+            getter('Active', function (user) { return !user.userCredentials.disabled; }, 'N', 'Y'),
+            getter('Username', 'username'),
+            getter('Account Type', '$accountType'),
+            getter('Organisations', '$orgUnits')
+        ];
+
+        return userUtils.getAllDataGroups().then(function (dataGroups) {
+            // push data group columns / getters
+            dataGroups.forEach(function (dataGroup) {
+                fields.push(getter(dataGroup.name + ' Access', function (user) {
+                    return user.$dataGroups[dataGroup.name] && user.$dataGroups[dataGroup.name].access;
+                }, 'N', 'Y'));
+
+                fields.push(getter(dataGroup.name + ' Data Entry', function (user) {
+                    return user.$dataGroups[dataGroup.name] && user.$dataGroups[dataGroup.name].entry;
+                }, 'N', 'Y'));
+            });
+
+            // push actions columns / getters
+            actions.forEach(function (action) {
+                fields.push(getter(action.name, function (user) {
+                    return user.$actions[action.name];
+                }, 'N', 'Y'));
+            });
+
+            return dataGroups;
+        }).then(function (dataGroups) {
+            var promises = users.map(function (user) {
+                return userUtils.extendUser(user, dataGroups).then(function (extended) {
+                    return fields.map(function (getter) {
+                        return getter(extended);
+                    }).join(',');
+                });
+            });
+            return $q.all(promises);
+        }).then(function (csvUserData) {
+            var headers = fields.map(function (getter) { return getter(); }).join(',');
+            var data = csvUserData.join('\r\n');
+
+            var csvBlob = new Blob([ headers, '\r\n', data ], { type: 'text/csv' });
+            var csvUrl = URL.createObjectURL(csvBlob);
+
+            FileSaver.saveAs(csvBlob, "users.csv", true);
+        });
     }
 
     function getRequestParams() {
@@ -92,6 +158,18 @@ function userListService($q, Restangular, paginationService, errorHandler, webap
         return [userEndPointUrl, getHrefQuery()].join('?');
     }
 
+    function downloadAsCSV() {
+        return Restangular.one('users')
+            .get(addExtraFieldsForCSVObject(removePagingParameters(getRequestParams())))
+            .then(extractUsers)
+            .then(createCSVFromUsers)
+            .catch(function (err) {
+                if (err && err.status !== 0) {
+                    errorHandler.error('Unable to get the list of users from the server');
+                }
+            });
+    }
+
     function getHrefQuery() {
         var queryParameters = removePagingParameters(getRequestParams());
 
@@ -127,6 +205,11 @@ function userListService($q, Restangular, paginationService, errorHandler, webap
             }
             return key;
         };
+    }
+
+    function addExtraFieldsForCSVObject(query) {
+        addExtraFieldsForCSV(query)('fields');
+        return query;
     }
 
     function removePagingParameters(queryParametersObject) {

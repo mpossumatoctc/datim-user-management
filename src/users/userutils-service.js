@@ -1,7 +1,7 @@
 /* global pick */
 angular.module('PEPFAR.usermanagement').factory('userUtils', userUtilsService);
 
-function userUtilsService(userActionsService, errorHandler) {
+function userUtilsService($q, userActionsService, schemaService, _, errorHandler) {
     var previousDataGroups;
     var previousUserActions;
 
@@ -13,6 +13,10 @@ function userUtilsService(userActionsService, errorHandler) {
     });
 
     return {
+        getAllActions: function () { return userActions.actions; },
+        getAllDataGroups: function () {
+            return schemaService.store.get('Data Groups')
+        },
         getUserRestrictionsDifference: getUserRestrictionsDifference,
         getDataGroupsForUserType: getDataGroupsForUserType,
         getDataEntryStreamNamesForUserType: getDataEntryStreamNamesForUserType,
@@ -26,7 +30,8 @@ function userUtilsService(userActionsService, errorHandler) {
         hasAdminUserGroup: hasAdminUserGroup,
         hasUserGroup: hasUserGroup,
         hasUserRole: hasUserRole,
-        hasStoredData: hasStoredData
+        hasStoredData: hasStoredData,
+        extendUser: extendUser
     };
 
     function getUserRestrictionsDifference(userRestrictionsForTypeLeft, userRestrictionsForTypeRight) {
@@ -221,6 +226,24 @@ function userUtilsService(userActionsService, errorHandler) {
 
     function hasStoredData() {
         return previousDataGroups && previousUserActions ? true : false;
+    }
+
+    function extendUser(user, dataGroups) {
+        var userType = schemaService.store.get('User Types', true).fromUser(user);
+
+        return userActions.getActionsForUser(user).then(function (actions) {
+            var userDataGroups = dataGroups.fromUser(user);
+
+            return $.extend({}, user, {
+                $orgUnits: _.pluck(user.orgnisationUnits || [], 'name').join(', '),
+                $accountType: userType,
+                $actions: actions.reduce(function ($actions, action) {
+                    $actions[action.name] = action.hasAction === true;
+                    return $actions;
+                }, {}),
+                $dataGroups: _.indexBy(userDataGroups, 'name')
+            });
+        });
     }
 
     function throwWhenNotObject(value, name) {

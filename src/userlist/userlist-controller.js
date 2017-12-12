@@ -22,6 +22,7 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
     vm.listIsLoading = false;
     vm.currentPage = 1;
     vm.pageChanged = pageChanged;
+    vm.isUserAdministrator = currentUser.hasAllAuthority() || currentUser.isUserAdministrator();
     vm.activateUser = activateUser;
     vm.deactivateUser = deactivateUser;
     vm.isProcessing = isProcessing;
@@ -43,6 +44,8 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
     vm.resetFilters = resetFilters;
     vm.canEditUser = canEditUser;
     vm.getCSVUrl = getCSVUrl;
+    vm.isDownloadingCSV = false;
+    vm.downloadAsCSV = downloadAsCSV;
     vm.setDisabledUserFilter = setDisabledUserFilter;
     vm.selectedUserMap = {};
     vm.selectedUsers = [];
@@ -348,6 +351,13 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
 
     function getCSVUrl() {
         return userListService.getCSVUrl();
+    }
+
+    function downloadAsCSV() {
+        vm.isDownloadingCSV = true;
+        userListService.downloadAsCSV().then(function () {
+            vm.isDownloadingCSV = false;
+        });
     }
 
     function setDisabledUserFilter(disabledUsersOnly) {
