@@ -71,7 +71,7 @@ function userListService($q, Restangular, schemaService, paginationService, user
         }, {});
 
         var userGroupIds = Object.keys(userGroups);
-        if (userGroupIds.length) {
+        if (!userGroupIds.length) {
             return users;
         }
 
