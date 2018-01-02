@@ -362,11 +362,16 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
             errors.push('They do not conform to a known type');
         }
 
-        (user.userGroups || []).forEach(function (userGroup) {
-            if (userGroup.access && !userGroup.access.manage) {
-                errors.push('They are a member of the "' + userGroup.name + '" group which you are not');
-            }
+        var unmanagableGroups = (user.userGroups || []).filter(function (userGroup) {
+            return !userGroup || !userGroup.access || !userGroup.access.manage;
         });
+
+        // Cannot manage ANY group
+        if (unmanagableGroups.length !== 0 && unmanagableGroups.length === user.userGroups.length) {
+            unmanagableGroups.forEach(function (userGroup) {
+                errors.push('They are a member of the "' + userGroup.name + '" group which you are not');
+            });
+        }
 
         if (!isSuperUser && user.userCredentials && user.userCredentials.userRoles) {
             var currentUserRoles = (currentUser.userCredentials && currentUser.userCredentials.userRoles) || [];
