@@ -42,7 +42,8 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
     vm.removeFilter = removeFilter;
     vm.addFilter = addFilter;
     vm.resetFilters = resetFilters;
-    vm.canEditUser = canEditUser;
+    vm.getEditDisabledReasons = getEditDisabledReasons;
+    vm.showEditDisabledReason = showEditDisabledReason;
     vm.getCSVUrl = getCSVUrl;
     vm.isDownloadingCSV = false;
     vm.downloadAsCSV = downloadAsCSV;
@@ -336,17 +337,59 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
         }
     }
 
-    function canEditUser(user) {
-        var userType = schemaService.store.get('User Types', true).fromUser(user);
+    function getEditDisabledReasons(user) {
+        var userTypes = schemaService.store.get('User Types', true);
+        var userType = userTypes.fromUser(user);
+        var currentUserType = userTypes.fromUser(currentUser);
 
-        if (currentUser.isGlobalUser() && !currentUser.hasAllAuthority() && userType !== 'Global') {
-            return false;
+        var isSuperUser = currentUser.hasAllAuthority();
+
+        var errors = [];
+
+        if (currentUser.isGlobalUser() && !isSuperUser && userType !== 'Global') {
+            errors.push('"Global" user cannot edit this "' + userType + '" user');
         }
 
-        if (user && user.id && (user.id !== currentUser.id) && userType !== 'Unknown type') {
-            return true;
+        if (currentUserType === 'MOH' && !isSuperUser && userType !== 'MOH') {
+            errors.push('"MOH" user cannot edit this "' + userType + '" user');
         }
-        return false;
+
+        if (user && user.id && user.id === currentUser.id) {
+            errors.push('You cannot edit yourself');
+        }
+
+        if (userType === 'Unknown type') {
+            errors.push('They do not conform to a known type');
+        }
+
+        (user.userGroups || []).forEach(function (userGroup) {
+            if (userGroup.access && !userGroup.access.manage) {
+                errors.push('They are a member of the "' + userGroup.name + '" group which you are not');
+            }
+        });
+
+        if (!isSuperUser && user.userCredentials && user.userCredentials.userRoles) {
+            var currentUserRoles = (currentUser.userCredentials && currentUser.userCredentials.userRoles) || [];
+            var currentUserRolesMap = _.indexBy(currentUserRoles, 'id');
+
+            user.userCredentials.userRoles.forEach(function (userRole) {
+                if (!currentUserRolesMap[userRole.id]) {
+                    errors.push('They have the role "' + userRole.name + '" which you do not');
+                }
+            });
+        }
+
+        return errors;
+    }
+
+    function showEditDisabledReason(user) {
+        var reasons = getEditDisabledReasons(user);
+        var html = 'You cannot modify this user because: <ul><li>' +
+            reasons.join('</li><li>') +
+            '</li></ul>';
+
+        toastr.warning(html, undefined, { timeOut: 0, extendedTimeOut: 0 })
+            .addClass('user-list-edituser-warning');
     }
 
     function getCSVUrl() {

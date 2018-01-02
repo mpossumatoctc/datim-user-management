@@ -1,9 +1,12 @@
 angular.module('PEPFAR.usermanagement').factory('userListService', userListService);
 
-function userListService($q, Restangular, paginationService, userUtils, errorHandler, webappManifest) {
+function userListService($q, Restangular, schemaService, paginationService, userUtils, errorHandler, webappManifest) {
     var fields = ['id', 'firstName', 'surname', 'email', 'organisationUnits[name,displayName,id]', 'userCredentials[username,disabled,userRoles[id,name,displayName]]', 'userGroups[name,displayName,id]'];
     var filters = [];
     var pendingRequest = null;
+
+    var currentUser = schemaService.store.get('Current User', true);
+    var userGroupAccessCache = {};
 
     return {
         getList: getList,
@@ -27,12 +30,13 @@ function userListService($q, Restangular, paginationService, userUtils, errorHan
         return Restangular.one('users')
             .withHttpConfig({ timeout: pendingRequest.promise })
             .get(getRequestParams())
-            .then(function (data) {
-                pendingRequest = null;
-                return data;
-            })
             .then(setPagination)
             .then(extractUsers)
+            .then(bindUserGroupAccessData)
+            .then(function (users) {
+                pendingRequest = null;
+                return users;
+            })
             .catch(function (err) {
                 if (err && err.status !== 0) {
                     errorHandler.error('Unable to get the list of users from the server');
@@ -49,6 +53,104 @@ function userListService($q, Restangular, paginationService, userUtils, errorHan
 
     function extractUsers(response) {
         return response.users || [];
+    }
+
+    function bindUserGroupAccessData(users) {
+        var userGroups = users.reduce(function (userGroups, user) {
+            ((user || {}).userGroups || []).forEach(function (userGroup) {
+                var cachedUserGroupAccess = userGroupAccessCache[userGroup.id];
+                if (cachedUserGroupAccess) {
+                    Object.assign(userGroup, cachedUserGroupAccess);
+                }
+                else {
+                    userGroups[userGroup.id] = userGroups[userGroup.id] || [];
+                    userGroups[userGroup.id].push(userGroup);
+                }
+            });
+            return userGroups;
+        }, {});
+
+        var userGroupIds = Object.keys(userGroups);
+        if (userGroupIds.length) {
+            return users;
+        }
+
+        var managedUserGroups = {};
+
+        return queryUserGroups(userGroupIds)
+            .then(setUserGroupAccessToUserGroups)
+            .then(function () {
+                return users;
+            });
+
+        function queryUserGroups(ids) {
+            console.log('querying group ids => ', ids);
+
+            return Restangular.one('userGroups')
+                .withHttpConfig({ timeout: pendingRequest.promise })
+                .get({
+                    fields: 'id,managedByGroups',
+                    paging: false,
+                    filter: 'id:in:[' + ids.join(',') + ']'
+                })
+                .then(function (data) {
+                    var userGroupData = (data || {}).userGroups || [];
+                    userGroupData.forEach(function (userGroup) {
+                        managedUserGroups[userGroup.id] = _.pluck(userGroup.managedByGroups || [], 'id');
+                    });
+
+                    var missingUserGroupIds = userGroupData.reduce(function (missingUserGroupIds, userGroup) {
+                        var missingIds = _.pluck(userGroup.managedByGroups || [], 'id')
+                            .filter(function (managedByGroup) {
+                                return !managedUserGroups[managedByGroup.id];
+                            });
+
+                        return missingUserGroupIds.concat(missingIds);
+                    }, []);
+
+                    missingUserGroupIds = _.uniq(missingUserGroupIds);
+
+                    return missingUserGroupIds.length && queryUserGroups(missingUserGroupIds);
+                });
+        }
+
+        function setUserGroupAccessToUserGroups() {
+            var currentUserGroups = _.indexBy(currentUser.userGroups || [], 'id');
+
+            userGroupIds.forEach(function (userGroupId) {
+                // Does user have this group?
+                var userGroupAccess = {
+                    access: {
+                        manage: !!currentUserGroups[userGroupId]
+                    }
+                };
+
+                if (!userGroupAccess.access.manage) {
+                    // try managed by groups
+                    var allUserGroupIds = getAllUserGroupIds(userGroupId);
+                    userGroupAccess.access.manage = allUserGroupIds.some(function (id) {
+                        return !!currentUserGroups[id];
+                    });
+                }
+
+                // cache the result
+                userGroupAccessCache[userGroupId] = userGroupAccess;
+
+                // update all the user's user groups
+                userGroups[userGroupId].forEach(function (userGroup) {
+                    Object.assign(userGroup, userGroupAccess);
+                });
+            });
+        }
+
+        function getAllUserGroupIds(id) {
+            var allUserGroupIds = (managedUserGroups[id] || [])
+                .reduce(function (all, userGroupId) {
+                    return all.concat(getAllUserGroupIds(userGroupId));
+                }, []);
+
+            return _.uniq(allUserGroupIds);
+        }
     }
 
     function createCSVFromUsers(users) {

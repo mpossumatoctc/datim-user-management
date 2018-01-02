@@ -12957,6 +12957,19 @@ button.close {
     height: 0;
   }
 }
+/* line 297, ../userlist/_userlist.sass */
+.user-list-edituser-warning {
+  width: 400px !important;
+}
+/* line 300, ../userlist/_userlist.sass */
+.user-list-edituser-warning ul {
+  padding-left: 20px !important;
+}
+/* line 303, ../userlist/_userlist.sass */
+.user-list-edituser-warning ul li {
+  color: white !important;
+}
+
 /* line 1, ../edituser/_edit.sass */
 .user-edit-header {
   position: relative;
