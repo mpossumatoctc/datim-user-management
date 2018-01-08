@@ -367,7 +367,7 @@ function userListController(userFilter, currentUser, schemaService, dataGroupsSe
         });
 
         // Cannot manage ANY group
-        if (unmanagableGroups.length !== 0 && unmanagableGroups.length === user.userGroups.length) {
+        if (!isSuperUser && unmanagableGroups.length !== 0 && unmanagableGroups.length === user.userGroups.length) {
             unmanagableGroups.forEach(function (userGroup) {
                 errors.push('They are a member of the "' + userGroup.name + '" group which you are not');
             });

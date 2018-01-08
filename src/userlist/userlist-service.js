@@ -173,7 +173,7 @@ function userListService($q, Restangular, schemaService, paginationService, user
             getter('Surname', 'surname'),
             getter('E-mail', 'email'),
             getter('Active', function (user) { return !user.userCredentials.disabled; }, 'N', 'Y'),
-            getter('Username', 'username'),
+            getter('Username', function (user) { return user.userCredentials.username; }),
             getter('Account Type', '$accountType'),
             getter('Organisations', '$orgUnits')
         ];
@@ -311,6 +311,7 @@ function userListService($q, Restangular, schemaService, paginationService, user
 
     function addExtraFieldsForCSVObject(query) {
         addExtraFieldsForCSV(query)('fields');
+        query.paging = 'false';
         return query;
     }
 

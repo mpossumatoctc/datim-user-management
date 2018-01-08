@@ -235,7 +235,7 @@ function userUtilsService($q, userActionsService, schemaService, _, errorHandler
             var userDataGroups = dataGroups.fromUser(user);
 
             return $.extend({}, user, {
-                $orgUnits: _.pluck(user.orgnisationUnits || [], 'name').join(', '),
+                $orgUnits: _.pluck(user.organisationUnits || [], 'name').join(', '),
                 $accountType: userType,
                 $actions: actions.reduce(function ($actions, action) {
                     $actions[action.name] = action.hasAction === true;
