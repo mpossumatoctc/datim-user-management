@@ -174,10 +174,7 @@ function userService($q, Restangular, userUtils, schemaService, errorHandler, da
             return actions.concat(current);
         }, actions)
         .filter(function (action) {
-            if (((selectedActions.indexOf(action.name) >= 0) || action.default === true)) {
-                return true;
-            }
-            return false;
+            return selectedActions.indexOf(action.name) >= 0;
         });
     }
 
